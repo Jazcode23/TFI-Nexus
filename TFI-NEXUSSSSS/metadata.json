@@ -1,0 +1,6 @@
+{
+  "name": "NEXUS · Gestión Integral de Talento",
+  "description": "Arquitectura de Inteligencia de Capital Humano, Talent Mapping Multidimensional, Perfiles 360°, Matriz de Competencias, Cadena de Valor de Porter y Reclutamiento Predictivo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
