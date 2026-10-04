@@ -145,27 +145,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">1. Mapa de Talento</h3>
+                <h3 className="text-base font-extrabold text-on-surface">1. Talento y Competencias</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Conexión visual interactiva entre los colaboradores, las habilidades que dominan y los puestos de trabajo.
-                </p>
-              </div>
-
-              <div
-                onClick={() => onNavigate('empleados')}
-                className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center">
-                    <span className="material-symbols-outlined">group</span>
-                  </span>
-                  <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
-                    Abrir sección &rarr;
-                  </span>
-                </div>
-                <h3 className="text-base font-extrabold text-on-surface">2. Directorio de Empleados</h3>
-                <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Fichas individuales completas, datos de contacto, supervisor, habilidades observables y registro de evaluaciones.
+                  Conexión visual interactiva entre los colaboradores, las competencias observables y los puestos de trabajo.
                 </p>
               </div>
 
@@ -181,27 +163,27 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">3. Puestos de Trabajo</h3>
+                <h3 className="text-base font-extrabold text-on-surface">2. Puestos y Perfiles (Word)</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Catálogo de cargos de la organización, responsabilidades, nivel salarial y botón para crear nuevos puestos.
+                  Catálogo con los puestos del manual y sus 12 estructuras relacionales (funciones, tareas, perfil, riesgos y estándares).
                 </p>
               </div>
 
               <div
-                onClick={() => onNavigate('value-map')}
+                onClick={() => onNavigate('empleados')}
                 className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
-                    <span className="material-symbols-outlined">schema</span>
+                  <span className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center">
+                    <span className="material-symbols-outlined">group</span>
                   </span>
                   <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">4. Cadena de Valor</h3>
+                <h3 className="text-base font-extrabold text-on-surface">3. Colaboradores</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Las 5 etapas clave de trabajo de la empresa (datos, desarrollo, operaciones, ventas y soporte) y sus responsables.
+                  Fichas individuales, datos de legajo, puesto asignado, dependencia jerárquica y competencias individuales.
                 </p>
               </div>
 
@@ -217,27 +199,45 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">5. Reclutamiento de Personal</h3>
+                <h3 className="text-base font-extrabold text-on-surface">4. Selección de Personal</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Seguimiento de candidatos por etapa (Revisión, Entrevista, Oferta) y compatibilidad con el puesto.
+                  Candidatos postulados por puesto, etapas del proceso y compatibilidad calculada con el perfil del cargo.
                 </p>
               </div>
 
               <div
-                onClick={() => onNavigate('capacitacion-upskilling')}
+                onClick={() => onNavigate('evaluacion-desempeno')}
                 className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center">
-                    <span className="material-symbols-outlined">trending_up</span>
+                  <span className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center">
+                    <span className="material-symbols-outlined">fact_check</span>
                   </span>
                   <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">6. Cursos y Capacitación</h3>
+                <h3 className="text-base font-extrabold text-on-surface">5. Evaluación de Desempeño</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Planes formativos para cerrar brechas de conocimiento y registrar el avance de cada colaborador.
+                  Calibración de potencial vs desempeño (9-Box) alineada a los estándares de desempeño definidos para el puesto.
+                </p>
+              </div>
+
+              <div
+                onClick={() => onNavigate('reportes-metricas')}
+                className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center">
+                    <span className="material-symbols-outlined">query_stats</span>
+                  </span>
+                  <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
+                    Abrir sección &rarr;
+                  </span>
+                </div>
+                <h3 className="text-base font-extrabold text-on-surface">6. Informes y Fichas</h3>
+                <p className="text-xs text-outline mt-1 leading-relaxed">
+                  Exportación de fichas oficiales del manual de puestos, actas de evaluación y resúmenes ejecutivos en PDF y Excel.
                 </p>
               </div>
             </div>

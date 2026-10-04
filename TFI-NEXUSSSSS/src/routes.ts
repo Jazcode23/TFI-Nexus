@@ -21,20 +21,18 @@ export interface NavGroup {
 
 export const MODULES: ModuleRoute[] = [
   { id: 'dashboard-ejecutivo', path: '/', title: 'Inicio', subtitle: 'Resumen e indicadores clave', icon: 'home', group: 'panorama' },
-  { id: 'talent-map', path: '/talento', title: 'Talento y Habilidades', subtitle: 'Personas, habilidades y puestos', icon: 'hub', group: 'panorama' },
-  { id: 'value-map', path: '/cadena-valor', title: 'Áreas y Actividades', subtitle: 'Áreas clave del negocio', icon: 'schema', group: 'panorama' },
-  { id: 'puestos', path: '/puestos', title: 'Puestos y Perfiles', subtitle: 'Catálogo de cargos y requisitos', icon: 'work', group: 'personas' },
-  { id: 'empleados', path: '/personas', title: 'Personas', subtitle: 'Directorio y ficha del personal', icon: 'group', group: 'personas' },
-  { id: 'reclutamiento', path: '/reclutamiento', title: 'Selección de Personal', subtitle: 'Candidatos en selección', icon: 'person_search', group: 'personas' },
-  { id: 'evaluacion-desempeno', path: '/desempeno', title: 'Desempeño', subtitle: 'Calificaciones y matriz de 9 cajas', icon: 'fact_check', group: 'crecimiento' },
-  { id: 'capacitacion-upskilling', path: '/capacitacion', title: 'Capacitación', subtitle: 'Planes de aprendizaje y avance', icon: 'trending_up', group: 'crecimiento' },
-  { id: 'reportes-metricas', path: '/reportes', title: 'Informes', subtitle: 'Informes descargables en PDF/Excel', icon: 'query_stats', group: 'crecimiento' },
+  { id: 'talent-map', path: '/talento', title: 'Talento y Competencias', subtitle: 'Personas, habilidades y criticidad', icon: 'hub', group: 'panorama' },
+  { id: 'puestos', path: '/puestos', title: 'Puestos y Perfiles', subtitle: 'Catálogo oficial (12 tablas del Word)', icon: 'work', group: 'organizacion' },
+  { id: 'empleados', path: '/personas', title: 'Colaboradores', subtitle: 'Directorio y legajos por puesto', icon: 'group', group: 'organizacion' },
+  { id: 'reclutamiento', path: '/reclutamiento', title: 'Selección de Personal', subtitle: 'Candidatos asociados a puestos', icon: 'person_search', group: 'ciclo' },
+  { id: 'evaluacion-desempeno', path: '/desempeno', title: 'Evaluación de Desempeño', subtitle: 'Matriz 9-Box y estándares del puesto', icon: 'fact_check', group: 'ciclo' },
+  { id: 'reportes-metricas', path: '/reportes', title: 'Informes y Fichas', subtitle: 'Fichas de puestos y actas oficiales', icon: 'query_stats', group: 'ciclo' },
 ];
 
 export const NAV_GROUPS: NavGroup[] = [
-  { key: 'panorama', label: 'Visión general', description: 'Panorama de la organización' },
-  { key: 'personas', label: 'Puestos y personas', description: 'Cargos, colaboradores y selección' },
-  { key: 'crecimiento', label: 'Crecimiento y resultados', description: 'Desempeño, cursos e informes' },
+  { key: 'panorama', label: 'Visión general', description: 'Panorama estratégico de la organización' },
+  { key: 'organizacion', label: 'Estructura y puestos', description: 'Modelo oficial del manual de puestos (Word)' },
+  { key: 'ciclo', label: 'Ciclo de talento', description: 'Selección, desempeño e informes oficiales' },
 ];
 
 export const SCREEN_PATHS = Object.fromEntries(

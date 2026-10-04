@@ -767,6 +767,242 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </div>
           </div>
 
+          {/* Section 6: Especificación Formal y Modelo Relacional (Diseño del Word / UTN) */}
+          <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-3xl shadow-sm border border-outline-variant/30 flex flex-col gap-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/20 pb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-primary-fixed/70 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[18px]">account_tree</span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-on-surface">
+                    6. Especificación Formal y Modelo de Puestos (Diseño Relacional del Word)
+                  </h4>
+                  <p className="text-xs text-outline">
+                    Entidades normalizadas: Unidad, Puesto, Perfil, Funciones, Tareas, Riesgos, Relaciones y Estándares
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs px-3 py-1 rounded-full bg-secondary-container/40 text-on-secondary-container font-bold">
+                Manual de Organización &bull; UTN FRT
+              </span>
+            </div>
+
+            {/* Sub-bloque A: Jerarquía y Posiciones */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <span className="text-[11px] text-outline font-bold uppercase block mb-1">
+                  Unidad Organizacional (1:N)
+                </span>
+                <span className="text-sm font-bold text-on-surface block">
+                  {selectedJob.unidad?.nombre || selectedJob.department}
+                </span>
+                <span className="text-[11px] text-outline-variant mt-1 block">
+                  Depende de: {selectedJob.unidad?.unidadSuperior?.nombre || 'Dirección General'}
+                </span>
+              </div>
+
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <span className="text-[11px] text-outline font-bold uppercase block mb-1">
+                  Puesto Superior (Recursiva 1:N)
+                </span>
+                <span className="text-sm font-bold text-on-surface block">
+                  {selectedJob.puestoSuperior?.title || selectedJob.reportsTo}
+                </span>
+                <span className="text-[11px] text-outline-variant mt-1 block">
+                  Supervisión inmediata formal
+                </span>
+              </div>
+
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <span className="text-[11px] text-outline font-bold uppercase block mb-1">
+                  Posiciones Asignadas (n_posiciones)
+                </span>
+                <span className="text-sm font-bold text-primary block">
+                  {selectedJob.nPosiciones ?? selectedJob.activeIncumbentsCount} Puesto(s) Físico(s)
+                </span>
+                <span className="text-[11px] text-outline-variant mt-1 block">
+                  Diferencia entre Puesto y Posición (Diapositiva 31)
+                </span>
+              </div>
+            </div>
+
+            {/* Sub-bloque B: Especificación del Puesto (Perfil y Responsabilidades 1:1) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Perfil (1:1) */}
+              <div className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[18px]">school</span>
+                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                    Perfil del Puesto (1:1 con PUESTO)
+                  </h5>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-outline block">Educación Formal:</span>
+                  <p className="text-xs text-on-surface mt-0.5">
+                    {selectedJob.perfil?.educacionFormal || 'Educación universitaria o técnica afín al área requerida.'}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-outline block">Experiencia Requerida:</span>
+                  <p className="text-xs text-on-surface mt-0.5">
+                    {selectedJob.perfil?.experienciaRequerida || 'Experiencia laboral demostrable en funciones del cargo.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Ficha de Responsabilidades (1:1) */}
+              <div className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary text-[18px]">inventory_2</span>
+                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                    Responsabilidad (1:1 con PUESTO)
+                  </h5>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-outline block">Manejo de Personal:</span>
+                  <p className="text-xs text-on-surface mt-0.5">
+                    {selectedJob.responsabilidadFicha?.manejoPersonal || selectedJob.supervises}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-outline block">Equipo de Trabajo:</span>
+                  <p className="text-xs text-on-surface mt-0.5">
+                    {selectedJob.responsabilidadFicha?.equipoTrabajo || selectedJob.workingConditions.tools}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-outline block">Manejo de Información:</span>
+                  <p className="text-xs text-on-surface mt-0.5">
+                    {selectedJob.responsabilidadFicha?.manejoInformacion || 'Bases de datos y documentación reservada institucional.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sub-bloque C: Funciones y Tareas Desagregadas (1:N y 1:N) */}
+            {selectedJob.funciones && selectedJob.funciones.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[18px]">format_list_numbered</span>
+                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                    Unidades de Competencia (Funciones) y Tareas (1:N)
+                  </h5>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {selectedJob.funciones.map((func, fIdx) => (
+                    <div
+                      key={func.id || fIdx}
+                      className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20"
+                    >
+                      <span className="text-xs font-bold text-primary block mb-1">
+                        Función {fIdx + 1}: {func.descripcion}
+                      </span>
+                      {func.tareas && func.tareas.length > 0 && (
+                        <div className="mt-2 flex flex-col gap-1.5 pl-2 border-l-2 border-primary/30">
+                          <span className="text-[10px] uppercase font-bold text-outline">Tareas Operativas:</span>
+                          {func.tareas.map((tar, tIdx) => (
+                            <div key={tar.id || tIdx} className="text-xs text-on-surface-variant flex items-start gap-1.5">
+                              <span className="text-primary font-bold">•</span>
+                              <span>{tar.descripcion}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sub-bloque D: Riesgos del Cargo (1:N) */}
+            {selectedJob.riesgosPuesto && selectedJob.riesgosPuesto.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-error text-[18px]">warning</span>
+                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                    Riesgos del Cargo (1:N con PUESTO)
+                  </h5>
+                </div>
+                <div className="overflow-x-auto rounded-2xl border border-outline-variant/20">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-surface-container-high text-on-surface font-bold uppercase tracking-wider text-[10px]">
+                      <tr>
+                        <th className="p-3">Tipo de Riesgo</th>
+                        <th className="p-3">Motivo / Causa</th>
+                        <th className="p-3">Consecuencia</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-outline-variant/10 bg-surface-container-low">
+                      {selectedJob.riesgosPuesto.map((r, rIdx) => (
+                        <tr key={r.id || rIdx} className="hover:bg-surface-container transition-colors">
+                          <td className="p-3 font-bold text-primary">{r.tipoRiesgo}</td>
+                          <td className="p-3 text-on-surface">{r.motivo}</td>
+                          <td className="p-3 text-on-surface-variant font-medium">{r.consecuencia}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Sub-bloque E: Relaciones de Trabajo (1:N) & Estándares de Desempeño (1:N) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Relaciones de Trabajo (1:N) */}
+              {selectedJob.relacionesPuesto && selectedJob.relacionesPuesto.length > 0 && (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary text-[18px]">share</span>
+                    <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                      Relaciones de Trabajo (1:N)
+                    </h5>
+                  </div>
+                  <div className="overflow-x-auto rounded-2xl border border-outline-variant/20">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-surface-container-high text-on-surface font-bold uppercase tracking-wider text-[10px]">
+                        <tr>
+                          <th className="p-2.5">Tipo</th>
+                          <th className="p-2.5">Puesto o Institución</th>
+                          <th className="p-2.5">Propósito</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-outline-variant/10 bg-surface-container-low">
+                        {selectedJob.relacionesPuesto.map((rel, rIdx) => (
+                          <tr key={rel.id || rIdx}>
+                            <td className="p-2.5 font-bold uppercase text-[10px] text-primary">{rel.tipo}</td>
+                            <td className="p-2.5 font-medium text-on-surface">{rel.puestoOInstitucion}</td>
+                            <td className="p-2.5 text-on-surface-variant text-[11px]">{rel.proposito}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Estándares de Desempeño (1:N) */}
+              {selectedJob.estandaresDesempeno && selectedJob.estandaresDesempeno.length > 0 && (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
+                    <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                      Estándares de Desempeño del Manual (1:N)
+                    </h5>
+                  </div>
+                  <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
+                    {selectedJob.estandaresDesempeno.map((est, eIdx) => (
+                      <div key={est.id || eIdx} className="flex items-start gap-2 text-xs text-on-surface">
+                        <span className="material-symbols-outlined text-secondary text-[16px] shrink-0">check_circle</span>
+                        <span>{est.descripcion}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Sticky Bottom Ribbon */}
           <div className="sticky bottom-4 z-30 bg-surface-container-lowest/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-outline-variant/30 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
