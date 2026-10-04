@@ -26,7 +26,7 @@ export const tokenStorage = {
   setUser: (user: any) => localStorage.setItem(USER_KEY, JSON.stringify(user)),
 };
 
-// Utilidad para descargar archivos Blob (Excel, CSV, JSON) en el navegador
+// Utilidad para descargar archivos Blob (Excel, CSV, JSON, PDF) en el navegador
 export function downloadFile(blob: Blob, filename: string) {
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -35,8 +35,13 @@ export function downloadFile(blob: Blob, filename: string) {
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  window.URL.revokeObjectURL(url);
-  document.body.removeChild(a);
+  // Retrasar la revocación para permitir que el hilo de descargas del navegador procese el archivo
+  setTimeout(() => {
+    window.URL.revokeObjectURL(url);
+    if (a.parentNode) {
+      a.parentNode.removeChild(a);
+    }
+  }, 2000);
 }
 
 // Wrapper tipado para solicitudes HTTP fetch
@@ -44,7 +49,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const token = tokenStorage.get();
   const headers = new Headers(options.headers || {});
 
-  if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+  if (options.body && !headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
   }
 
@@ -72,6 +77,8 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const contentDisposition = response.headers.get('content-disposition') || '';
   const contentType = response.headers.get('content-type') || '';
   if (
+    endpoint.includes('/export') ||
+    endpoint.includes('/pdf') ||
     contentDisposition.includes('attachment') ||
     contentType.includes('application/pdf') ||
     contentType.includes('application/vnd') ||
