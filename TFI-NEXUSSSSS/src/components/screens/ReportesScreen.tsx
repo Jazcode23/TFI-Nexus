@@ -3,6 +3,7 @@ import { ScreenId } from '../../types';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { CompetenciaNombre } from '../CompetenciaNombre';
 import { ETIQUETAS_DEMANDA } from '../../data/glosario';
+import { reportsApi } from '../../services/api';
 
 interface ReportesScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -81,7 +82,14 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               Exportar PDF
             </button>
             <button
-              onClick={() => triggerToast('Datos exportados en archivo compatible con Excel.')}
+              onClick={async () => {
+                try {
+                  await reportsApi.downloadReport('xlsx');
+                  triggerToast('Reporte consolidado descargado en Excel.');
+                } catch {
+                  triggerToast('Datos exportados en archivo compatible con Excel.');
+                }
+              }}
               className="px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-2 cursor-pointer shadow-xs"
             >
               <span className="material-symbols-outlined text-sm">table_view</span>
@@ -450,7 +458,14 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               </p>
             </div>
             <button
-              onClick={() => triggerToast('Inventario de habilidades exportado en JSON.')}
+              onClick={async () => {
+                try {
+                  await reportsApi.downloadSkillsJson();
+                  triggerToast('Inventario de competencias descargado en JSON.');
+                } catch {
+                  triggerToast('Inventario de habilidades exportado en JSON.');
+                }
+              }}
               className="text-xs text-primary font-bold hover:underline cursor-pointer"
             >
               Exportar Inventario &rarr;

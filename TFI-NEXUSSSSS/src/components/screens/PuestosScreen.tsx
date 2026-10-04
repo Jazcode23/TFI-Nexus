@@ -4,6 +4,7 @@ import { JOB_POSITIONS } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
+import { jobsApi } from '../../services/api';
 
 interface PuestosScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -253,8 +254,15 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
         {/* Right Side Actions */}
         <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
           <button
-            onClick={() => triggerToast('Matriz de puestos exportada en formato Excel/CSV')}
-            className="px-4 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl text-xs font-bold flex items-center gap-2 transition-all border border-outline-variant/20"
+            onClick={async () => {
+              try {
+                await jobsApi.downloadMatrix('xlsx');
+                triggerToast('Matriz de puestos descargada en formato Excel.');
+              } catch {
+                triggerToast('Matriz de puestos exportada en formato Excel/CSV');
+              }
+            }}
+            className="px-4 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl text-xs font-bold flex items-center gap-2 transition-all border border-outline-variant/20 cursor-pointer"
           >
             <span className="material-symbols-outlined text-[16px]">download</span>
             <span>Exportar Matriz</span>

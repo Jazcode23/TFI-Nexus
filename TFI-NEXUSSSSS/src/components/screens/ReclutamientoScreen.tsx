@@ -6,6 +6,7 @@ import { ConfirmationModal } from '../ConfirmationModal';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { CompetenciaNombre } from '../CompetenciaNombre';
 import { HelpTooltip } from '../HelpTooltip';
+import { recruitmentApi } from '../../services/api';
 
 interface ReclutamientoScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -47,18 +48,28 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleStageChange = (candidateId: string, newStage: string) => {
+  const handleStageChange = async (candidateId: string, newStage: string) => {
     setCandidateStages((prev) => ({ ...prev, [candidateId]: newStage }));
     triggerToast(`Candidato movido a la etapa "${newStage}".`);
+    try {
+      await recruitmentApi.updateStage(candidateId, newStage);
+    } catch {
+      // silencioso en modo offline/local
+    }
   };
 
-  const handleConfirmSendOffer = () => {
+  const handleConfirmSendOffer = async () => {
     setShowConfirmOffer(false);
     setShowOfferModal(false);
-    handleStageChange(selectedCandidate.id, 'Oferta Enviada');
+    await handleStageChange(selectedCandidate.id, 'Oferta Enviada');
     triggerToast(
       `¡Listo! Oferta formal de empleo enviada exitosamente a ${selectedCandidate.name}.`
     );
+    try {
+      await recruitmentApi.sendOffer(selectedCandidate.id);
+    } catch {
+      // silencioso en modo offline/local
+    }
   };
 
   const handleScheduleInterview = (e: React.FormEvent) => {

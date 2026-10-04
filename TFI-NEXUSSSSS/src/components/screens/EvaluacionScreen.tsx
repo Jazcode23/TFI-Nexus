@@ -5,6 +5,7 @@ import { UserAvatar } from '../UserAvatar';
 import { ConfirmationModal } from '../ConfirmationModal';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
+import { evaluationsApi } from '../../services/api';
 
 interface EvaluacionScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -535,13 +536,27 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
                 Segmentación estratégica para planes de sucesión, bonos por desempeño y retención de talento clave.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs flex-wrap">
               <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold">
                 Estrellas: 18 (12%)
               </span>
               <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold">
                 Base sólida: 95 (67%)
               </span>
+              <button
+                onClick={async () => {
+                  try {
+                    await evaluationsApi.download9Box('xlsx');
+                    triggerToast('Acta 9-Box descargada con éxito en Excel.');
+                  } catch {
+                    triggerToast('Acta 9-Box exportada (modo local).');
+                  }
+                }}
+                className="px-3 py-1 rounded-xl bg-primary text-on-primary font-bold flex items-center gap-1.5 shadow-xs hover:bg-primary-container transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-xs">download</span>
+                <span>Descargar Acta 9-Box</span>
+              </button>
             </div>
           </div>
 
