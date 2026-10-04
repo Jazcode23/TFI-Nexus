@@ -7,6 +7,8 @@ import { lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { ToastProvider } from './components/ToastProvider';
+import { AuthProvider } from './context/AuthContext';
+import { LoginModal } from './components/LoginModal';
 
 // Cada módulo se carga solo cuando el usuario entra (la app inicia más rápido).
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -22,21 +24,24 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
   return (
-    <ToastProvider>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="talento" element={<Talento />} />
-          <Route path="cadena-valor" element={<CadenaValor />} />
-          <Route path="puestos/:jobCode?" element={<Puestos />} />
-          <Route path="personas/:employeeId?/:action?" element={<Personas />} />
-          <Route path="reclutamiento/:jobCode?" element={<Reclutamiento />} />
-          <Route path="desempeno" element={<Desempeno />} />
-          <Route path="capacitacion" element={<Capacitacion />} />
-          <Route path="reportes" element={<Reportes />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </ToastProvider>
+    <AuthProvider>
+      <ToastProvider>
+        <LoginModal />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="talento" element={<Talento />} />
+            <Route path="cadena-valor" element={<CadenaValor />} />
+            <Route path="puestos/:jobCode?" element={<Puestos />} />
+            <Route path="personas/:employeeId?/:action?" element={<Personas />} />
+            <Route path="reclutamiento/:jobCode?" element={<Reclutamiento />} />
+            <Route path="desempeno" element={<Desempeno />} />
+            <Route path="capacitacion" element={<Capacitacion />} />
+            <Route path="reportes" element={<Reportes />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </ToastProvider>
+    </AuthProvider>
   );
 }

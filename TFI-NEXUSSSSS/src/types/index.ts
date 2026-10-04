@@ -351,3 +351,81 @@ export interface Vacante {
   vacanteHabilidades?: VacanteHabilidad[];
   postulaciones?: Postulacion[];
 }
+
+export type UserRole = 'ADMIN_HR' | 'MANAGER' | 'RECRUITER' | 'EMPLOYEE';
+
+export type Permission =
+  | 'jobs:read'
+  | 'jobs:create'
+  | 'jobs:edit'
+  | 'jobs:open_vacancy'
+  | 'employees:read'
+  | 'employees:edit'
+  | 'evaluations:read'
+  | 'evaluations:calibrate'
+  | 'training:read'
+  | 'training:enroll'
+  | 'recruitment:read'
+  | 'recruitment:manage'
+  | 'porter:read'
+  | 'porter:simulate'
+  | 'reports:read'
+  | 'reports:export';
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  employeeId?: string;
+  avatar?: string;
+  title?: string;
+  area?: string;
+}
+
+export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+  ADMIN_HR: [
+    'jobs:read',
+    'jobs:create',
+    'jobs:edit',
+    'jobs:open_vacancy',
+    'employees:read',
+    'employees:edit',
+    'evaluations:read',
+    'evaluations:calibrate',
+    'training:read',
+    'training:enroll',
+    'recruitment:read',
+    'recruitment:manage',
+    'porter:read',
+    'porter:simulate',
+    'reports:read',
+    'reports:export',
+  ],
+  MANAGER: [
+    'jobs:read',
+    'employees:read',
+    'evaluations:read',
+    'evaluations:calibrate',
+    'training:read',
+    'training:enroll',
+    'recruitment:read',
+    'porter:read',
+    'reports:read',
+    'reports:export',
+  ],
+  RECRUITER: [
+    'jobs:read',
+    'jobs:open_vacancy',
+    'employees:read',
+    'recruitment:read',
+    'recruitment:manage',
+    'reports:read',
+  ],
+  EMPLOYEE: [
+    'jobs:read',
+    'employees:read',
+    'training:read',
+    'reports:read',
+  ],
+};

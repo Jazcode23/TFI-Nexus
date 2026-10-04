@@ -5,6 +5,7 @@ import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
 import { jobsApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 interface PuestosScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -20,6 +21,7 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
   selectedJobCode = 'PUE-2026-ARCH-03',
   onChangeJobCode,
 }) => {
+  const { user, role, hasPermission, openLoginModal } = useAuth();
   const setSelectedJobCode = (code: string) => onChangeJobCode?.(code);
   const [positions, setPositions] = useState<JobPosition[]>(JOB_POSITIONS);
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,6 +81,11 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
   };
 
   const handleSaveJob = async () => {
+    if (!hasPermission('jobs:create')) {
+      triggerToast('Acción restringida: Se requiere rol de Administrador (ADMIN_HR) para crear puestos.');
+      openLoginModal();
+      return;
+    }
     if (!newTitle.trim()) {
       triggerToast('Por favor, ingresá el nombre del puesto.');
       return;
@@ -104,7 +111,13 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
       setPositions((prev) => [created, ...prev]);
       setSelectedJobCode(created.code);
       triggerToast(`¡Listo! Puesto "${created.title}" guardado en la base de datos.`);
-    } catch {
+    } catch (err: any) {
+      if (err?.message?.includes('401') || err?.message?.includes('Unauthorized')) {
+        triggerToast('Sesión no autorizada. Por favor iniciá sesión como Administrador.');
+        openLoginModal();
+        setIsSubmittingJob(false);
+        return;
+      }
       // Fallback local
       const fallbackJob: JobPosition = {
         ...jobPayload,
@@ -1160,6 +1173,24 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </div>
 
             <div className="flex flex-col gap-3.5">
+              {/* Security & Role Status Banner */}
+              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-emerald-600 text-base">verified_user</span>
+                  <div>
+                    <span className="text-on-surface font-bold block">
+                      Autorizado como: {user?.name || 'Administrador General'}
+                    </span>
+                    <span className="text-[10px] text-outline">
+                      Rol: {role} &bull; Permiso total de creación en base de datos
+                    </span>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-800">
+                  {role}
+                </span>
+              </div>
+
               <div>
                 <label className="text-xs font-bold text-on-surface block mb-1">
                   Nombre del Puesto o Cargo:

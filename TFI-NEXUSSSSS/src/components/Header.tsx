@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserAvatar } from './UserAvatar';
+import { UserProfileMenu } from './UserProfileMenu';
 
 interface HeaderProps {
   selectedCampus: string;
@@ -242,23 +243,9 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* User Profile Emblem */}
-        <div className="flex items-center gap-2 pl-1 sm:pl-2 border-l border-outline-variant/30">
-          <UserAvatar
-            name="Cordero Lucas"
-            size="sm"
-            shape="rounded"
-            showStatus={true}
-            statusColor="emerald"
-          />
-          <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-bold text-on-surface leading-tight">
-              Ing. Cordero Lucas
-            </span>
-            <span className="text-[10px] text-outline leading-tight">
-              Recursos Humanos
-            </span>
-          </div>
+        {/* User Profile & Permissions Menu */}
+        <div className="pl-1 sm:pl-2 border-l border-outline-variant/30 flex items-center">
+          <UserProfileMenu />
         </div>
       </div>
     </header>
