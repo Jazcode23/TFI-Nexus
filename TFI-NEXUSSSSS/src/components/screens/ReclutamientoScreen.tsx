@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Candidate, ScreenId } from '../../types';
-import { CANDIDATES_DATA, JOB_POSITIONS } from '../../data/mockData';
+import {
+  CANDIDATES_DATA,
+  JOB_POSITIONS,
+  VACANTES_DATA,
+  POSTULANTES_DATA,
+  HABILIDADES_DATA,
+} from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { ConfirmationModal } from '../ConfirmationModal';
 import { QuickGuideBanner } from '../QuickGuideBanner';
@@ -22,6 +28,9 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
 }) => {
   const currentJobCode = selectedJobCode;
   const setCurrentJobCode = (code: string) => onChangeJobCode?.(code);
+  const [viewMode, setViewMode] = useState<'operativo' | 'modelo_er'>('operativo');
+  const [selectedVacanteId, setSelectedVacanteId] = useState<number>(1);
+  const [selectedPostulanteId, setSelectedPostulanteId] = useState<number>(1);
   const [candidates, setCandidates] = useState<Candidate[]>(CANDIDATES_DATA);
   const [selectedCandidateId, setSelectedCandidateId] = useState<string>('mateo');
   const [filterThreshold, setFilterThreshold] = useState<number>(0);
@@ -199,7 +208,35 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
         </div>
       </div>
 
-      {/* Filter and View Controls */}
+      {/* Selector de Modo: Tablero Operativo vs Modelo ER Relacional */}
+      <div className="flex border-b border-outline-variant/30 gap-2">
+        <button
+          onClick={() => setViewMode('operativo')}
+          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+            viewMode === 'operativo'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-outline hover:text-on-surface'
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">view_kanban</span>
+          Tablero de Selección & Candidatos
+        </button>
+        <button
+          onClick={() => setViewMode('modelo_er')}
+          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
+            viewMode === 'modelo_er'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-outline hover:text-on-surface'
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">schema</span>
+          Modelo Relacional ER: Vacantes, Habilidades & Matching
+        </button>
+      </div>
+
+      {viewMode === 'operativo' ? (
+        <>
+          {/* Filter and View Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-outline uppercase">Filtrar por compatibilidad:</span>
@@ -589,6 +626,291 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
           </div>
         </div>
       </div>
+      </>
+    ) : (
+      <div className="flex flex-col gap-6">
+        {/* Banner de arquitectura ER */}
+        <div className="p-6 bg-surface-container-lowest rounded-3xl border border-primary/30 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-primary-fixed text-primary">
+                Base de Datos Supabase
+              </span>
+              <span className="text-xs text-outline font-semibold">
+                6 Tablas Relacionales Integradas
+              </span>
+            </div>
+            <h2 className="text-xl font-extrabold text-on-surface">
+              Arquitectura ER: Vacantes, Postulantes, Habilidades y Postulaciones
+            </h2>
+            <p className="text-xs text-outline mt-1 max-w-3xl">
+              Implementación exacta del diagrama relacional: cruce de habilidades requeridas en la vacante contra las habilidades declaradas por el postulante para calcular el ranking de adecuación y su justificación técnica.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-[11px] font-mono">
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface">vacante</span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface">perfil</span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface">habilidad</span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface">postulacion</span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface">vacante_habilidad</span>
+            <span className="px-2.5 py-1 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface">perfil_habilidad</span>
+          </div>
+        </div>
+
+        {/* Grid de 2 columnas: Selector de Vacante y Selector de Postulante */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Columna Izquierda: Vacante seleccionada */}
+          <div className="lg:col-span-6 flex flex-col gap-4">
+            <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-extrabold text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">work</span>
+                  1. Entidad: Vacante (<code className="text-xs font-mono">vacante</code>)
+                </h3>
+                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                  Tabla BD activa
+                </span>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-outline block mb-1">Seleccionar Vacante Activa:</label>
+                <select
+                  value={selectedVacanteId}
+                  onChange={(e) => setSelectedVacanteId(Number(e.target.value))}
+                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface font-bold text-sm outline-hidden focus:border-primary"
+                >
+                  {VACANTES_DATA.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      Vacante #{v.id} &bull; {v.titulo} ({v.tipo})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {(() => {
+                const currentVacante = VACANTES_DATA.find((v) => v.id === selectedVacanteId) || VACANTES_DATA[0];
+                return (
+                  <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-sm text-on-surface">{currentVacante.titulo}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-primary-fixed text-primary">
+                        {currentVacante.tipo}
+                      </span>
+                    </div>
+                    <div className="text-outline">
+                      <strong>Puesto Asociado (Word):</strong> {currentVacante.idPuesto || 'General'} &bull; <strong>Área:</strong> {currentVacante.area}
+                    </div>
+                    <div className="text-on-surface-variant">
+                      <strong>Requisitos:</strong> {currentVacante.requisitos}
+                    </div>
+                    <div className="text-on-surface-variant">
+                      <strong>Beneficios:</strong> {currentVacante.beneficios}
+                    </div>
+
+                    <div className="pt-2 border-t border-outline-variant/30">
+                      <span className="font-bold text-outline uppercase text-[10px] block mb-2">
+                        Habilidades requeridas (<code className="font-mono">vacante_habilidad</code>):
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {currentVacante.vacanteHabilidades?.map((vh) => (
+                          <span
+                            key={vh.habilidadId}
+                            className="px-2.5 py-1 rounded-xl bg-surface-container-high border border-outline-variant/40 font-semibold text-on-surface flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-xs text-primary">check_circle</span>
+                            {vh.habilidad?.nombre}
+                            <span className="text-[10px] text-outline font-normal">({vh.habilidad?.tipo})</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* Columna Derecha: Postulante / Perfil */}
+          <div className="lg:col-span-6 flex flex-col gap-4">
+            <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-extrabold text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">person</span>
+                  2. Entidad: Postulante (<code className="text-xs font-mono">perfil</code>)
+                </h3>
+                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+                  Tabla BD activa
+                </span>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-outline block mb-1">Seleccionar Postulante:</label>
+                <select
+                  value={selectedPostulanteId}
+                  onChange={(e) => setSelectedPostulanteId(Number(e.target.value))}
+                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface font-bold text-sm outline-hidden focus:border-primary"
+                >
+                  {POSTULANTES_DATA.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre} {p.apellido} &bull; {p.carrera} ({p.legajo})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {(() => {
+                const currentPostulante = POSTULANTES_DATA.find((p) => p.id === selectedPostulanteId) || POSTULANTES_DATA[0];
+                return (
+                  <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-sm text-on-surface">
+                        {currentPostulante.nombre} {currentPostulante.apellido}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-800">
+                        {currentPostulante.legajo}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-outline">
+                      <div><strong>DNI:</strong> {currentPostulante.dni}</div>
+                      <div><strong>Correo:</strong> {currentPostulante.correo}</div>
+                      <div><strong>Teléfono:</strong> {currentPostulante.telefono}</div>
+                      <div><strong>Estado académico:</strong> {currentPostulante.anioCursado}</div>
+                    </div>
+                    <div className="text-on-surface-variant">
+                      <strong>Carrera:</strong> {currentPostulante.carrera}
+                    </div>
+                    <p className="text-outline text-[11px] leading-relaxed italic bg-surface-container p-2.5 rounded-xl">
+                      "{currentPostulante.descripcion}"
+                    </p>
+
+                    <div className="pt-2 border-t border-outline-variant/30">
+                      <span className="font-bold text-outline uppercase text-[10px] block mb-2">
+                        Habilidades que posee (<code className="font-mono">perfil_habilidad</code>):
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {currentPostulante.habilidades?.map((ph) => (
+                          <span
+                            key={ph.habilidadId}
+                            className="px-2.5 py-1 rounded-xl bg-primary/10 border border-primary/20 font-semibold text-primary flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-xs">verified</span>
+                            {ph.habilidad?.nombre}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+
+        {/* Sección Inferior: Entidad POSTULACION y Matching */}
+        {(() => {
+          const currentVacante = VACANTES_DATA.find((v) => v.id === selectedVacanteId) || VACANTES_DATA[0];
+          const currentPostulante = POSTULANTES_DATA.find((p) => p.id === selectedPostulanteId) || POSTULANTES_DATA[0];
+
+          const reqSkills = currentVacante.vacanteHabilidades?.map((vh) => vh.habilidadId) || [];
+          const candSkills = currentPostulante.habilidades?.map((ph) => ph.habilidadId) || [];
+
+          const matchedSkills = reqSkills.filter((id) => candSkills.includes(id));
+          const missingSkills = reqSkills.filter((id) => !candSkills.includes(id));
+
+          const matchPercent = reqSkills.length > 0 ? Math.round((matchedSkills.length / reqSkills.length) * 100) : 0;
+
+          const existingPostulacion = currentPostulante.postulaciones?.find((post) => post.vacanteId === currentVacante.id);
+          const ranking = existingPostulacion?.ranking ?? matchPercent;
+          const etapa = existingPostulacion?.etapa ?? (matchPercent >= 80 ? 'Preseleccionado' : 'Revisión Inicial');
+          const justificacion =
+            existingPostulacion?.justificacion ??
+            (matchPercent >= 85
+              ? `El postulante posee el ${matchPercent}% de las habilidades requeridas. Muy alta adecuación para la posición.`
+              : `Adecuación parcial (${matchPercent}%). Registra ${missingSkills.length} brechas de competencia frente al perfil.`);
+
+          return (
+            <div className="bg-surface-container-lowest p-6 rounded-3xl border border-primary/20 shadow-xs flex flex-col gap-5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-outline-variant/30 pb-4">
+                <div>
+                  <h3 className="text-lg font-black text-on-surface flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary">join_inner</span>
+                    3. Entidad: Postulación (<code className="text-xs font-mono">postulacion</code>) & Matching Relacional
+                  </h3>
+                  <p className="text-xs text-outline mt-0.5">
+                    Cruce entre Vacante #{currentVacante.id} ({currentVacante.titulo}) y Postulante #{currentPostulante.id} ({currentPostulante.nombre} {currentPostulante.apellido})
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className="text-[10px] font-bold text-outline uppercase block">Ranking / Match</span>
+                    <span className="text-2xl font-black text-primary">{ranking}%</span>
+                  </div>
+                  <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-primary text-on-primary">
+                    {etapa}
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Habilidades coincidentes */}
+                <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                  <div className="flex items-center gap-2 mb-2 font-bold text-emerald-800 text-xs">
+                    <span className="material-symbols-outlined text-sm">task_alt</span>
+                    Habilidades coincidentes ({matchedSkills.length} de {reqSkills.length}):
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {matchedSkills.map((hId) => {
+                      const h = HABILIDADES_DATA.find((x) => x.id === hId);
+                      return (
+                        <span key={hId} className="px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">check</span>
+                          {h?.nombre}
+                        </span>
+                      );
+                    })}
+                    {matchedSkills.length === 0 && (
+                      <span className="text-xs text-outline italic">No registra habilidades coincidentes directas.</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Brechas */}
+                <div className="p-4 bg-amber-500/10 rounded-2xl border border-amber-500/20">
+                  <div className="flex items-center gap-2 mb-2 font-bold text-amber-800 text-xs">
+                    <span className="material-symbols-outlined text-sm">warning</span>
+                    Brechas de habilidades ({missingSkills.length}):
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {missingSkills.map((hId) => {
+                      const h = HABILIDADES_DATA.find((x) => x.id === hId);
+                      return (
+                        <span key={hId} className="px-2.5 py-1 rounded-xl bg-amber-100 text-amber-800 font-bold text-xs flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">close</span>
+                          {h?.nombre}
+                        </span>
+                      );
+                    })}
+                    {missingSkills.length === 0 && (
+                      <span className="text-xs text-emerald-700 font-bold">¡Cubre el 100% de las habilidades requeridas!</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Justificación técnica guardada en BD */}
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-1 text-xs">
+                <span className="font-bold text-outline uppercase text-[10px]">
+                  Justificación almacenada (<code className="font-mono">justificacion</code>):
+                </span>
+                <p className="text-on-surface font-medium leading-relaxed">
+                  {justificacion}
+                </p>
+              </div>
+            </div>
+          );
+        })()}
+      </div>
+    )}
 
       {/* Offer Modal */}
       {showOfferModal && (

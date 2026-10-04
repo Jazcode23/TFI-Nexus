@@ -22,17 +22,19 @@ export interface NavGroup {
 export const MODULES: ModuleRoute[] = [
   { id: 'dashboard-ejecutivo', path: '/', title: 'Inicio', subtitle: 'Resumen e indicadores clave', icon: 'home', group: 'panorama' },
   { id: 'talent-map', path: '/talento', title: 'Talento y Competencias', subtitle: 'Personas, habilidades y criticidad', icon: 'hub', group: 'panorama' },
+  { id: 'value-map', path: '/cadena-valor', title: 'Cadena de Valor', subtitle: 'Eslabones clave de Porter y cobertura', icon: 'schema', group: 'panorama' },
   { id: 'puestos', path: '/puestos', title: 'Puestos y Perfiles', subtitle: 'Catálogo oficial (12 tablas del Word)', icon: 'work', group: 'organizacion' },
   { id: 'empleados', path: '/personas', title: 'Colaboradores', subtitle: 'Directorio y legajos por puesto', icon: 'group', group: 'organizacion' },
-  { id: 'reclutamiento', path: '/reclutamiento', title: 'Selección de Personal', subtitle: 'Candidatos asociados a puestos', icon: 'person_search', group: 'ciclo' },
+  { id: 'reclutamiento', path: '/reclutamiento', title: 'Selección de Personal', subtitle: 'Vacantes, postulantes y matching ER', icon: 'person_search', group: 'ciclo' },
   { id: 'evaluacion-desempeno', path: '/desempeno', title: 'Evaluación de Desempeño', subtitle: 'Matriz 9-Box y estándares del puesto', icon: 'fact_check', group: 'ciclo' },
+  { id: 'capacitacion-upskilling', path: '/capacitacion', title: 'Capacitación', subtitle: 'Rutas de formación y desarrollo', icon: 'trending_up', group: 'ciclo' },
   { id: 'reportes-metricas', path: '/reportes', title: 'Informes y Fichas', subtitle: 'Fichas de puestos y actas oficiales', icon: 'query_stats', group: 'ciclo' },
 ];
 
 export const NAV_GROUPS: NavGroup[] = [
   { key: 'panorama', label: 'Visión general', description: 'Panorama estratégico de la organización' },
   { key: 'organizacion', label: 'Estructura y puestos', description: 'Modelo oficial del manual de puestos (Word)' },
-  { key: 'ciclo', label: 'Ciclo de talento', description: 'Selección, desempeño e informes oficiales' },
+  { key: 'ciclo', label: 'Ciclo de talento', description: 'Selección, desempeño, formación e informes' },
 ];
 
 export const SCREEN_PATHS = Object.fromEntries(

@@ -147,7 +147,25 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                 </div>
                 <h3 className="text-base font-extrabold text-on-surface">1. Talento y Competencias</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Conexión visual interactiva entre los colaboradores, las competencias observables y los puestos de trabajo.
+                  Conexión visual interactiva entre colaboradores, competencias y criticidad de puestos.
+                </p>
+              </div>
+
+              <div
+                onClick={() => onNavigate('value-map')}
+                className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+                    <span className="material-symbols-outlined">schema</span>
+                  </span>
+                  <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
+                    Abrir sección &rarr;
+                  </span>
+                </div>
+                <h3 className="text-base font-extrabold text-on-surface">2. Cadena de Valor</h3>
+                <p className="text-xs text-outline mt-1 leading-relaxed">
+                  Eslabones clave de Porter, cobertura de funciones operativas y simulación de dotación.
                 </p>
               </div>
 
@@ -163,9 +181,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">2. Puestos y Perfiles (Word)</h3>
+                <h3 className="text-base font-extrabold text-on-surface">3. Puestos y Perfiles (Word)</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Catálogo con los puestos del manual y sus 12 estructuras relacionales (funciones, tareas, perfil, riesgos y estándares).
+                  Catálogo con los puestos del manual y sus 12 estructuras relacionales normalizadas.
                 </p>
               </div>
 
@@ -181,9 +199,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">3. Colaboradores</h3>
+                <h3 className="text-base font-extrabold text-on-surface">4. Colaboradores</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Fichas individuales, datos de legajo, puesto asignado, dependencia jerárquica y competencias individuales.
+                  Directorio de personal, legajos individuales, dependencia jerárquica y puesto asignado.
                 </p>
               </div>
 
@@ -199,9 +217,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">4. Selección de Personal</h3>
+                <h3 className="text-base font-extrabold text-on-surface">5. Selección de Personal</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Candidatos postulados por puesto, etapas del proceso y compatibilidad calculada con el perfil del cargo.
+                  Vacantes, postulantes, habilidades y matching relacional con el nuevo modelo ER.
                 </p>
               </div>
 
@@ -217,9 +235,27 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">5. Evaluación de Desempeño</h3>
+                <h3 className="text-base font-extrabold text-on-surface">6. Evaluación de Desempeño</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Calibración de potencial vs desempeño (9-Box) alineada a los estándares de desempeño definidos para el puesto.
+                  Calibración de potencial vs desempeño (9-Box) alineada a los estándares del puesto.
+                </p>
+              </div>
+
+              <div
+                onClick={() => onNavigate('capacitacion-upskilling')}
+                className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center">
+                    <span className="material-symbols-outlined">trending_up</span>
+                  </span>
+                  <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
+                    Abrir sección &rarr;
+                  </span>
+                </div>
+                <h3 className="text-base font-extrabold text-on-surface">7. Cursos y Capacitación</h3>
+                <p className="text-xs text-outline mt-1 leading-relaxed">
+                  Planes formativos para cerrar brechas técnicas y registrar el avance de aprendizaje.
                 </p>
               </div>
 
@@ -228,16 +264,16 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
                 className="p-5 bg-surface-container-low hover:bg-surface-container rounded-2xl border border-outline-variant/30 transition-all cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center">
+                  <span className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
                     <span className="material-symbols-outlined">query_stats</span>
                   </span>
                   <span className="text-xs font-black text-primary group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
                     Abrir sección &rarr;
                   </span>
                 </div>
-                <h3 className="text-base font-extrabold text-on-surface">6. Informes y Fichas</h3>
+                <h3 className="text-base font-extrabold text-on-surface">8. Informes y Fichas</h3>
                 <p className="text-xs text-outline mt-1 leading-relaxed">
-                  Exportación de fichas oficiales del manual de puestos, actas de evaluación y resúmenes ejecutivos en PDF y Excel.
+                  Exportación de manual de puestos, actas de evaluación y resúmenes ejecutivos en PDF y Excel.
                 </p>
               </div>
             </div>
