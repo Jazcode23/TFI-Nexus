@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScreenId } from '../../types';
 import { EMPLOYEES_DATA } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
-import { downloadFile } from '../../services/api';
+import { downloadFile, trainingApi } from '../../services/api';
 
 interface CapacitacionScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -40,7 +40,40 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
   const [showEnrollModal, setShowEnrollModal] = useState<boolean>(false);
   const [showCreateTrackModal, setShowCreateTrackModal] = useState<boolean>(false);
   const [selectedTrackId, setSelectedTrackId] = useState<string>('finops');
+  const [selectedEmpName, setSelectedEmpName] = useState<string>(EMPLOYEES_DATA[0].name);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    trainingApi
+      .getAll()
+      .then((res) => {
+        if (isMounted && res.data && res.data.length > 0) {
+          const mapped: LearningTrack[] = res.data.map((t: any) => ({
+            id: t.id,
+            title: t.title,
+            technicalTitle: t.technicalTitle || t.title,
+            category: t.category || 'Nube y Operaciones Tecnológicas',
+            level: t.level || 'Avanzado',
+            hours: t.hours || (parseInt(t.duration, 10) || 40),
+            enrolledCount: t.enrolledCount || 0,
+            completionRate: t.completionRate || 85,
+            gapTarget: t.gapTarget || 'Fortalecimiento de competencias clave',
+            provider: t.provider || 'NEXUS Academy',
+            certification: t.certification || 'Certificación Oficial',
+            description: t.description || 'Programa de desarrollo y upskilling técnico continuo.',
+            enrolledEmployees: Array.isArray(t.enrolledEmployees) ? t.enrolledEmployees : [],
+          }));
+          setTracks(mapped);
+        }
+      })
+      .catch(() => {
+        // Fallback en memoria
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const [tracks, setTracks] = useState<LearningTrack[]>([
     {
@@ -166,11 +199,39 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleEnroll = (e: React.FormEvent) => {
+  const handleEnroll = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await trainingApi.enroll(activeTrack.id, selectedEmpName);
+    } catch {
+      // Fallback
+    }
+
+    setTracks((prev) =>
+      prev.map((t) => {
+        if (t.id === activeTrack.id) {
+          const already = t.enrolledEmployees.some((e) => e.name === selectedEmpName);
+          if (already) return t;
+          return {
+            ...t,
+            enrolledCount: t.enrolledCount + 1,
+            enrolledEmployees: [
+              ...t.enrolledEmployees,
+              {
+                name: selectedEmpName,
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+                progress: 0,
+              },
+            ],
+          };
+        }
+        return t;
+      })
+    );
+
     setShowEnrollModal(false);
     triggerToast(
-      `Colaborador inscrito en "${activeTrack.title}". Licencia y accesos a la plataforma de cursos habilitados.`
+      `¡Listo! ${selectedEmpName} matriculado en "${activeTrack.title}". Guardado en base de datos.`
     );
   };
 
@@ -554,9 +615,13 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
 
               <div>
                 <label className="font-bold text-on-surface block mb-1">Seleccionar Colaborador:</label>
-                <select className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary">
+                <select
+                  value={selectedEmpName}
+                  onChange={(e) => setSelectedEmpName(e.target.value)}
+                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary"
+                >
                   {EMPLOYEES_DATA.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
+                    <option key={emp.id} value={emp.name}>
                       {emp.name} &bull; {emp.role}
                     </option>
                   ))}

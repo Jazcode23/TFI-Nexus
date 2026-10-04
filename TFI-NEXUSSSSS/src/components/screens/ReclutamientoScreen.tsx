@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Candidate, ScreenId } from '../../types';
 import {
   CANDIDATES_DATA,
@@ -45,6 +45,29 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
   const [showInterviewModal, setShowInterviewModal] = useState<boolean>(false);
   const [interviewDate, setInterviewDate] = useState<string>('2026-10-04T10:00');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    recruitmentApi
+      .getCandidates({ jobCode: currentJobCode })
+      .then((res) => {
+        if (isMounted && res && res.data && res.data.length > 0) {
+          setCandidates(res.data);
+          const newStages: { [id: string]: string } = {};
+          res.data.forEach((c) => {
+            if (c.stage) newStages[c.id] = c.stage;
+          });
+          setCandidateStages((prev) => ({ ...prev, ...newStages }));
+        }
+      })
+      .catch((err) => {
+        console.warn('Candidatos fallback local:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentJobCode]);
 
   const selectedCandidate: Candidate =
     candidates.find((c) => c.id === selectedCandidateId) || candidates[0];

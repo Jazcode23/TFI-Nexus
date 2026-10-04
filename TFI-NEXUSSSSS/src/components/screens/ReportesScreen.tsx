@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScreenId } from '../../types';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { CompetenciaNombre } from '../CompetenciaNombre';
@@ -20,13 +20,31 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const squadsData = [
+  const [squadsData, setSquadsData] = useState([
     { squad: 'Arquitectura Central', k8s: 98, zeroTrust: 95, distributed: 99, finops: 82, comm: 94, risk: 'Bajo' },
     { squad: 'IA y Aprendizaje Automático', k8s: 90, zeroTrust: 86, distributed: 94, finops: 78, comm: 88, risk: 'Medio' },
     { squad: 'Ingeniería de Datos', k8s: 92, zeroTrust: 90, distributed: 98, finops: 85, comm: 86, risk: 'Bajo' },
     { squad: 'Operaciones y Plataforma', k8s: 99, zeroTrust: 96, distributed: 95, finops: 91, comm: 89, risk: 'Bajo' },
     { squad: 'Ciberseguridad y Accesos', k8s: 88, zeroTrust: 100, distributed: 89, finops: 75, comm: 92, risk: 'Bajo' },
-  ];
+  ]);
+
+  useEffect(() => {
+    let isMounted = true;
+    reportsApi
+      .getSquadsHeatmap()
+      .then((res) => {
+        if (isMounted && res && res.data && res.data.length > 0) {
+          setSquadsData(res.data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Squads heatmap fallback local:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6">

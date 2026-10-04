@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScreenId } from '../../types';
 import { QuickGuideBanner } from '../QuickGuideBanner';
+import { reportsApi } from '../../services/api';
 
 interface DashboardScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -8,6 +9,54 @@ interface DashboardScreenProps {
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) => {
   const [selectedQuarter, setSelectedQuarter] = useState('Q4 2026');
+  const [kpis, setKpis] = useState<{
+    overallEffectiveness: string;
+    averagePerformanceScore: string;
+    criticalRolesCovered: string;
+    criticalRolesDetail: string;
+    trainingRoi: string;
+    activeHeadcount: number;
+    spofAlertsCount: number;
+  }>({
+    overallEffectiveness: '94.8%',
+    averagePerformanceScore: '4.62 / 5.0',
+    criticalRolesCovered: '92.4%',
+    criticalRolesDetail: '13 de 14 roles con responsable',
+    trainingRoi: '3.4x',
+    activeHeadcount: 142,
+    spofAlertsCount: 1,
+  });
+  const [loadingKpis, setLoadingKpis] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    setLoadingKpis(true);
+    reportsApi
+      .getDashboardKpis(selectedQuarter)
+      .then((data) => {
+        if (isMounted && data) {
+          setKpis({
+            overallEffectiveness: data.overallEffectiveness || '94.8%',
+            averagePerformanceScore: data.averagePerformanceScore || '4.62 / 5.0',
+            criticalRolesCovered: data.criticalRolesCovered || '92.4%',
+            criticalRolesDetail: data.criticalRolesDetail || '13 de 14 roles con responsable',
+            trainingRoi: data.trainingRoi || '3.4x',
+            activeHeadcount: data.activeHeadcount ?? 142,
+            spofAlertsCount: data.spofAlertsCount ?? 1,
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn('Dashboard KPIs fallback a datos locales:', err);
+      })
+      .finally(() => {
+        if (isMounted) setLoadingKpis(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedQuarter]);
 
   return (
     <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6">
@@ -25,8 +74,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
           <h1 className="text-2xl lg:text-3xl font-black text-on-surface tracking-tight font-headline flex items-center gap-3">
             Panel Principal y Estado del Equipo
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              94.8% Efectividad General
+              <span className={`w-2 h-2 rounded-full bg-emerald-500 ${loadingKpis ? 'animate-ping' : 'animate-pulse'}`}></span>
+              {kpis.overallEffectiveness} Efectividad General
             </span>
           </h1>
           <p className="text-sm text-outline mt-1 max-w-3xl">
@@ -71,7 +120,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
         <div className="bg-surface-container-lowest p-5 rounded-3xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
           <div>
             <span className="text-xs font-semibold text-outline">Promedio de Desempeño</span>
-            <div className="text-2xl font-black text-on-surface mt-1">4.62 / 5.0</div>
+            <div className="text-2xl font-black text-on-surface mt-1">{kpis.averagePerformanceScore}</div>
             <div className="text-[11px] text-emerald-600 font-medium mt-1 flex items-center gap-1">
               <span className="material-symbols-outlined text-xs">trending_up</span>
               +0.3 vs evaluación anterior
@@ -85,9 +134,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
         <div className="bg-surface-container-lowest p-5 rounded-3xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
           <div>
             <span className="text-xs font-semibold text-outline">Puestos Críticos Cubiertos</span>
-            <div className="text-2xl font-black text-on-surface mt-1">92.4%</div>
+            <div className="text-2xl font-black text-on-surface mt-1">{kpis.criticalRolesCovered}</div>
             <div className="text-[11px] text-emerald-600 font-medium mt-1">
-              13 de 14 roles con responsable
+              {kpis.criticalRolesDetail}
             </div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
@@ -98,9 +147,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
         <div className="bg-surface-container-lowest p-5 rounded-3xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
           <div>
             <span className="text-xs font-semibold text-outline">Retorno en Capacitación</span>
-            <div className="text-2xl font-black text-primary mt-1">3.4x Retorno</div>
+            <div className="text-2xl font-black text-primary mt-1">{kpis.trainingRoi} Retorno</div>
             <div className="text-[11px] text-primary font-medium mt-1">
-              42 empleados completaron cursos
+              {kpis.activeHeadcount} colaboradores activos
             </div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-600">
@@ -111,9 +160,11 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
         <div className="bg-surface-container-lowest p-5 rounded-3xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
           <div>
             <span className="text-xs font-semibold text-outline">Estabilidad y Retención</span>
-            <div className="text-2xl font-black text-emerald-600 mt-1">97.9%</div>
+            <div className="text-2xl font-black text-emerald-600 mt-1">
+              {kpis.spofAlertsCount === 0 ? '100%' : '97.9%'}
+            </div>
             <div className="text-[11px] text-emerald-700 font-medium mt-1">
-              Bajo riesgo de rotación
+              {kpis.spofAlertsCount} {kpis.spofAlertsCount === 1 ? 'alerta SPOF bajo control' : 'alertas SPOF bajo control'}
             </div>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">

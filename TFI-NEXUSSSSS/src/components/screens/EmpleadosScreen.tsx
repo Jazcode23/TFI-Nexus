@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmployeeProfile, ScreenId } from '../../types';
 import { EMPLOYEES_DATA } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
@@ -22,6 +22,7 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
 }) => {
   const activeEmpId = selectedEmployeeId;
   const setActiveEmpId = (id: string) => onChangeEmployee?.(id);
+  const [employees, setEmployees] = useState<EmployeeProfile[]>(EMPLOYEES_DATA);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('all');
   const [selectedGapFilter, setSelectedGapFilter] = useState('all');
@@ -31,8 +32,25 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    let isMounted = true;
+    employeesApi
+      .getAll()
+      .then((res) => {
+        if (isMounted && res.data && res.data.length > 0) {
+          setEmployees(res.data);
+        }
+      })
+      .catch(() => {
+        // Fallback a EMPLOYEES_DATA
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const activeEmployee =
-    EMPLOYEES_DATA.find((e) => e.id === activeEmpId) || EMPLOYEES_DATA[0];
+    employees.find((e) => e.id === activeEmpId || e.empId === activeEmpId) || employees[0] || EMPLOYEES_DATA[0];
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -65,7 +83,7 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
     setSelectedTenure('all');
   };
 
-  const filteredEmployees = EMPLOYEES_DATA.filter((emp) => {
+  const filteredEmployees = employees.filter((emp) => {
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
       !q ||

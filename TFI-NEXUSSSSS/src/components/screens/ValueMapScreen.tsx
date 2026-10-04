@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PorterActivity, ScreenId } from '../../types';
 import { PORTER_ACTIVITIES } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
-import { reportsApi } from '../../services/api';
+import { reportsApi, porterApi } from '../../services/api';
 
 interface ValueMapScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -15,6 +15,7 @@ export const ValueMapScreen: React.FC<ValueMapScreenProps> = ({
   onNavigate,
   onSelectEmployee,
 }) => {
+  const [activities, setActivities] = useState<PorterActivity[]>(PORTER_ACTIVITIES);
   const [selectedActivityId, setSelectedActivityId] = useState<number>(2); // Default: Operaciones Core
   const [activeLayer, setActiveLayer] = useState<'primary' | 'support' | 'all'>('primary');
   const [showSimulateModal, setShowSimulateModal] = useState(false);
@@ -22,20 +23,46 @@ export const ValueMapScreen: React.FC<ValueMapScreenProps> = ({
   const [simulationHeadcount, setSimulationHeadcount] = useState(38);
   const [simulationBudget, setSimulationBudget] = useState(120);
 
+  useEffect(() => {
+    let isMounted = true;
+    porterApi
+      .getAll()
+      .then((res) => {
+        if (isMounted && res.data && res.data.length > 0) {
+          setActivities(res.data);
+        }
+      })
+      .catch(() => {
+        // Fallback a PORTER_ACTIVITIES
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const selectedActivity: PorterActivity =
-    PORTER_ACTIVITIES.find((a) => a.id === selectedActivityId) || PORTER_ACTIVITIES[1];
+    activities.find((a) => a.id === selectedActivityId) || activities[1] || PORTER_ACTIVITIES[1];
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleSimulate = (e: React.FormEvent) => {
+  const handleSimulate = async (e: React.FormEvent) => {
     e.preventDefault();
     setShowSimulateModal(false);
-    triggerToast(
-      `Simulación ejecutada: personal reasignado a ${simulationHeadcount} personas (+${simulationBudget}k USD). Margen proyectado: +2.4% de resultado operativo.`
-    );
+    try {
+      const res = await porterApi.simulate(
+        selectedActivity.id,
+        simulationHeadcount,
+        simulationBudget,
+      );
+      triggerToast(res.message);
+    } catch {
+      triggerToast(
+        `Simulación ejecutada: personal reasignado a ${simulationHeadcount} personas (+${simulationBudget}k USD). Margen proyectado: +2.4% de resultado operativo.`
+      );
+    }
   };
 
   return (

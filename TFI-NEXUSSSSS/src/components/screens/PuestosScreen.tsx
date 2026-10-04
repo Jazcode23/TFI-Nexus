@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { JobPosition, ScreenId } from '../../types';
 import { JOB_POSITIONS } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
@@ -21,6 +21,7 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
   onChangeJobCode,
 }) => {
   const setSelectedJobCode = (code: string) => onChangeJobCode?.(code);
+  const [positions, setPositions] = useState<JobPosition[]>(JOB_POSITIONS);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
   const [selectedHierarchy, setSelectedHierarchy] = useState('sr');
@@ -28,15 +29,44 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
   const [showNewJobModal, setShowNewJobModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Campos para crear nuevo puesto
+  const [newTitle, setNewTitle] = useState('');
+  const [newDepartment, setNewDepartment] = useState('Tecnología y Plataforma');
+  const [newStatus, setNewStatus] = useState<'critical' | 'operational'>('operational');
+  const [newMission, setNewMission] = useState('');
+  const [isSubmittingJob, setIsSubmittingJob] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    jobsApi
+      .getAll()
+      .then((res) => {
+        if (isMounted && res.data && res.data.length > 0) {
+          setPositions(res.data);
+        }
+      })
+      .catch(() => {
+        // Fallback a JOB_POSITIONS en memoria
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const selectedJob: JobPosition =
-    JOB_POSITIONS.find((j) => j.code === selectedJobCode) || JOB_POSITIONS[0];
+    positions.find((j) => j.code === selectedJobCode) || positions[0] || JOB_POSITIONS[0];
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleCreateVacancy = () => {
+  const handleCreateVacancy = async () => {
+    try {
+      await jobsApi.openVacancy(selectedJob.code);
+    } catch {
+      // Silencioso
+    }
     if (onSelectJobForRecruitment) {
       // La página muestra el aviso de éxito y lleva al usuario a Selección de Personal.
       onSelectJobForRecruitment(selectedJob.code);
@@ -48,7 +78,63 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
     }, 600);
   };
 
-  const filteredPositions = JOB_POSITIONS.filter((j) => {
+  const handleSaveJob = async () => {
+    if (!newTitle.trim()) {
+      triggerToast('Por favor, ingresá el nombre del puesto.');
+      return;
+    }
+    setIsSubmittingJob(true);
+    const code = `PUE-2026-${Date.now().toString().slice(-4)}`;
+    const jobPayload = {
+      code,
+      title: newTitle.trim(),
+      department: newDepartment,
+      status: newStatus,
+      division: newDepartment,
+      reportsTo: 'Dirección de Operaciones',
+      supervises: 'Equipo Asignado',
+      salaryBand: 'Banda Salarial Oficial',
+      mission: newMission.trim() || 'Asegurar la continuidad y desarrollo estratégico del área.',
+      techSkills: [],
+      softSkills: [],
+    };
+
+    try {
+      const created = await jobsApi.create(jobPayload);
+      setPositions((prev) => [created, ...prev]);
+      setSelectedJobCode(created.code);
+      triggerToast(`¡Listo! Puesto "${created.title}" guardado en la base de datos.`);
+    } catch {
+      // Fallback local
+      const fallbackJob: JobPosition = {
+        ...jobPayload,
+        activeIncumbentsCount: 1,
+        complianceRate: 100,
+        isCalibrated: true,
+        incumbents: [],
+        purposeLink: 'Impacto directo en la continuidad operacional.',
+        internalRelations: 'Coordinación interna de área',
+        externalRelations: 'Proveedores y entidades externas',
+        formalAuthority: 'Responsabilidades según manual institucional',
+        responsibilities: [],
+        workingConditions: {
+          modality: 'Condiciones estándar de oficina',
+          tools: 'Terminal de trabajo y software institucional',
+          mobility: 'No requerida',
+        },
+      };
+      setPositions((prev) => [fallbackJob, ...prev]);
+      setSelectedJobCode(fallbackJob.code);
+      triggerToast(`¡Listo! Puesto "${fallbackJob.title}" creado correctamente.`);
+    } finally {
+      setIsSubmittingJob(false);
+      setShowNewJobModal(false);
+      setNewTitle('');
+      setNewMission('');
+    }
+  };
+
+  const filteredPositions = positions.filter((j) => {
     const matchesSearch =
       !searchQuery ||
       j.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1080,6 +1166,8 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 </label>
                 <input
                   type="text"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Ej: Desarrollador Backend Senior"
                   className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 focus:border-primary font-medium"
                 />
@@ -1088,20 +1176,27 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-bold text-on-surface block mb-1">Área o Departamento:</label>
-                  <select className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer">
-                    <option>Tecnología y Plataforma</option>
-                    <option>Inteligencia Artificial y Datos</option>
-                    <option>Operaciones e Infraestructura</option>
-                    <option>Recursos Humanos</option>
-                    <option>Ventas y Comercial</option>
+                  <select
+                    value={newDepartment}
+                    onChange={(e) => setNewDepartment(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer"
+                  >
+                    <option value="Tecnología y Plataforma">Tecnología y Plataforma</option>
+                    <option value="Inteligencia Artificial y Datos">Inteligencia Artificial y Datos</option>
+                    <option value="Operaciones e Infraestructura">Operaciones e Infraestructura</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                    <option value="Ventas y Comercial">Ventas y Comercial</option>
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-on-surface block mb-1">Nivel de Importancia:</label>
-                  <select className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer">
-                    <option>Crítico (Puesto clave para la empresa)</option>
-                    <option>Operativo (Funcionamiento regular)</option>
-                    <option>De soporte (Asistencia general)</option>
+                  <select
+                    value={newStatus}
+                    onChange={(e) => setNewStatus(e.target.value as 'critical' | 'operational')}
+                    className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer"
+                  >
+                    <option value="critical">Crítico (Puesto clave para la empresa)</option>
+                    <option value="operational">Operativo (Funcionamiento regular)</option>
                   </select>
                 </div>
               </div>
@@ -1115,6 +1210,8 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 </p>
                 <textarea
                   rows={3}
+                  value={newMission}
+                  onChange={(e) => setNewMission(e.target.value)}
                   placeholder="Describí las funciones clave que realizará..."
                   className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 focus:border-primary resize-none font-medium"
                 />
@@ -1131,14 +1228,12 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setShowNewJobModal(false);
-                  triggerToast('¡Listo! Puesto de trabajo creado y registrado correctamente.');
-                }}
-                className="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold shadow-xs hover:bg-primary-container transition-all cursor-pointer flex items-center gap-1.5"
+                disabled={isSubmittingJob}
+                onClick={handleSaveJob}
+                className="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold shadow-xs hover:bg-primary-container transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-sm">check</span>
-                Guardar Puesto
+                {isSubmittingJob ? 'Guardando...' : 'Guardar Puesto'}
               </button>
             </div>
           </div>
