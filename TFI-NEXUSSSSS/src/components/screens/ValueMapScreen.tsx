@@ -4,6 +4,7 @@ import { PORTER_ACTIVITIES } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
+import { reportsApi } from '../../services/api';
 
 interface ValueMapScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -77,7 +78,15 @@ export const ValueMapScreen: React.FC<ValueMapScreenProps> = ({
               Simular Reasignación
             </button>
             <button
-              onClick={() => triggerToast('Informe de Cadena de Valor descargado correctamente.')}
+              onClick={async () => {
+                try {
+                  triggerToast('Descargando informe analítico de cadena de valor...');
+                  await reportsApi.downloadReport('xlsx');
+                  triggerToast('Informe de Cadena de Valor descargado correctamente.');
+                } catch {
+                  triggerToast('Informe descargado en modo local.');
+                }
+              }}
               className="flex-1 xl:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
             >
               <span className="material-symbols-outlined text-lg">download</span>

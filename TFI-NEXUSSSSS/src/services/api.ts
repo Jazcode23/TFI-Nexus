@@ -68,9 +68,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     throw new Error(errorMsg);
   }
 
-  // Si la respuesta es un archivo descargable
+  // Si la respuesta es un archivo descargable (Excel, CSV, PDF, JSON exportado)
+  const contentDisposition = response.headers.get('content-disposition') || '';
   const contentType = response.headers.get('content-type') || '';
   if (
+    contentDisposition.includes('attachment') ||
+    contentType.includes('application/pdf') ||
     contentType.includes('application/vnd') ||
     contentType.includes('text/csv') ||
     contentType.includes('application/octet-stream')
@@ -167,6 +170,12 @@ export const employeesApi = {
       body: JSON.stringify(updateData),
     });
   },
+
+  downloadPdf: async (id: string, employeeName?: string) => {
+    const blob = await request<Blob>(`/employees/${id}/pdf`);
+    const cleanName = employeeName ? employeeName.replace(/\s+/g, '_') : id;
+    downloadFile(blob, `Ficha_Colaborador_${cleanName}_${Date.now()}.pdf`);
+  },
 };
 
 // 3. Módulo de Puestos (DPT)
@@ -197,7 +206,7 @@ export const jobsApi = {
     });
   },
 
-  downloadMatrix: async (format: 'xlsx' | 'csv' = 'xlsx') => {
+  downloadMatrix: async (format: 'xlsx' | 'csv' | 'pdf' = 'xlsx') => {
     const blob = await request<Blob>(`/jobs/export?format=${format}`);
     downloadFile(blob, `Matriz_Puestos_NEXUS_${Date.now()}.${format}`);
   },
@@ -257,7 +266,7 @@ export const evaluationsApi = {
     });
   },
 
-  download9Box: async (format: 'xlsx' | 'csv' = 'xlsx') => {
+  download9Box: async (format: 'xlsx' | 'csv' | 'pdf' = 'xlsx') => {
     const blob = await request<Blob>(`/evaluations/export?format=${format}`);
     downloadFile(blob, `Acta_9Box_Calibracion_NEXUS_${Date.now()}.${format}`);
   },
@@ -314,7 +323,7 @@ export const reportsApi = {
     return request<{ totalCompetencies: number; data: any[] }>('/reports/skills-inventory');
   },
 
-  downloadReport: async (format: 'xlsx' | 'csv' = 'xlsx') => {
+  downloadReport: async (format: 'xlsx' | 'csv' | 'pdf' = 'xlsx') => {
     const blob = await request<Blob>(`/reports/export?format=${format}`);
     downloadFile(blob, `Reporte_Consolidado_NEXUS_${Date.now()}.${format}`);
   },

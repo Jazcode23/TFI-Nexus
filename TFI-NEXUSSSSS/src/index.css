@@ -82,3 +82,33 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #7b7487;
 }
+
+/* Estilos de impresión y exportación visual a PDF */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #131b2e !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  header,
+  nav,
+  aside,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  @page {
+    margin: 1.2cm;
+    size: A4 portrait;
+  }
+}

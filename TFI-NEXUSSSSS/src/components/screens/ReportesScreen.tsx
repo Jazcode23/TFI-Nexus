@@ -75,7 +75,15 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               <option value="Q3 2026">Q3 2026 (Trimestre previo)</option>
             </select>
             <button
-              onClick={() => triggerToast('Reporte en PDF generado exitosamente.')}
+              onClick={async () => {
+                try {
+                  triggerToast('Generando reporte ejecutivo en PDF...');
+                  await reportsApi.downloadReport('pdf');
+                  triggerToast('Reporte en PDF descargado exitosamente.');
+                } catch {
+                  window.print();
+                }
+              }}
               className="px-4 py-2 rounded-xl text-xs font-bold bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/40 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
             >
               <span className="material-symbols-outlined text-sm text-primary">picture_as_pdf</span>

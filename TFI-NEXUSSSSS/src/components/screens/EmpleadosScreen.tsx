@@ -4,6 +4,7 @@ import { EMPLOYEES_DATA } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
+import { employeesApi } from '../../services/api';
 
 interface EmpleadosScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -45,6 +46,16 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
       setEnrolled(true);
       triggerToast('Plan formativo asignado a ' + activeEmployee.name);
     }, 1000);
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      triggerToast(`Generando Ficha 360° en PDF para ${activeEmployee.name}...`);
+      await employeesApi.downloadPdf(activeEmployee.id, activeEmployee.name);
+      triggerToast(`Ficha de ${activeEmployee.name} descargada exitosamente.`);
+    } catch {
+      window.print();
+    }
   };
 
   const resetFilters = () => {
@@ -99,7 +110,7 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
 
           <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
             <button
-              onClick={() => triggerToast('Descargando ficha en formato PDF')}
+              onClick={handleDownloadPdf}
               className="px-4 py-2.5 bg-surface-container-low text-on-surface text-xs font-bold rounded-xl flex items-center gap-2 hover:bg-surface-container transition-all border border-outline-variant/30 cursor-pointer"
             >
               <span className="material-symbols-outlined text-outline text-[18px]">file_download</span>

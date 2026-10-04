@@ -4,6 +4,7 @@ import { TALENT_PERSONS } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
+import { employeesApi } from '../../services/api';
 
 interface TalentMapScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -950,7 +951,15 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                 Plan de Relevo
               </button>
               <button
-                onClick={() => triggerToast(`Descargando datos de habilidades en formato visual`)}
+                onClick={async () => {
+                  try {
+                    triggerToast(`Generando Ficha 360° en PDF de ${activePerson.name}...`);
+                    await employeesApi.downloadPdf(activePerson.id, activePerson.name);
+                    triggerToast(`Ficha de ${activePerson.name} descargada exitosamente.`);
+                  } catch {
+                    window.print();
+                  }
+                }}
                 className="py-2 px-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-[16px] text-primary">

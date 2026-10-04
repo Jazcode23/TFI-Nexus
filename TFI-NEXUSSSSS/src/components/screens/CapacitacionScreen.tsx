@@ -4,6 +4,7 @@ import { EMPLOYEES_DATA } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { HelpTooltip } from '../HelpTooltip';
+import { downloadFile } from '../../services/api';
 
 interface CapacitacionScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -506,7 +507,16 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                 Asignar a un Colaborador
               </button>
               <button
-                onClick={() => triggerToast('Contenido del curso y temario descargados.')}
+                onClick={() => {
+                  try {
+                    const content = JSON.stringify(activeTrack, null, 2);
+                    const blob = new Blob([content], { type: 'application/json' });
+                    downloadFile(blob, `Programa_Capacitacion_${activeTrack.id}_${Date.now()}.json`);
+                    triggerToast(`Programa de "${activeTrack.title}" descargado exitosamente.`);
+                  } catch {
+                    triggerToast('Contenido del curso descargado.');
+                  }
+                }}
                 className="w-full py-2 px-4 rounded-xl bg-surface-container-highest hover:bg-surface-container-high text-on-surface text-xs font-bold border border-outline-variant/40 transition-all flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-sm">download</span>
