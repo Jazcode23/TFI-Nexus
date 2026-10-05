@@ -241,7 +241,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
   });
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -250,94 +250,97 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
         </div>
       )}
 
-      {/* Screen Header & Friendly Guide */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs tracking-wider text-primary uppercase font-extrabold">
-                Crecimiento y Resultados &bull; Aprendizaje
-              </span>
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-on-surface-variant font-medium">
-                Cursos y desarrollo profesional
-              </span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-on-surface tracking-tight font-headline flex items-center gap-3">
-              Capacitación y Cursos de Formación
-            </h1>
-            <p className="text-xs sm:text-sm text-outline mt-0.5 max-w-3xl">
-              Planes de aprendizaje, certificaciones y cursos diseñados para potenciar las habilidades del equipo y cerrar brechas de conocimiento.
-            </p>
+      {/* Compact Header & Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs uppercase tracking-wider text-primary font-bold font-headline">
+              Crecimiento y Resultados &bull; Aprendizaje
+            </span>
+            <span className="text-outline-variant">•</span>
+            <span className="text-xs text-on-surface-variant font-medium">
+              Cursos y desarrollo profesional
+            </span>
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              {tracks.length} rutas activas
+            </span>
           </div>
-
-          <div className="flex items-center gap-2 self-stretch xl:self-auto">
-            <button
-              onClick={() => setShowEnrollModal(true)}
-              className="flex-1 xl:flex-none px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-base">person_add</span>
-              Inscribir Empleado en un Curso
-            </button>
-          </div>
+          <h1 className="text-xl lg:text-2xl font-black text-on-surface tracking-tight font-headline">
+            Capacitación y Cursos de Formación
+          </h1>
         </div>
 
-        {/* Quick Guide Banner */}
-        <QuickGuideBanner
-          title="¿Cómo funciona la capacitación del personal?"
-          description="Ayudá a tus colaboradores a crecer adquiriendo nuevas habilidades técnicas y blandas."
-          tips={[
-            'Explorá los cursos disponibles organizados por categoría (ej: Cloud, IA, Liderazgo).',
-            'Hacé clic en cualquier curso para ver los empleados inscriptos y su avance porcentual.',
-            'Usá "Inscribir Empleado en un Curso" para asignar una nueva capacitación a un miembro del equipo.',
-          ]}
-        />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setShowEnrollModal(true)}
+            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[16px]">person_add</span>
+            Inscribir Colaborador
+          </button>
+        </div>
       </div>
 
-      {/* Metrics Ribbon */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+      {/* Slim Guide Bar */}
+      <QuickGuideBanner
+        title="Guía de Capacitación del Personal"
+        description="Planes de aprendizaje, upskilling técnico y certificaciones para mitigar brechas de competencias."
+        tips={[
+          'Explorá los cursos disponibles organizados por categoría (Cloud, IA, Liderazgo, etc.).',
+          'Hacé clic en cualquier curso para ver los colaboradores matriculados y su avance porcentual.',
+          'Usá "Inscribir Colaborador" para asignar una nueva ruta de desarrollo profesional.',
+        ]}
+        dismissible={true}
+      />
+
+      {/* Compact 4-Metric Status Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Horas Impartidas</span>
-            <div className="text-xl font-black text-on-surface mt-0.5">1,480 hrs</div>
-            <div className="text-[11px] text-emerald-600 font-medium mt-0.5">100% cubiertas por la empresa</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Horas Impartidas</span>
+            <div className="text-base font-black text-on-surface">
+              1,480 <span className="text-[11px] font-normal text-outline">hrs</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined">schedule</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-secondary-container/40 text-on-secondary-container text-[10px] font-bold">
+            100% cubiertas
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Brechas Mitigadas</span>
-            <div className="text-xl font-black text-on-surface mt-0.5">28 Brechas</div>
-            <div className="text-[11px] text-emerald-600 font-medium mt-0.5">-85% de riesgo operativo</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Brechas Mitigadas</span>
+            <div className="text-base font-black text-emerald-600">
+              28 <span className="text-[11px] font-normal text-outline">roles</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-600">
-            <span className="material-symbols-outlined">verified</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+            -85% riesgo
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Certificaciones Emitidas</span>
-            <div className="text-xl font-black text-primary mt-0.5">42 Credenciales</div>
-            <div className="text-[11px] text-primary font-medium mt-0.5">Reconocimiento Global</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Certificaciones</span>
+            <div className="text-base font-black text-primary">
+              42 <span className="text-[11px] font-normal text-outline">emitidas</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-            <span className="material-symbols-outlined">workspace_premium</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[10px] font-bold">
+            Globales
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Retorno de la Capacitación</span>
-            <div className="text-xl font-black text-emerald-600 mt-0.5">3.4x Retorno</div>
-            <div className="text-[11px] text-emerald-700 font-medium mt-0.5">+$420k USD valor agregado</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Retorno Inversión</span>
+            <div className="text-base font-black text-on-secondary-container">
+              3.4x <span className="text-[11px] font-normal text-outline">ROI</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-            <span className="material-symbols-outlined">trending_up</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold">
+            +$420k USD
+          </span>
         </div>
       </div>
 
@@ -413,9 +416,9 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                 <div
                   key={track.id}
                   onClick={() => setSelectedTrackId(track.id)}
-                  className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col gap-3 ${
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2.5 ${
                     isSelected
-                      ? 'bg-surface-container-lowest border-primary ring-2 ring-primary/25 shadow-md transform -translate-y-0.5'
+                      ? 'bg-surface-container-lowest border-primary ring-2 ring-primary/20 shadow-xs'
                       : 'bg-surface-container-lowest hover:bg-surface-container-low border-outline-variant/30'
                   }`}
                 >
@@ -490,7 +493,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
 
         {/* Right Column: Track Deep Dive */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs sticky top-6">
+          <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs sticky top-6">
             <div className="flex items-center justify-between mb-4">
               <span className="px-3 py-1 rounded-full text-xs font-black bg-primary text-on-primary">
                 {activeTrack.level}
@@ -591,7 +594,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
       {/* Modal Inscribir */}
       {showEnrollModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-surface-container-lowest max-w-md w-full rounded-3xl p-6 shadow-2xl border border-outline-variant/40">
+          <div className="bg-surface-container-lowest max-w-md w-full rounded-2xl p-6 shadow-2xl border border-outline-variant/30">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">school</span>

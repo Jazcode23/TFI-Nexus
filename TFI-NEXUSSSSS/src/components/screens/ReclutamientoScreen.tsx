@@ -127,179 +127,169 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
         </div>
       )}
 
-      {/* Header & Friendly Guide */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs tracking-wider text-primary uppercase font-extrabold">
-                Gestión de Personas &bull; Selección de Talento
-              </span>
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-on-surface-variant font-medium">
-                Evaluación y seguimiento de postulantes
-              </span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-on-surface tracking-tight font-headline flex items-center gap-3">
-              Candidatos y Selección de Personal
-            </h1>
-            <p className="text-xs sm:text-sm text-outline mt-0.5 max-w-3xl">
-              Evaluá postulantes comparando sus habilidades con las exigencias del puesto para tomar decisiones de contratación con claridad.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 self-stretch xl:self-auto">
-            <button
-              onClick={() => onNavigate('puestos')}
-              className="flex-1 xl:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-surface-container text-on-surface hover:bg-surface-container-high border border-outline-variant/40 transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-primary text-lg">work</span>
-              Ver Puesto de Trabajo
-            </button>
-            <button
-              onClick={() => triggerToast('Candidatos actualizados con las fuentes de postulación.')}
-              className="flex-1 xl:flex-none px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-lg">refresh</span>
-              Actualizar Candidatos
-            </button>
-          </div>
+      {/* Compact Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl lg:text-2xl font-black text-on-surface tracking-tight font-headline">
+            Candidatos y Selección
+          </h1>
+          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+            {candidates.length} en proceso
+          </span>
         </div>
 
-        {/* Quick Guide Banner */}
-        <QuickGuideBanner
-          title="¿Cómo gestionar los candidatos?"
-          description="Seguí el progreso de cada postulante a través de las etapas del proceso de contratación."
-          tips={[
-            'Hacé clic en cualquier candidato de la lista para revisar su experiencia y compatibilidad.',
-            'Cambiá la etapa del proceso (ej: Entrevista Técnica, Oferta Final) con los botones de la ficha.',
-            'Hacé clic en "Extender Oferta Formal" para preparar y enviar la propuesta laboral.',
-          ]}
-        />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => onNavigate('puestos')}
+            className="flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-bold bg-surface-container text-on-surface hover:bg-surface-container-high border border-outline-variant/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            title="Ver la ficha descriptiva de este puesto"
+          >
+            <span className="material-symbols-outlined text-primary text-base">work</span>
+            <span>Ver Puesto</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => triggerToast('Candidatos actualizados con las fuentes de postulación.')}
+            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+            title="Sincronizar postulantes"
+          >
+            <span className="material-symbols-outlined text-base">refresh</span>
+            <span>Actualizar</span>
+          </button>
+        </div>
       </div>
 
-      {/* Vacancy Selector & Status Banner */}
-      <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-primary-fixed text-primary flex items-center justify-center shadow-xs">
-            <span className="material-symbols-outlined text-2xl">architecture</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-outline uppercase">Vacante Seleccionada:</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 uppercase">
-                Misión Crítica
-              </span>
-            </div>
-            <div className="flex items-center gap-3 mt-1">
-              <select
-                value={currentJobCode}
-                onChange={(e) => setCurrentJobCode(e.target.value)}
-                className="text-lg lg:text-xl font-black text-on-surface bg-transparent border-b-2 border-primary/40 focus:border-primary outline-hidden cursor-pointer pb-0.5"
+      {/* Slim Guide Bar */}
+      <QuickGuideBanner
+        title="Guía de Selección de Personal"
+        description="Flujo de postulación, etapas y propuesta laboral formal."
+        tips={[
+          'Hacé clic en cualquier candidato de la lista para revisar su experiencia y radar de compatibilidad.',
+          'Cambiá la etapa del proceso (ej: Entrevista Técnica, Oferta Final) con los botones de la ficha.',
+          'Hacé clic en "Extender Oferta Formal" para preparar y enviar la propuesta laboral.',
+        ]}
+        dismissible={true}
+      />
+
+      {/* Compact Vacancy Context Bar */}
+      <div className="bg-surface-container-lowest px-4 py-2.5 rounded-2xl border border-outline-variant/30 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+          <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-base">architecture</span>
+          </span>
+          <span className="text-[11px] font-bold text-outline shrink-0">Vacante:</span>
+          <select
+            value={currentJobCode}
+            onChange={(e) => setCurrentJobCode(e.target.value)}
+            className="font-extrabold text-on-surface bg-surface-container-low hover:bg-surface-container px-2.5 py-1 rounded-lg border border-outline-variant/30 text-xs cursor-pointer truncate max-w-xs sm:max-w-md focus:border-primary outline-hidden"
+          >
+            {JOB_POSITIONS.map((j) => (
+              <option key={j.code} value={j.code}>
+                {j.code} &bull; {j.title} ({j.department})
+              </option>
+            ))}
+          </select>
+          <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 uppercase shrink-0">
+            Misión Crítica
+          </span>
+        </div>
+
+        {/* Inline Metrics */}
+        <div className="flex items-center gap-2 text-[11px] font-semibold text-outline shrink-0 overflow-x-auto w-full md:w-auto">
+          <span className="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-bold">
+            2 Abiertas
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-bold">
+            14 en proceso
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-700 font-bold">
+            84.6% Match
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-800 font-bold">
+            12d plazo
+          </span>
+        </div>
+      </div>
+
+      {/* Unified Toolbar: View Mode Tabs + Filter Threshold Chips + AI Badge */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-1 border-b border-outline-variant/20">
+        <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-outline-variant/30">
+          <button
+            type="button"
+            onClick={() => setViewMode('operativo')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+              viewMode === 'operativo'
+                ? 'bg-surface-container-lowest text-primary shadow-xs'
+                : 'text-outline hover:text-on-surface'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">view_kanban</span>
+            <span>Tablero de Selección</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('modelo_er')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+              viewMode === 'modelo_er'
+                ? 'bg-surface-container-lowest text-primary shadow-xs'
+                : 'text-outline hover:text-on-surface'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">schema</span>
+            <span>Modelo Relacional ER</span>
+          </button>
+        </div>
+
+        {viewMode === 'operativo' && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-bold text-outline">Filtrar:</span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setFilterThreshold(0)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterThreshold === 0
+                    ? 'bg-primary text-on-primary shadow-xs'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                }`}
               >
-                {JOB_POSITIONS.map((j) => (
-                  <option key={j.code} value={j.code}>
-                    {j.code} &bull; {j.title} ({j.department})
-                  </option>
-                ))}
-              </select>
+                Todos ({candidates.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterThreshold(85)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterThreshold === 85
+                    ? 'bg-primary text-on-primary shadow-xs'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                }`}
+              >
+                &gt;85%
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterThreshold(95)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  filterThreshold === 95
+                    ? 'bg-primary text-on-primary shadow-xs'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                }`}
+              >
+                &gt;95%
+              </button>
             </div>
-            <p className="text-xs text-outline mt-1">
-              {currentJob.division} &bull; Reporta a {currentJob.reportsTo} &bull; {currentJob.salaryBand}
-            </p>
-          </div>
-        </div>
 
-        {/* Quick Vacancy Metrics */}
-        <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-1">
-          <div className="p-3 bg-surface-container rounded-2xl text-center min-w-[100px]">
-            <span className="text-[10px] text-outline uppercase font-semibold">Vacantes</span>
-            <div className="text-lg font-black text-on-surface">2 Abiertas</div>
+            <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-[11px] font-semibold text-outline" title="Algoritmo ponderado de afinidad">
+              <span className="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+              <span>Matching IA</span>
+            </div>
           </div>
-          <div className="p-3 bg-surface-container rounded-2xl text-center min-w-[100px]">
-            <span className="text-[10px] text-outline uppercase font-semibold">En proceso</span>
-            <div className="text-lg font-black text-primary">14 Candidatos</div>
-          </div>
-          <div className="p-3 bg-surface-container rounded-2xl text-center min-w-[100px]">
-            <span className="text-[10px] text-outline uppercase font-semibold">Compatibilidad Promedio</span>
-            <div className="text-lg font-black text-emerald-600">84.6%</div>
-          </div>
-          <div className="p-3 bg-surface-container rounded-2xl text-center min-w-[100px]">
-            <span className="text-[10px] text-outline uppercase font-semibold">Plazo de Cierre</span>
-            <div className="text-lg font-black text-amber-600">12 Días</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Selector de Modo: Tablero Operativo vs Modelo ER Relacional */}
-      <div className="flex border-b border-outline-variant/30 gap-2">
-        <button
-          onClick={() => setViewMode('operativo')}
-          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
-            viewMode === 'operativo'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-outline hover:text-on-surface'
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">view_kanban</span>
-          Tablero de Selección & Candidatos
-        </button>
-        <button
-          onClick={() => setViewMode('modelo_er')}
-          className={`px-4 py-2.5 text-xs sm:text-sm font-extrabold flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
-            viewMode === 'modelo_er'
-              ? 'border-primary text-primary'
-              : 'border-transparent text-outline hover:text-on-surface'
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">schema</span>
-          Modelo Relacional ER: Vacantes, Habilidades & Matching
-        </button>
+        )}
       </div>
 
       {viewMode === 'operativo' ? (
         <>
-          {/* Filter and View Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-outline uppercase">Filtrar por compatibilidad:</span>
-          <button
-            onClick={() => setFilterThreshold(0)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filterThreshold === 0
-                ? 'bg-primary text-on-primary shadow-xs'
-                : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-            }`}
-          >
-            Todos ({candidates.length})
-          </button>
-          <button
-            onClick={() => setFilterThreshold(85)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filterThreshold === 85
-                ? 'bg-primary text-on-primary shadow-xs'
-                : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-            }`}
-          >
-            Compatibilidad alta (&gt;85%)
-          </button>
-          <button
-            onClick={() => setFilterThreshold(95)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filterThreshold === 95
-                ? 'bg-primary text-on-primary shadow-xs'
-                : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container'
-            }`}
-          >
-            Máxima compatibilidad (&gt;95%)
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs text-outline">
-          <span className="material-symbols-outlined text-sm text-primary">auto_awesome</span>
-          <span>Análisis realizado con Inteligencia Artificial (modelo GPT/Gen-4)</span>
-        </div>
-      </div>
 
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -938,15 +928,18 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
       {/* Offer Modal */}
       {showOfferModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-surface-container-lowest max-w-lg w-full rounded-3xl p-6 shadow-2xl border border-outline-variant/40">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-surface-container-lowest max-w-md w-full rounded-2xl p-5 shadow-2xl border border-outline-variant/40 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20 mb-3">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">payments</span>
-                <h3 className="text-lg font-black text-on-surface">Extensión de Oferta Formal</h3>
+                <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-base">payments</span>
+                </span>
+                <h3 className="text-sm font-extrabold text-on-surface">Oferta Laboral Formal</h3>
               </div>
               <button
+                type="button"
                 onClick={() => setShowOfferModal(false)}
-                className="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-outline cursor-pointer"
+                className="p-1 rounded-lg hover:bg-surface-container text-outline cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">close</span>
               </button>
@@ -957,61 +950,66 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
                 e.preventDefault();
                 setShowConfirmOffer(true);
               }}
-              className="flex flex-col gap-4 text-xs"
+              className="flex flex-col gap-3 text-xs"
             >
-              <div className="p-3 bg-surface-container rounded-2xl flex items-center gap-3">
-                <UserAvatar
-                  name={selectedCandidate.name}
-                  size="md"
-                  shape="rounded"
-                />
-                <div>
-                  <h4 className="font-bold text-on-surface">{selectedCandidate.name}</h4>
-                  <p className="text-outline text-[11px]">{currentJob.title} &bull; Tier E7</p>
+              <div className="p-2.5 bg-surface-container-low rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <UserAvatar
+                    name={selectedCandidate.name}
+                    size="sm"
+                    shape="rounded"
+                  />
+                  <div>
+                    <h4 className="font-bold text-on-surface">{selectedCandidate.name}</h4>
+                    <p className="text-outline text-[10px]">{currentJob.title}</p>
+                  </div>
                 </div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  {selectedCandidate.matchScore}% Match
+                </span>
               </div>
 
               <div>
-                <label className="font-bold text-on-surface block mb-1">Paquete Salarial Base Anual:</label>
+                <label className="font-bold text-on-surface block mb-1">Paquete Salarial Base:</label>
                 <input
                   type="text"
-                  defaultValue="$145,000 USD + Bono por Desempeño (15%)"
-                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary"
+                  defaultValue="$145,000 USD + Bono (15%)"
+                  className="w-full p-2 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-on-surface block mb-1">Fecha de Incorporación Prevista:</label>
+                <label className="font-bold text-on-surface block mb-1">Fecha de Incorporación:</label>
                 <input
                   type="date"
                   defaultValue="2026-11-01"
-                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary"
+                  className="w-full p-2 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-on-surface block mb-1">Beneficios y Equipamiento:</label>
-                <div className="p-2.5 bg-surface-container rounded-xl text-on-surface-variant text-[11px] space-y-1">
-                  <div>&bull; Presupuesto anual de formación y certificaciones</div>
-                  <div>&bull; Equipo de trabajo de última generación</div>
-                  <div>&bull; Cobertura médica integral 100%</div>
+                <label className="font-bold text-outline block mb-1">Beneficios incluidos:</label>
+                <div className="flex flex-wrap gap-1.5 text-[11px]">
+                  <span className="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant font-medium">Capacitación continua</span>
+                  <span className="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant font-medium">Equipamiento Pro</span>
+                  <span className="px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant font-medium">Prepaga 100%</span>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/20 mt-1">
                 <button
                   type="button"
                   onClick={() => setShowOfferModal(false)}
-                  className="px-4 py-2 rounded-xl text-on-surface-variant font-bold hover:bg-surface-container cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-on-surface-variant font-bold hover:bg-surface-container text-xs cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-bold hover:bg-primary-container shadow-xs cursor-pointer flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container shadow-xs cursor-pointer flex items-center gap-1.5"
                 >
                   <span className="material-symbols-outlined text-sm">mark_email_read</span>
-                  Continuar y Enviar Oferta
+                  <span>Enviar Propuesta</span>
                 </button>
               </div>
             </form>
@@ -1022,10 +1020,10 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
       {/* Confirmation Modal for Offer */}
       <ConfirmationModal
         isOpen={showConfirmOffer}
-        title="¿Confirmás el envío de la oferta laboral?"
-        message={`Se enviará formalmente la propuesta económica a ${selectedCandidate.name} para el puesto de ${currentJob.title}. El candidato pasará a la etapa "Oferta Enviada".`}
-        confirmLabel="Sí, enviar propuesta"
-        cancelLabel="Revisar datos"
+        title="¿Confirmás el envío de la oferta?"
+        message={`Se enviará formalmente la propuesta económica a ${selectedCandidate.name} para ${currentJob.title}.`}
+        confirmLabel="Enviar propuesta"
+        cancelLabel="Revisar"
         type="primary"
         onConfirm={handleConfirmSendOffer}
         onCancel={() => setShowConfirmOffer(false)}
@@ -1034,25 +1032,28 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
       {/* Schedule Interview Modal */}
       {showInterviewModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-surface-container-lowest max-w-md w-full rounded-3xl p-6 shadow-2xl border border-outline-variant/40">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-surface-container-lowest max-w-md w-full rounded-2xl p-5 shadow-2xl border border-outline-variant/40 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20 mb-3">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">event</span>
-                <h3 className="text-lg font-black text-on-surface">Agendar Entrevista Técnica</h3>
+                <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-base">event</span>
+                </span>
+                <h3 className="text-sm font-extrabold text-on-surface">Agendar Entrevista Técnica</h3>
               </div>
               <button
+                type="button"
                 onClick={() => setShowInterviewModal(false)}
-                className="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-outline cursor-pointer"
+                className="p-1 rounded-lg hover:bg-surface-container text-outline cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">close</span>
               </button>
             </div>
 
-            <form onSubmit={handleScheduleInterview} className="flex flex-col gap-4 text-xs">
+            <form onSubmit={handleScheduleInterview} className="flex flex-col gap-3 text-xs">
               <div>
-                <label className="font-bold text-on-surface block mb-1">Candidato:</label>
-                <div className="p-2.5 bg-surface-container rounded-xl font-bold text-on-surface">
-                  {selectedCandidate.name} ({selectedCandidate.title})
+                <label className="font-bold text-outline block mb-1">Candidato:</label>
+                <div className="p-2 bg-surface-container rounded-xl font-bold text-on-surface">
+                  {selectedCandidate.name}
                 </div>
               </div>
 
@@ -1062,40 +1063,37 @@ export const ReclutamientoScreen: React.FC<ReclutamientoScreenProps> = ({
                   type="datetime-local"
                   value={interviewDate}
                   onChange={(e) => setInterviewDate(e.target.value)}
-                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary"
+                  className="w-full p-2 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary text-xs"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-on-surface block mb-1">Entrevistadores Principales:</label>
+                <label className="font-bold text-on-surface block mb-1">Entrevistadores:</label>
                 <input
                   type="text"
-                  defaultValue="Sofía Méndez (Líder de IA y Arquitectura), Martín Krause (Director de Tecnología)"
-                  className="w-full p-2.5 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary"
+                  defaultValue="Sofía Méndez, Martín Krause"
+                  className="w-full p-2 bg-surface-container rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary text-xs"
                 />
               </div>
 
-              <div>
-                <label className="font-bold text-on-surface block mb-1">Plataforma:</label>
-                <div className="p-2.5 bg-surface-container rounded-xl text-on-surface-variant flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">video_call</span>
-                  Google Meet (Enlace generado automáticamente)
-                </div>
+              <div className="flex items-center gap-2 p-2 bg-surface-container-low rounded-xl text-outline text-[11px]">
+                <span className="material-symbols-outlined text-primary text-sm">video_call</span>
+                <span>Google Meet (Enlace automático)</span>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/20 mt-1">
                 <button
                   type="button"
                   onClick={() => setShowInterviewModal(false)}
-                  className="px-4 py-2 rounded-xl text-on-surface-variant font-bold hover:bg-surface-container cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-on-surface-variant font-bold hover:bg-surface-container text-xs cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-primary text-on-primary font-bold hover:bg-primary-container shadow-xs cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container shadow-xs cursor-pointer"
                 >
-                  Confirmar y Enviar Invitación
+                  Confirmar e Invitar
                 </button>
               </div>
             </form>

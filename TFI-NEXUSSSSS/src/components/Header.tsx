@@ -7,12 +7,14 @@ interface HeaderProps {
   selectedCampus: string;
   onSelectCampus: (campus: string) => void;
   onToggleMobileSidebar?: () => void;
+  isSidebarCollapsed?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   selectedCampus,
   onSelectCampus,
   onToggleMobileSidebar,
+  isSidebarCollapsed = false,
 }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,7 +80,11 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="fixed top-0 left-0 lg:left-72 right-0 h-20 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-30 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-6 border-b border-outline-variant/30">
+    <header
+      className={`fixed top-0 left-0 ${
+        isSidebarCollapsed ? 'lg:left-20' : 'lg:left-72'
+      } right-0 h-20 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-30 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3 sm:gap-6 border-b border-outline-variant/30 transition-all duration-300 ease-in-out`}
+    >
       {/* Mobile Menu Button + Search Bar */}
       <div className="flex items-center gap-2 sm:gap-3 flex-1 max-w-2xl">
         <button

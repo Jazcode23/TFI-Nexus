@@ -158,7 +158,7 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
   });
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-8 pb-20">
+    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
       {/* Toast */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -167,150 +167,130 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
         </div>
       )}
 
-      {/* Screen Header & Friendly Guide */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs uppercase tracking-wider text-primary font-bold">
-                Gestión de Personas &bull; Estructura Organizacional
-              </span>
-              <span className="text-outline-variant">•</span>
-              <span className="text-xs text-on-surface-variant font-medium">
-                Catálogo de cargos y competencias
-              </span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl text-on-surface font-extrabold tracking-tight">
-              Puestos de Trabajo y Perfiles del Cargo
-            </h1>
-            <p className="text-xs sm:text-sm text-outline mt-0.5">
-              Definición de cargos, responsabilidades, nivel salarial y habilidades requeridas para cada posición.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowNewJobModal(true)}
-              className="px-4 py-2.5 bg-primary text-on-primary text-xs font-bold rounded-xl flex items-center gap-2 shadow-xs hover:bg-primary-container transition-all cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[18px]">add_circle</span>
-              + Crear Nuevo Puesto
-            </button>
-          </div>
+      {/* Compact Header & Main Actions */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl lg:text-2xl font-black text-on-surface tracking-tight font-headline">
+            Puestos de Trabajo y Perfiles
+          </h1>
+          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+            {positions.length} puestos &bull; {positions.filter((p) => p.status === 'critical').length} críticos
+          </span>
         </div>
 
-        {/* Quick Guide Banner */}
-        <QuickGuideBanner
-          title="¿Cómo gestionar los puestos de trabajo?"
-          description="Consultá qué exige cada rol en la empresa, quiénes lo desempeñan y qué vacantes están abiertas."
-          tips={[
-            'Hacé clic en cualquier puesto de la lista para ver su descripción y competencias requeridas.',
-            'Usá el botón "+ Crear Nuevo Puesto" para dar de alta un cargo con sus requisitos.',
-            'Hacé clic en "Generar Vacante" si necesitás iniciar la búsqueda de candidatos en Reclutamiento.',
-          ]}
-        />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={async () => {
+              try {
+                await jobsApi.downloadMatrix('xlsx');
+                triggerToast('Matriz de puestos descargada en formato Excel.');
+              } catch {
+                triggerToast('Matriz de puestos exportada en formato Excel/CSV');
+              }
+            }}
+            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold bg-surface-container text-on-surface hover:bg-surface-container-high border border-outline-variant/40 transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-outline text-[16px]">download</span>
+            Exportar Matriz
+          </button>
+          <button
+            onClick={() => setShowNewJobModal(true)}
+            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[16px]">add_circle</span>
+            + Nuevo Puesto
+          </button>
+        </div>
       </div>
 
-      {/* Top Global Metrics Ribbon */}
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {/* Metric 1 */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between group hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined text-[22px]">account_tree</span>
+      {/* Slim Guide Bar */}
+      <QuickGuideBanner
+        title="Guía de Puestos y Perfiles"
+        description="Gestión de roles organizacionales, responsabilidades y competencias requeridas."
+        tips={[
+          'Hacé clic en cualquier puesto del catálogo para inspeccionar su ficha técnica y requisitos.',
+          'Usá el botón "+ Nuevo Puesto" para dar de alta una posición en el organigrama.',
+          'Hacé clic en "Generar Vacante" para iniciar la búsqueda de candidatos en Reclutamiento.',
+        ]}
+        dismissible={true}
+      />
+
+      {/* Compact 4-Metric Status Strip (Saves over 120px of vertical space) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Puestos Definidos</span>
+            <div className="text-base font-black text-on-surface">
+              {positions.length} <span className="text-[11px] font-normal text-outline">cargos</span>
             </div>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-bold flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" /> Activas
-            </span>
           </div>
-          <div className="mt-4">
-            <div className="text-4xl font-extrabold text-on-surface tracking-tight">42</div>
-            <p className="text-sm text-on-surface-variant font-bold mt-0.5">Puestos Definidos</p>
-            <p className="text-xs text-outline mt-1">Estructura unificada 2026</p>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold">
+            Estructura 2026
+          </span>
         </div>
 
-        {/* Metric 2 */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between group hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-tertiary-fixed flex items-center justify-center text-tertiary">
-              <span className="material-symbols-outlined text-[22px]">warning</span>
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Puestos Críticos</span>
+            <div className="text-base font-black text-amber-600">
+              {positions.filter((p) => p.status === 'critical').length}{' '}
+              <span className="text-[11px] font-bold text-amber-700">roles clave</span>
             </div>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-bold">
-              33.3% impacto
-            </span>
           </div>
-          <div className="mt-4">
-            <div className="text-4xl font-extrabold text-on-surface tracking-tight">14</div>
-            <p className="text-sm text-on-surface-variant font-bold mt-0.5">Puestos Críticos</p>
-            <p className="text-xs text-outline mt-1">Alta dependencia de continuidad</p>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[10px] font-bold">
+            33.3% impacto
+          </span>
         </div>
 
-        {/* Metric 3 */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between group hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-secondary-container/40 flex items-center justify-center text-secondary">
-              <span className="material-symbols-outlined text-[22px]">verified_user</span>
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Brecha Cero</span>
+            <div className="text-base font-black text-emerald-600">
+              82% <span className="text-[11px] font-normal text-outline">calibrados</span>
             </div>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary-container/30 text-on-secondary-container font-bold flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-secondary" /> +4.5% vs Q3
-            </span>
           </div>
-          <div className="mt-4">
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-extrabold text-on-surface tracking-tight">82</span>
-              <span className="text-2xl font-bold text-secondary">%</span>
-            </div>
-            <p className="text-sm text-on-surface-variant font-bold mt-0.5">
-              Perfiles con Brecha Cero
-            </p>
-            <p className="text-xs text-outline mt-1">Colaboradores 100% calibrados</p>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+            +4.5% vs Q3
+          </span>
         </div>
 
-        {/* Metric 4 */}
-        <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col justify-between group hover:shadow-md transition-all">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary-container">
-              <span className="material-symbols-outlined text-[22px]">psychology</span>
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Habilidades Registradas</span>
+            <div className="text-base font-black text-on-surface">
+              320 <span className="text-[11px] font-normal text-outline">skills</span>
             </div>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary font-bold">
-              Catálogo inteligente
-            </span>
           </div>
-          <div className="mt-4">
-            <div className="text-4xl font-extrabold text-on-surface tracking-tight">320</div>
-            <p className="text-sm text-on-surface-variant font-bold mt-0.5">Habilidades Registradas</p>
-            <p className="text-xs text-outline mt-1">190 técnicas / 130 conductuales</p>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-surface-container-high text-primary text-[10px] font-bold">
+            190 téc / 130 cond
+          </span>
         </div>
-      </section>
+      </div>
 
-      {/* Control & Filter Bar */}
-      <section className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col lg:flex-row items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+      {/* Unified Filter Toolbar */}
+      <div className="bg-surface-container-lowest px-4 py-2 rounded-2xl shadow-2xs border border-outline-variant/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
           {/* Search Input */}
-          <div className="relative flex items-center min-w-[280px] flex-1 lg:flex-initial">
-            <span className="material-symbols-outlined absolute left-3.5 text-outline text-[18px]">
+          <div className="relative flex items-center min-w-[240px] flex-1 sm:flex-initial">
+            <span className="material-symbols-outlined absolute left-2.5 text-outline text-[16px]">
               search
             </span>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por código, nombre de puesto o habilidad..."
-              className="w-full pl-10 pr-4 py-2 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary-container/20 transition-all border border-transparent focus:border-outline-variant/40"
+              placeholder="Buscar por código, nombre o habilidad..."
+              className="w-full pl-8 pr-3 py-1.5 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs outline-hidden focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary border border-outline-variant/30"
             />
           </div>
 
           {/* Area Filter */}
-          <div className="flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-outline-variant/20">
-            <span className="material-symbols-outlined text-outline text-[16px]">domain</span>
+          <div className="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1.5 rounded-xl border border-outline-variant/20">
+            <span className="material-symbols-outlined text-outline text-[15px]">domain</span>
             <select
               value={selectedArea}
               onChange={(e) => setSelectedArea(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-on-surface outline-none cursor-pointer"
+              className="bg-transparent text-xs font-semibold text-on-surface outline-hidden cursor-pointer"
             >
               <option value="">Todas las Áreas</option>
               <option value="ing">Tecnología y Plataforma</option>
@@ -321,12 +301,12 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
           </div>
 
           {/* Hierarchy Filter */}
-          <div className="flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-outline-variant/20">
-            <span className="material-symbols-outlined text-outline text-[16px]">layers</span>
+          <div className="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1.5 rounded-xl border border-outline-variant/20">
+            <span className="material-symbols-outlined text-outline text-[15px]">layers</span>
             <select
               value={selectedHierarchy}
               onChange={(e) => setSelectedHierarchy(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-on-surface outline-none cursor-pointer"
+              className="bg-transparent text-xs font-semibold text-on-surface outline-hidden cursor-pointer"
             >
               <option value="">Nivel Jerárquico</option>
               <option value="dir">Dirección</option>
@@ -336,45 +316,25 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </select>
           </div>
 
-          {/* Status Toggle */}
+          {/* Critical Only Toggle */}
           <button
+            type="button"
             onClick={() => setOnlyCritical(!onlyCritical)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               onlyCritical
-                ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant'
+                ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant shadow-2xs'
                 : 'bg-surface-container-low hover:bg-surface-container text-on-surface-variant'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px] text-primary">filter_list</span>
-            <span>Críticos Primero</span>
+            <span className="material-symbols-outlined text-[15px] text-tertiary">warning</span>
+            <span>{onlyCritical ? 'Solo Críticos' : 'Críticos Primero'}</span>
           </button>
         </div>
 
-        {/* Right Side Actions */}
-        <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
-          <button
-            onClick={async () => {
-              try {
-                await jobsApi.downloadMatrix('xlsx');
-                triggerToast('Matriz de puestos descargada en formato Excel.');
-              } catch {
-                triggerToast('Matriz de puestos exportada en formato Excel/CSV');
-              }
-            }}
-            className="px-4 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl text-xs font-bold flex items-center gap-2 transition-all border border-outline-variant/20 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[16px]">download</span>
-            <span>Exportar Matriz</span>
-          </button>
-          <button
-            onClick={() => setShowNewJobModal(true)}
-            className="px-4 py-2 bg-primary-container hover:bg-primary text-on-primary rounded-xl text-xs font-bold flex items-center gap-2 shadow-[0_4px_14px_0_rgba(124,58,237,0.35)] transition-all"
-          >
-            <span className="material-symbols-outlined text-[16px]">add_circle</span>
-            <span>+ Diseñar Nuevo Puesto</span>
-          </button>
-        </div>
-      </section>
+        <span className="text-[11px] text-outline font-medium">
+          {filteredPositions.length} de {positions.length} puestos mostrados
+        </span>
+      </div>
 
       {/* Main Split Layout: Position List (Left 4 cols) & Detailed Technical Sheet (Right 8 cols) */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
@@ -396,40 +356,42 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               <div
                 key={pos.code}
                 onClick={() => setSelectedJobCode(pos.code)}
-                className={`p-4 rounded-2xl transition-all cursor-pointer border ${
+                className={`p-3.5 rounded-2xl transition-all cursor-pointer border ${
                   isSelected
-                    ? 'bg-surface-container-lowest shadow-md ring-2 ring-primary-container border-primary'
-                    : 'bg-surface-container-lowest shadow-sm hover:shadow-md border-outline-variant/30'
+                    ? 'bg-primary/5 shadow-xs ring-2 ring-primary/20 border-primary'
+                    : 'bg-surface-container-lowest shadow-2xs hover:shadow-xs border-outline-variant/30 hover:border-outline-variant'
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <div
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center font-bold shadow-sm ${
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold shrink-0 ${
                         isSelected
-                          ? 'bg-primary-fixed text-primary'
+                          ? 'bg-primary text-on-primary'
                           : 'bg-surface-container text-outline'
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[20px]">cloud</span>
+                      <span className="material-symbols-outlined text-[18px]">
+                        {pos.status === 'critical' ? 'vpn_key' : 'work'}
+                      </span>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono font-bold text-primary">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono font-bold text-primary">
                           {pos.code}
                         </span>
                         {pos.status === 'critical' && (
                           <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
                         )}
                       </div>
-                      <h3 className="text-sm font-bold text-on-surface leading-snug">
+                      <h3 className="text-xs font-bold text-on-surface leading-tight truncate">
                         {pos.title}
                       </h3>
                     </div>
                   </div>
 
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    className={`px-2 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${
                       pos.status === 'critical'
                         ? 'bg-tertiary-fixed text-on-tertiary-fixed-variant'
                         : 'bg-surface-container-high text-on-surface-variant'
@@ -439,44 +401,39 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                   </span>
                 </div>
 
-                <div className="mt-3 flex items-center gap-4 text-on-surface-variant text-xs">
-                  <span className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-outline text-[14px]">domain</span>
-                    {pos.department}
+                <div className="mt-2 flex items-center justify-between text-on-surface-variant text-[11px]">
+                  <span className="flex items-center gap-1 truncate text-outline">
+                    <span className="material-symbols-outlined text-[13px]">domain</span>
+                    <span className="truncate">{pos.department}</span>
                   </span>
-                  <span className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-outline text-[14px]">group</span>
-                    {pos.activeIncumbentsCount} Personas
+                  <span className="flex items-center gap-1 shrink-0 text-outline">
+                    <span className="material-symbols-outlined text-[13px]">group</span>
+                    <span>{pos.activeIncumbentsCount} pers.</span>
                   </span>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-outline-variant/20 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-outline">Cumplimiento de habilidades</span>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <div className="w-20 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${
-                            pos.complianceRate >= 90
-                              ? 'bg-secondary-container'
-                              : 'bg-primary-container'
-                          }`}
-                          style={{ width: `${pos.complianceRate}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-bold text-on-surface">
-                        {pos.complianceRate}%
-                      </span>
+                <div className="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${
+                          pos.complianceRate >= 90 ? 'bg-emerald-500' : 'bg-primary'
+                        }`}
+                        style={{ width: `${pos.complianceRate}%` }}
+                      />
                     </div>
+                    <span className="text-[11px] font-bold text-on-surface">
+                      {pos.complianceRate}%
+                    </span>
                   </div>
 
                   <span
-                    className={`text-xs font-bold flex items-center gap-0.5 ${
+                    className={`text-[11px] font-bold flex items-center gap-0.5 ${
                       isSelected ? 'text-primary' : 'text-outline'
                     }`}
                   >
                     {isSelected ? 'Inspeccionar' : 'Ver ficha'}
-                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+                    <span className="material-symbols-outlined text-[13px]">arrow_forward</span>
                   </span>
                 </div>
               </div>
@@ -485,35 +442,37 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
         </div>
 
         {/* RIGHT PANEL: DETAILED TECHNICAL SHEET (FICHA TÉCNICA) */}
-        <div className="xl:col-span-8 flex flex-col gap-6">
+        <div className="xl:col-span-8 flex flex-col gap-5">
           {/* Master Header */}
-          <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-3xl shadow-sm border border-outline-variant/30 relative overflow-hidden">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary shadow-sm">
-                  <span className="material-symbols-outlined text-[36px]">cloud_done</span>
+          <div className="bg-surface-container-lowest p-5 lg:p-6 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary-fixed flex items-center justify-center text-primary shadow-2xs shrink-0">
+                  <span className="material-symbols-outlined text-[28px]">cloud_done</span>
                 </div>
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-primary px-2 py-0.5 bg-primary-fixed/40 rounded-md">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-[11px] font-mono font-bold text-primary px-2 py-0.5 bg-primary-fixed/40 rounded-md">
                       {selectedJob.code}
                     </span>
-                    <span className="text-xs text-secondary font-bold px-2 py-0.5 bg-secondary-container/30 rounded-full flex items-center gap-1">
+                    <span className="text-[11px] text-secondary font-bold px-2 py-0.5 bg-secondary-container/30 rounded-full flex items-center gap-1">
                       <span className="h-1.5 w-1.5 rounded-full bg-secondary" /> Activo &amp; Calibrado
                     </span>
-                    <span className="text-xs text-on-tertiary-fixed-variant font-bold px-2 py-0.5 bg-tertiary-fixed rounded-full">
-                      Puesto Clave / Crítico
-                    </span>
+                    {selectedJob.status === 'critical' && (
+                      <span className="text-[11px] text-on-tertiary-fixed-variant font-bold px-2 py-0.5 bg-tertiary-fixed rounded-full">
+                        Puesto Clave / Crítico
+                      </span>
+                    )}
                   </div>
-                  <h2 className="text-2xl font-extrabold text-on-surface mt-1">
+                  <h2 className="text-xl lg:text-2xl font-black text-on-surface mt-1">
                     {selectedJob.title}
                   </h2>
-                  <p className="text-xs text-on-surface-variant">{selectedJob.division}</p>
+                  <p className="text-xs text-outline">{selectedJob.division}</p>
                 </div>
               </div>
 
               {/* Incumbents Cluster */}
-              <div className="flex items-center gap-3 bg-surface-container-low px-4 py-2.5 rounded-2xl border border-outline-variant/20">
+              <div className="flex items-center gap-2.5 bg-surface-container-low px-3.5 py-2 rounded-2xl border border-outline-variant/20">
                 <div className="flex -space-x-2 overflow-hidden">
                   {selectedJob.incumbents.map((inc, i) => (
                     <UserAvatar
@@ -526,7 +485,7 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                   ))}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] text-outline font-bold">Personas Ocupantes</span>
+                  <span className="text-[10px] text-outline font-bold">Personas Asignadas</span>
                   <span className="text-xs font-bold text-on-surface">
                     {selectedJob.activeIncumbentsCount} Asignados (100% Cobertura)
                   </span>
@@ -535,69 +494,69 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </div>
 
             {/* Quick Specs Strip */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-4 bg-surface-container-low/50 p-4 rounded-2xl border border-outline-variant/20">
-              <div>
-                <span className="text-[11px] text-outline block font-bold">Área Organizacional</span>
-                <span className="text-xs font-bold text-on-surface">{selectedJob.department}</span>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 pt-3 border-t border-outline-variant/20">
+              <div className="p-2.5 bg-surface-container-low/70 rounded-xl">
+                <span className="text-[10px] text-outline block font-bold uppercase">Área Organizacional</span>
+                <span className="text-xs font-bold text-on-surface truncate block mt-0.5">{selectedJob.department}</span>
               </div>
-              <div>
-                <span className="text-[11px] text-outline block font-bold">Reporta Directamente a</span>
-                <span className="text-xs font-bold text-primary">{selectedJob.reportsTo}</span>
+              <div className="p-2.5 bg-surface-container-low/70 rounded-xl">
+                <span className="text-[10px] text-outline block font-bold uppercase">Reporta Directamente a</span>
+                <span className="text-xs font-bold text-primary truncate block mt-0.5">{selectedJob.reportsTo}</span>
               </div>
-              <div>
-                <span className="text-[11px] text-outline block font-bold">Supervisa Directamente</span>
-                <span className="text-xs font-bold text-on-surface">{selectedJob.supervises}</span>
+              <div className="p-2.5 bg-surface-container-low/70 rounded-xl">
+                <span className="text-[10px] text-outline block font-bold uppercase">Supervisa Directamente</span>
+                <span className="text-xs font-bold text-on-surface truncate block mt-0.5">{selectedJob.supervises}</span>
               </div>
-              <div>
-                <span className="text-[11px] text-outline block font-bold">Nivel Salarial / Banda</span>
-                <span className="text-xs font-bold text-on-surface">{selectedJob.salaryBand}</span>
+              <div className="p-2.5 bg-surface-container-low/70 rounded-xl">
+                <span className="text-[10px] text-outline block font-bold uppercase">Nivel Salarial / Banda</span>
+                <span className="text-xs font-bold text-on-surface truncate block mt-0.5">{selectedJob.salaryBand}</span>
               </div>
             </div>
           </div>
 
           {/* Section 1 & 2: Misión, Relaciones & Autoridad */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* 1. Misión Estratégica */}
-            <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant/30 flex flex-col justify-between">
+            <div className="bg-surface-container-lowest p-5 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined text-[18px]">flag</span>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined text-[16px]">flag</span>
                   </div>
-                  <h4 className="text-sm font-bold text-on-surface">1. Misión Estratégica</h4>
+                  <h4 className="text-xs font-extrabold text-on-surface uppercase tracking-wide">1. Misión Estratégica</h4>
                 </div>
-                <div className="p-4 bg-surface-container-low rounded-2xl relative border border-outline-variant/20">
+                <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/20">
                   <p className="text-xs text-on-surface font-medium leading-relaxed italic">
                     &ldquo;{selectedJob.mission}&rdquo;
                   </p>
                 </div>
               </div>
-              <div className="mt-4">
-                <span className="text-[11px] uppercase tracking-wider text-outline font-bold">
+              <div className="pt-2 border-t border-outline-variant/20">
+                <span className="text-[10px] uppercase tracking-wider text-outline font-bold block">
                   Vínculo con el propósito de la empresa
                 </span>
-                <p className="text-xs text-on-surface-variant mt-1">{selectedJob.purposeLink}</p>
+                <p className="text-xs text-on-surface-variant mt-0.5 leading-relaxed">{selectedJob.purposeLink}</p>
               </div>
             </div>
 
             {/* 2. Relaciones & Autoridad */}
-            <div className="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant/30 flex flex-col justify-between">
+            <div className="bg-surface-container-lowest p-5 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
-                    <span className="material-symbols-outlined text-[18px]">hub</span>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
+                    <span className="material-symbols-outlined text-[16px]">hub</span>
                   </div>
-                  <h4 className="text-sm font-bold text-on-surface">2. Relaciones y Autoridad</h4>
+                  <h4 className="text-xs font-extrabold text-on-surface uppercase tracking-wide">2. Relaciones y Autoridad</h4>
                 </div>
                 <div className="space-y-2">
                   <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/20">
-                    <span className="text-[11px] text-primary font-bold block mb-0.5">
+                    <span className="text-[10px] text-primary font-bold uppercase block mb-0.5">
                       Interacciones Internas Clave
                     </span>
                     <p className="text-xs text-on-surface">{selectedJob.internalRelations}</p>
                   </div>
                   <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/20">
-                    <span className="text-[11px] text-secondary font-bold block mb-0.5">
+                    <span className="text-[10px] text-secondary font-bold uppercase block mb-0.5">
                       Interacciones Externas Clave
                     </span>
                     <p className="text-xs text-on-surface">{selectedJob.externalRelations}</p>
@@ -605,63 +564,63 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-surface-container-high/60 rounded-xl border border-outline-variant/20">
-                <div className="flex items-center gap-2 text-on-surface">
-                  <span className="material-symbols-outlined text-[18px] text-primary">gavel</span>
+              <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/20">
+                <div className="flex items-center gap-1.5 text-on-surface">
+                  <span className="material-symbols-outlined text-[16px] text-primary">gavel</span>
                   <span className="text-xs font-bold">Alcance de Autoridad Formal:</span>
                 </div>
-                <p className="text-xs text-on-surface-variant mt-1">{selectedJob.formalAuthority}</p>
+                <p className="text-xs text-on-surface-variant mt-0.5">{selectedJob.formalAuthority}</p>
               </div>
             </div>
           </div>
 
           {/* Section 3: Responsabilidades y Estándares de Desempeño */}
-          <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-3xl shadow-sm border border-outline-variant/30">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-surface-container-lowest p-5 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col gap-3.5">
+            <div className="flex items-center justify-between pb-1 border-b border-outline-variant/20">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary">
-                  <span className="material-symbols-outlined text-[18px]">task_alt</span>
+                <div className="w-7 h-7 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary">
+                  <span className="material-symbols-outlined text-[16px]">task_alt</span>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-on-surface">
+                  <h4 className="text-xs font-extrabold text-on-surface uppercase tracking-wide">
                     3. Responsabilidades y Estándares de Desempeño
                   </h4>
-                  <p className="text-xs text-outline">
+                  <p className="text-[11px] text-outline">
                     Entregables medibles y criterios objetivos de cumplimiento para el puesto
                   </p>
                 </div>
               </div>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold">
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-semibold">
                 {selectedJob.responsibilities.length} Macro-Responsabilidades
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {selectedJob.responsibilities.map((resp, idx) => (
                 <div
                   key={idx}
-                  className="bg-surface-container-low p-4 rounded-2xl flex flex-col justify-between border border-outline-variant/20"
+                  className="bg-surface-container-low p-3.5 rounded-2xl flex flex-col justify-between border border-outline-variant/20"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-primary px-2 py-0.5 bg-primary-fixed/40 rounded">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-[11px] font-bold text-primary px-1.5 py-0.2 bg-primary-fixed/40 rounded">
                         {resp.number}
                       </span>
-                      <span className="material-symbols-outlined text-[18px] text-secondary">
+                      <span className="material-symbols-outlined text-[16px] text-secondary">
                         verified
                       </span>
                     </div>
-                    <h5 className="text-sm font-bold text-on-surface">{resp.title}</h5>
-                    <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+                    <h5 className="text-xs font-bold text-on-surface">{resp.title}</h5>
+                    <p className="text-[11px] text-on-surface-variant mt-1 leading-relaxed">
                       {resp.description}
                     </p>
                   </div>
-                  <div className="mt-4 pt-2 bg-surface-container-lowest p-2.5 rounded-xl border border-outline-variant/20">
-                    <span className="text-[10px] text-outline block font-bold">
+                  <div className="mt-3 pt-2 bg-surface-container-lowest p-2 rounded-xl border border-outline-variant/20">
+                    <span className="text-[9px] text-outline block font-bold uppercase">
                       Estándar de Desempeño:
                     </span>
                     <span className="text-xs font-bold text-secondary flex items-center gap-1 mt-0.5">
-                      <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                      <span className="material-symbols-outlined text-[13px]">check_circle</span>
                       {resp.standard}
                     </span>
                   </div>
@@ -671,25 +630,25 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
           </div>
 
           {/* Section 4: Condiciones de Trabajo */}
-          <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-3xl shadow-sm border border-outline-variant/30">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
-                <span className="material-symbols-outlined text-[18px]">workspaces</span>
+          <div className="bg-surface-container-lowest p-5 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col gap-3">
+            <div className="flex items-center gap-2 pb-1 border-b border-outline-variant/20">
+              <div className="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-on-surface">
+                <span className="material-symbols-outlined text-[16px]">workspaces</span>
               </div>
               <div>
-                <h4 className="text-sm font-bold text-on-surface">
+                <h4 className="text-xs font-extrabold text-on-surface uppercase tracking-wide">
                   4. Condiciones del Entorno y Trabajo
                 </h4>
-                <p className="text-xs text-outline">
-                  Lugar de trabajo, beneficios y esquema de presencia
+                <p className="text-[11px] text-outline">
+                  Lugar de trabajo, equipamiento y esquema de presencia
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-surface-container-low rounded-2xl flex items-start gap-3 border border-outline-variant/20">
-                <div className="p-2 bg-surface-container rounded-xl text-primary">
-                  <span className="material-symbols-outlined text-[20px]">laptop_mac</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 bg-surface-container-low rounded-2xl flex items-start gap-2.5 border border-outline-variant/20">
+                <div className="p-1.5 bg-surface-container rounded-xl text-primary">
+                  <span className="material-symbols-outlined text-[18px]">laptop_mac</span>
                 </div>
                 <div>
                   <span className="text-xs font-bold text-on-surface block">Modalidad de trabajo</span>
@@ -699,21 +658,21 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 </div>
               </div>
 
-              <div className="p-4 bg-surface-container-low rounded-2xl flex items-start gap-3 border border-outline-variant/20">
-                <div className="p-2 bg-surface-container rounded-xl text-secondary">
-                  <span className="material-symbols-outlined text-[20px]">developer_board</span>
+              <div className="p-3 bg-surface-container-low rounded-2xl flex items-start gap-2.5 border border-outline-variant/20">
+                <div className="p-1.5 bg-surface-container rounded-xl text-secondary">
+                  <span className="material-symbols-outlined text-[18px]">developer_board</span>
                 </div>
                 <div>
-                  <span className="text-xs font-bold text-on-surface block">Herramientas y equipamiento</span>
+                  <span className="text-xs font-bold text-on-surface block">Herramientas y equipo</span>
                   <span className="text-[11px] text-on-surface-variant mt-0.5 block">
                     {selectedJob.workingConditions.tools}
                   </span>
                 </div>
               </div>
 
-              <div className="p-4 bg-surface-container-low rounded-2xl flex items-start gap-3 border border-outline-variant/20">
-                <div className="p-2 bg-surface-container rounded-xl text-primary-container">
-                  <span className="material-symbols-outlined text-[20px]">flight_takeoff</span>
+              <div className="p-3 bg-surface-container-low rounded-2xl flex items-start gap-2.5 border border-outline-variant/20">
+                <div className="p-1.5 bg-surface-container rounded-xl text-primary-container">
+                  <span className="material-symbols-outlined text-[18px]">flight_takeoff</span>
                 </div>
                 <div>
                   <span className="text-xs font-bold text-on-surface block">Viajes y congresos</span>
@@ -725,53 +684,34 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </div>
           </div>
 
-          {/* Section 5: Matriz de Conocimientos, Aptitudes y Habilidades (Escala 1 a 5) */}
-          <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-3xl shadow-sm border border-outline-variant/30">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined text-[18px]">unfold_more_double</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-on-surface">
+          {/* Section 5: Matriz de Conocimientos, Aptitudes y Habilidades */}
+          <div className="bg-surface-container-lowest p-5 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-outline-variant/20">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[16px]">unfold_more_double</span>
+                </div>
+                <div>
+                  <h4 className="text-xs font-extrabold text-on-surface uppercase tracking-wide">
                     5. Matriz de Conocimientos, Aptitudes y Habilidades
                   </h4>
+                  <p className="text-[11px] text-outline">
+                    Escala de dominio: 1 Novato &bull; 2 Aplicado &bull; 3 Autónomo &bull; 4 Avanzado &bull; 5 Experto
+                  </p>
                 </div>
-                <p className="text-xs text-outline mt-0.5">
-                  Escala NEXUS (1: Básico → 5: Experto de referencia)
-                </p>
-              </div>
-
-              {/* Scale Legend */}
-              <div className="flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-full text-xs text-outline border border-outline-variant/20">
-                <span className="flex items-center gap-1 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-outline-variant" />1 Novato
-                </span>
-                <span className="flex items-center gap-1 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-outline" />2 Aplicado
-                </span>
-                <span className="flex items-center gap-1 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-surface-tint" />3 Autónomo
-                </span>
-                <span className="flex items-center gap-1 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-primary-container" />4 Avanzado
-                </span>
-                <span className="flex items-center gap-1 font-bold text-secondary">
-                  <span className="w-2 h-2 rounded-full bg-secondary" />5 Experto
-                </span>
               </div>
             </div>
 
             {/* Two Columns: Technical Skills & Soft Skills */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Technical Skills */}
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between pb-1 border-b border-outline-variant/20">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[20px]">memory</span>
-                    <span className="text-sm font-bold text-on-surface">Habilidades Técnicas Requeridas</span>
-                  </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary-fixed text-primary">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between pb-1">
+                  <span className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-primary text-[16px]">memory</span>
+                    Habilidades Técnicas
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-fixed text-primary">
                     Técnicas clave
                   </span>
                 </div>
@@ -779,33 +719,31 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 {selectedJob.techSkills.map((ts, idx) => (
                   <div
                     key={idx}
-                    className="p-4 bg-surface-container-low rounded-2xl flex flex-col gap-2 border border-outline-variant/20"
+                    className="p-3 bg-surface-container-low rounded-2xl flex flex-col gap-1.5 border border-outline-variant/20"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-xs font-bold text-on-surface block">{ts.name}</span>
+                        <span className="text-xs font-bold text-on-surface block leading-tight">{ts.name}</span>
                         {ts.technicalName && (
-                          <span className="text-[11px] font-medium text-outline block">{ts.technicalName}</span>
+                          <span className="text-[10px] font-medium text-outline block">{ts.technicalName}</span>
                         )}
-                        <span className="text-[11px] text-outline">{ts.description}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-xl shadow-sm border border-outline-variant/20">
-                        <span className="text-[11px] text-outline font-semibold">Nivel:</span>
-                        <span className="text-xs font-bold text-primary">{ts.level} / 5</span>
-                      </div>
+                      <span className="text-xs font-bold text-primary bg-surface-container-lowest px-2 py-0.5 rounded-lg border border-outline-variant/20">
+                        {ts.level} / 5
+                      </span>
                     </div>
                     {/* 5-step progress indicator */}
-                    <div className="grid grid-cols-5 gap-1.5 mt-1">
+                    <div className="grid grid-cols-5 gap-1 my-0.5">
                       {[1, 2, 3, 4, 5].map((lvl) => (
                         <div
                           key={lvl}
-                          className={`h-2 rounded-full ${
-                            lvl <= ts.level ? 'bg-primary-container' : 'bg-surface-container-high'
+                          className={`h-1.5 rounded-full ${
+                            lvl <= ts.level ? 'bg-primary' : 'bg-surface-container-high'
                           }`}
                         />
                       ))}
                     </div>
-                    <div className="flex justify-between items-center text-[10px] text-outline mt-1">
+                    <div className="flex justify-between items-center text-[10px] text-outline">
                       <span>Dominio exigido:</span>
                       <span className="text-primary font-bold">{ts.observedBehavior}</span>
                     </div>
@@ -814,17 +752,13 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               </div>
 
               {/* Soft Skills */}
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between pb-1 border-b border-outline-variant/20">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-[20px]">
-                      diversity_3
-                    </span>
-                    <span className="text-sm font-bold text-on-surface">
-                      Habilidades Sociales y de Liderazgo
-                    </span>
-                  </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center justify-between pb-1">
+                  <span className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-secondary text-[16px]">diversity_3</span>
+                    Habilidades de Liderazgo y Humanas
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container">
                     Capital humano
                   </span>
                 </div>
@@ -832,31 +766,27 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 {selectedJob.softSkills.map((ss, idx) => (
                   <div
                     key={idx}
-                    className="p-4 bg-surface-container-low rounded-2xl flex flex-col gap-2 border border-outline-variant/20"
+                    className="p-3 bg-surface-container-low rounded-2xl flex flex-col gap-1.5 border border-outline-variant/20"
                   >
                     <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-xs font-bold text-on-surface block">{ss.name}</span>
-                        <span className="text-[11px] text-outline">{ss.description}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-xl shadow-sm border border-outline-variant/20">
-                        <span className="text-[11px] text-outline font-semibold">Nivel:</span>
-                        <span className="text-xs font-bold text-secondary">{ss.level} / 5</span>
-                      </div>
+                      <span className="text-xs font-bold text-on-surface leading-tight">{ss.name}</span>
+                      <span className="text-xs font-bold text-secondary bg-surface-container-lowest px-2 py-0.5 rounded-lg border border-outline-variant/20">
+                        {ss.level} / 5
+                      </span>
                     </div>
-                    <div className="grid grid-cols-5 gap-1.5 mt-1">
+                    <div className="grid grid-cols-5 gap-1 my-0.5">
                       {[1, 2, 3, 4, 5].map((lvl) => (
                         <div
                           key={lvl}
-                          className={`h-2 rounded-full ${
+                          className={`h-1.5 rounded-full ${
                             lvl <= ss.level ? 'bg-secondary' : 'bg-surface-container-high'
                           }`}
                         />
                       ))}
                     </div>
-                    <div className="flex justify-between items-center text-[10px] text-outline mt-1">
-                      <span>Comportamiento observado:</span>
-                      <span className="text-on-secondary-container font-bold">
+                    <div className="flex justify-between items-center text-[10px] text-outline">
+                      <span>Comportamiento:</span>
+                      <span className="text-on-secondary-container font-bold truncate max-w-[200px]">
                         {ss.observedBehavior}
                       </span>
                     </div>
@@ -866,112 +796,112 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </div>
           </div>
 
-          {/* Section 6: Especificación Formal y Modelo Relacional (Diseño del Word / UTN) */}
-          <div className="bg-surface-container-lowest p-6 lg:p-8 rounded-3xl shadow-sm border border-outline-variant/30 flex flex-col gap-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/20 pb-4">
+          {/* Section 6: Especificación Formal y Estructura Organizacional */}
+          <div className="bg-surface-container-lowest p-5 rounded-3xl shadow-xs border border-outline-variant/30 flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-outline-variant/20 pb-2.5">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary-fixed/70 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined text-[18px]">account_tree</span>
+                <div className="w-7 h-7 rounded-lg bg-primary-fixed/70 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-[16px]">account_tree</span>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-on-surface">
-                    6. Especificación Formal y Modelo de Puestos (Diseño Relacional del Word)
+                  <h4 className="text-xs font-extrabold text-on-surface uppercase tracking-wide">
+                    6. Especificación y Estructura Organizacional
                   </h4>
-                  <p className="text-xs text-outline">
-                    Entidades normalizadas: Unidad, Puesto, Perfil, Funciones, Tareas, Riesgos, Relaciones y Estándares
+                  <p className="text-[11px] text-outline">
+                    Entidades del cargo: Unidad, Jerarquía, Posiciones, Perfil y Responsabilidades
                   </p>
                 </div>
               </div>
-              <span className="text-xs px-3 py-1 rounded-full bg-secondary-container/40 text-on-secondary-container font-bold">
-                Manual de Organización &bull; UTN FRT
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-bold">
+                Manual de Organización
               </span>
             </div>
 
             {/* Sub-bloque A: Jerarquía y Posiciones */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
-                <span className="text-[11px] text-outline font-bold uppercase block mb-1">
-                  Unidad Organizacional (1:N)
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <span className="text-[10px] text-outline font-bold uppercase block mb-0.5">
+                  Unidad Organizacional
                 </span>
-                <span className="text-sm font-bold text-on-surface block">
+                <span className="text-xs font-bold text-on-surface block">
                   {selectedJob.unidad?.nombre || selectedJob.department}
                 </span>
-                <span className="text-[11px] text-outline-variant mt-1 block">
+                <span className="text-[10px] text-outline mt-0.5 block">
                   Depende de: {selectedJob.unidad?.unidadSuperior?.nombre || 'Dirección General'}
                 </span>
               </div>
 
-              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
-                <span className="text-[11px] text-outline font-bold uppercase block mb-1">
-                  Puesto Superior (Recursiva 1:N)
+              <div className="p-3 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <span className="text-[10px] text-outline font-bold uppercase block mb-0.5">
+                  Puesto Superior
                 </span>
-                <span className="text-sm font-bold text-on-surface block">
+                <span className="text-xs font-bold text-on-surface block">
                   {selectedJob.puestoSuperior?.title || selectedJob.reportsTo}
                 </span>
-                <span className="text-[11px] text-outline-variant mt-1 block">
+                <span className="text-[10px] text-outline mt-0.5 block">
                   Supervisión inmediata formal
                 </span>
               </div>
 
-              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
-                <span className="text-[11px] text-outline font-bold uppercase block mb-1">
-                  Posiciones Asignadas (n_posiciones)
+              <div className="p-3 bg-surface-container-low rounded-2xl border border-outline-variant/20">
+                <span className="text-[10px] text-outline font-bold uppercase block mb-0.5">
+                  Posiciones Asignadas
                 </span>
-                <span className="text-sm font-bold text-primary block">
-                  {selectedJob.nPosiciones ?? selectedJob.activeIncumbentsCount} Puesto(s) Físico(s)
+                <span className="text-xs font-bold text-primary block">
+                  {selectedJob.nPosiciones ?? selectedJob.activeIncumbentsCount} Plaza(s) en Estructura
                 </span>
-                <span className="text-[11px] text-outline-variant mt-1 block">
-                  Diferencia entre Puesto y Posición (Diapositiva 31)
+                <span className="text-[10px] text-outline mt-0.5 block">
+                  Plazas autorizadas para el cargo
                 </span>
               </div>
             </div>
 
-            {/* Sub-bloque B: Especificación del Puesto (Perfil y Responsabilidades 1:1) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Perfil (1:1) */}
-              <div className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">school</span>
-                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                    Perfil del Puesto (1:1 con PUESTO)
+            {/* Sub-bloque B: Especificación del Puesto (Perfil y Responsabilidades) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {/* Perfil */}
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-primary text-[16px]">school</span>
+                  <h5 className="text-[11px] font-bold text-on-surface uppercase tracking-wider">
+                    Perfil del Cargo
                   </h5>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-outline block">Educación Formal:</span>
+                  <span className="text-[10px] font-bold text-outline block">Educación Formal:</span>
                   <p className="text-xs text-on-surface mt-0.5">
                     {selectedJob.perfil?.educacionFormal || 'Educación universitaria o técnica afín al área requerida.'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-outline block">Experiencia Requerida:</span>
+                  <span className="text-[10px] font-bold text-outline block">Experiencia Requerida:</span>
                   <p className="text-xs text-on-surface mt-0.5">
                     {selectedJob.perfil?.experienciaRequerida || 'Experiencia laboral demostrable en funciones del cargo.'}
                   </p>
                 </div>
               </div>
 
-              {/* Ficha de Responsabilidades (1:1) */}
-              <div className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-secondary text-[18px]">inventory_2</span>
-                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                    Responsabilidad (1:1 con PUESTO)
+              {/* Ficha de Responsabilidades */}
+              <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-secondary text-[16px]">inventory_2</span>
+                  <h5 className="text-[11px] font-bold text-on-surface uppercase tracking-wider">
+                    Responsabilidades y Recursos
                   </h5>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-outline block">Manejo de Personal:</span>
+                  <span className="text-[10px] font-bold text-outline block">Manejo de Personal:</span>
                   <p className="text-xs text-on-surface mt-0.5">
                     {selectedJob.responsabilidadFicha?.manejoPersonal || selectedJob.supervises}
                   </p>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-outline block">Equipo de Trabajo:</span>
+                  <span className="text-[10px] font-bold text-outline block">Equipo de Trabajo:</span>
                   <p className="text-xs text-on-surface mt-0.5">
                     {selectedJob.responsabilidadFicha?.equipoTrabajo || selectedJob.workingConditions.tools}
                   </p>
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-outline block">Manejo de Información:</span>
+                  <span className="text-[10px] font-bold text-outline block">Manejo de Información:</span>
                   <p className="text-xs text-on-surface mt-0.5">
                     {selectedJob.responsabilidadFicha?.manejoInformacion || 'Bases de datos y documentación reservada institucional.'}
                   </p>
@@ -979,29 +909,29 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               </div>
             </div>
 
-            {/* Sub-bloque C: Funciones y Tareas Desagregadas (1:N y 1:N) */}
+            {/* Sub-bloque C: Funciones y Tareas Desagregadas */}
             {selectedJob.funciones && selectedJob.funciones.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">format_list_numbered</span>
-                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                    Unidades de Competencia (Funciones) y Tareas (1:N)
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-primary text-[16px]">format_list_numbered</span>
+                  <h5 className="text-[11px] font-bold text-on-surface uppercase tracking-wider">
+                    Funciones Principales y Tareas Operativas
                   </h5>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {selectedJob.funciones.map((func, fIdx) => (
                     <div
                       key={func.id || fIdx}
-                      className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20"
+                      className="p-3 bg-surface-container-low rounded-2xl border border-outline-variant/20"
                     >
                       <span className="text-xs font-bold text-primary block mb-1">
                         Función {fIdx + 1}: {func.descripcion}
                       </span>
                       {func.tareas && func.tareas.length > 0 && (
-                        <div className="mt-2 flex flex-col gap-1.5 pl-2 border-l-2 border-primary/30">
-                          <span className="text-[10px] uppercase font-bold text-outline">Tareas Operativas:</span>
+                        <div className="mt-1.5 flex flex-col gap-1 pl-2 border-l-2 border-primary/30">
+                          <span className="text-[9px] uppercase font-bold text-outline">Tareas Operativas:</span>
                           {func.tareas.map((tar, tIdx) => (
-                            <div key={tar.id || tIdx} className="text-xs text-on-surface-variant flex items-start gap-1.5">
+                            <div key={tar.id || tIdx} className="text-[11px] text-on-surface-variant flex items-start gap-1">
                               <span className="text-primary font-bold">•</span>
                               <span>{tar.descripcion}</span>
                             </div>
@@ -1014,30 +944,30 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               </div>
             )}
 
-            {/* Sub-bloque D: Riesgos del Cargo (1:N) */}
+            {/* Sub-bloque D: Riesgos del Cargo */}
             {selectedJob.riesgosPuesto && selectedJob.riesgosPuesto.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-error text-[18px]">warning</span>
-                  <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                    Riesgos del Cargo (1:N con PUESTO)
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-amber-600 text-[16px]">warning</span>
+                  <h5 className="text-[11px] font-bold text-on-surface uppercase tracking-wider">
+                    Riesgos Identificados del Cargo
                   </h5>
                 </div>
                 <div className="overflow-x-auto rounded-2xl border border-outline-variant/20">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-surface-container-high text-on-surface font-bold uppercase tracking-wider text-[10px]">
                       <tr>
-                        <th className="p-3">Tipo de Riesgo</th>
-                        <th className="p-3">Motivo / Causa</th>
-                        <th className="p-3">Consecuencia</th>
+                        <th className="p-2.5">Tipo de Riesgo</th>
+                        <th className="p-2.5">Motivo / Causa</th>
+                        <th className="p-2.5">Consecuencia</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-outline-variant/10 bg-surface-container-low">
                       {selectedJob.riesgosPuesto.map((r, rIdx) => (
                         <tr key={r.id || rIdx} className="hover:bg-surface-container transition-colors">
-                          <td className="p-3 font-bold text-primary">{r.tipoRiesgo}</td>
-                          <td className="p-3 text-on-surface">{r.motivo}</td>
-                          <td className="p-3 text-on-surface-variant font-medium">{r.consecuencia}</td>
+                          <td className="p-2.5 font-bold text-primary">{r.tipoRiesgo}</td>
+                          <td className="p-2.5 text-on-surface">{r.motivo}</td>
+                          <td className="p-2.5 text-on-surface-variant font-medium">{r.consecuencia}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -1046,32 +976,32 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
               </div>
             )}
 
-            {/* Sub-bloque E: Relaciones de Trabajo (1:N) & Estándares de Desempeño (1:N) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Relaciones de Trabajo (1:N) */}
+            {/* Sub-bloque E: Relaciones de Trabajo & Estándares de Desempeño */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {/* Relaciones de Trabajo */}
               {selectedJob.relacionesPuesto && selectedJob.relacionesPuesto.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-[18px]">share</span>
-                    <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                      Relaciones de Trabajo (1:N)
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-secondary text-[16px]">share</span>
+                    <h5 className="text-[11px] font-bold text-on-surface uppercase tracking-wider">
+                      Relaciones de Trabajo
                     </h5>
                   </div>
                   <div className="overflow-x-auto rounded-2xl border border-outline-variant/20">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-surface-container-high text-on-surface font-bold uppercase tracking-wider text-[10px]">
                         <tr>
-                          <th className="p-2.5">Tipo</th>
-                          <th className="p-2.5">Puesto o Institución</th>
-                          <th className="p-2.5">Propósito</th>
+                          <th className="p-2">Tipo</th>
+                          <th className="p-2">Puesto o Entidad</th>
+                          <th className="p-2">Propósito</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-outline-variant/10 bg-surface-container-low">
                         {selectedJob.relacionesPuesto.map((rel, rIdx) => (
                           <tr key={rel.id || rIdx}>
-                            <td className="p-2.5 font-bold uppercase text-[10px] text-primary">{rel.tipo}</td>
-                            <td className="p-2.5 font-medium text-on-surface">{rel.puestoOInstitucion}</td>
-                            <td className="p-2.5 text-on-surface-variant text-[11px]">{rel.proposito}</td>
+                            <td className="p-2 font-bold uppercase text-[9px] text-primary">{rel.tipo}</td>
+                            <td className="p-2 font-medium text-on-surface">{rel.puestoOInstitucion}</td>
+                            <td className="p-2 text-on-surface-variant text-[10px]">{rel.proposito}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1080,20 +1010,20 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                 </div>
               )}
 
-              {/* Estándares de Desempeño (1:N) */}
+              {/* Estándares de Desempeño */}
               {selectedJob.estandaresDesempeno && selectedJob.estandaresDesempeno.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-                    <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
-                      Estándares de Desempeño del Manual (1:N)
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-primary text-[16px]">verified</span>
+                    <h5 className="text-[11px] font-bold text-on-surface uppercase tracking-wider">
+                      Estándares de Desempeño
                     </h5>
                   </div>
-                  <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-2">
+                  <div className="p-3 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-1.5">
                     {selectedJob.estandaresDesempeno.map((est, eIdx) => (
-                      <div key={est.id || eIdx} className="flex items-start gap-2 text-xs text-on-surface">
-                        <span className="material-symbols-outlined text-secondary text-[16px] shrink-0">check_circle</span>
-                        <span>{est.descripcion}</span>
+                      <div key={est.id || eIdx} className="flex items-start gap-1.5 text-xs text-on-surface">
+                        <span className="material-symbols-outlined text-secondary text-[14px] shrink-0 mt-0.5">check_circle</span>
+                        <span className="text-[11px]">{est.descripcion}</span>
                       </div>
                     ))}
                   </div>
@@ -1102,46 +1032,46 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
             </div>
           </div>
 
-          {/* Sticky Bottom Ribbon */}
-          <div className="sticky bottom-4 z-30 bg-surface-container-lowest/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl border border-outline-variant/30 flex flex-wrap items-center justify-between gap-4">
+          {/* Sticky Bottom Action Ribbon */}
+          <div className="sticky bottom-4 z-30 bg-surface-container-lowest/95 backdrop-blur-xl px-4 py-2.5 rounded-2xl shadow-lg border border-outline-variant/30 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-secondary" />
-              <span className="text-xs font-bold text-on-surface">Ficha del cargo validada v3.2</span>
-              <span className="hidden md:inline text-xs text-outline">
-                • Última revisión: Octubre 2026
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="text-xs font-bold text-on-surface">Ficha validada v3.2</span>
+              <span className="hidden md:inline text-[11px] text-outline">
+                &bull; Octubre 2026
               </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => triggerToast(`Copia creada: ${selectedJob.title} (Borrador)`)}
-                className="px-3.5 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all border border-outline-variant/20"
+                className="px-3 py-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface rounded-xl text-xs font-semibold flex items-center gap-1 transition-all border border-outline-variant/20 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                <span className="material-symbols-outlined text-[15px]">content_copy</span>
                 <span className="hidden sm:inline">Duplicar</span>
               </button>
 
               <button
                 onClick={() => onNavigate('value-map')}
-                className="px-3.5 py-2 bg-surface-container-low hover:bg-secondary-container/20 text-on-secondary-container rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border border-outline-variant/20"
+                className="px-3 py-1.5 bg-surface-container-low hover:bg-secondary-container/20 text-on-secondary-container rounded-xl text-xs font-bold flex items-center gap-1 transition-all border border-outline-variant/20 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px] text-secondary">schema</span>
+                <span className="material-symbols-outlined text-[15px] text-secondary">schema</span>
                 <span>Cadena de Valor</span>
               </button>
 
               <button
                 onClick={handleCreateVacancy}
-                className="px-3.5 py-2 bg-surface-container-high hover:bg-primary-fixed text-primary rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all"
+                className="px-3 py-1.5 bg-surface-container-high hover:bg-primary-fixed text-primary rounded-xl text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]">person_add</span>
-                <span>Generar Vacante en Reclutamiento</span>
+                <span className="material-symbols-outlined text-[15px]">person_add</span>
+                <span>Generar Vacante</span>
               </button>
 
               <button
                 onClick={() => triggerToast(`Abriendo editor para ${selectedJob.code}`)}
-                className="px-4 py-2 bg-primary-container hover:bg-primary text-on-primary rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all"
+                className="px-3.5 py-1.5 bg-primary text-on-primary hover:bg-primary-container rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]">edit_square</span>
+                <span className="material-symbols-outlined text-[15px]">edit_square</span>
                 <span>Editar Puesto</span>
               </button>
             </div>
@@ -1153,44 +1083,26 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
       {showNewJobModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-surface-container-lowest rounded-3xl max-w-xl w-full p-6 shadow-2xl flex flex-col gap-4 border border-outline-variant/30 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
-              <div className="flex items-center gap-2.5">
-                <span className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <span className="material-symbols-outlined text-xl">work</span>
+            <div className="flex items-center justify-between pb-2.5 border-b border-outline-variant/20">
+              <div className="flex items-center gap-2">
+                <span className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[18px]">work</span>
                 </span>
                 <div>
-                  <h3 className="text-base font-black text-on-surface">Crear Nuevo Puesto de Trabajo</h3>
-                  <p className="text-[11px] text-outline">Completá los datos del cargo para incorporarlo al organigrama</p>
+                  <h3 className="text-sm font-black text-on-surface">Crear Nuevo Puesto de Trabajo</h3>
+                  <span className="text-[10px] text-outline">Incorporación de cargo al catálogo organizacional</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowNewJobModal(false)}
-                className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface cursor-pointer"
+                className="w-7 h-7 rounded-full hover:bg-surface-container flex items-center justify-center text-outline cursor-pointer"
                 title="Cerrar"
               >
-                <span className="material-symbols-outlined text-sm">close</span>
+                <span className="material-symbols-outlined text-[16px]">close</span>
               </button>
             </div>
 
-            <div className="flex flex-col gap-3.5">
-              {/* Security & Role Status Banner */}
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-emerald-600 text-base">verified_user</span>
-                  <div>
-                    <span className="text-on-surface font-bold block">
-                      Autorizado como: {user?.name || 'Administrador General'}
-                    </span>
-                    <span className="text-[10px] text-outline">
-                      Rol: {role} &bull; Permiso total de creación en base de datos
-                    </span>
-                  </div>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-800">
-                  {role}
-                </span>
-              </div>
-
+            <div className="flex flex-col gap-3 text-xs">
               <div>
                 <label className="text-xs font-bold text-on-surface block mb-1">
                   Nombre del Puesto o Cargo:
@@ -1200,7 +1112,7 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Ej: Desarrollador Backend Senior"
-                  className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 focus:border-primary font-medium"
+                  className="w-full px-3 py-2 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 focus:border-primary font-medium"
                 />
               </div>
 
@@ -1210,7 +1122,7 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                   <select
                     value={newDepartment}
                     onChange={(e) => setNewDepartment(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer"
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer"
                   >
                     <option value="Tecnología y Plataforma">Tecnología y Plataforma</option>
                     <option value="Inteligencia Artificial y Datos">Inteligencia Artificial y Datos</option>
@@ -1224,27 +1136,24 @@ export const PuestosScreen: React.FC<PuestosScreenProps> = ({
                   <select
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as 'critical' | 'operational')}
-                    className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer"
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 cursor-pointer"
                   >
-                    <option value="critical">Crítico (Puesto clave para la empresa)</option>
-                    <option value="operational">Operativo (Funcionamiento regular)</option>
+                    <option value="critical">Crítico (Puesto clave)</option>
+                    <option value="operational">Operativo (Estándar)</option>
                   </select>
                 </div>
               </div>
 
               <div>
                 <label className="text-xs font-bold text-on-surface block mb-1">
-                  Objetivo Principal del Puesto:
+                  Misión u Objetivo del Puesto:
                 </label>
-                <p className="text-[11px] text-outline mb-1.5">
-                  Explicá brevemente cuál será la responsabilidad principal de la persona que ocupe este cargo.
-                </p>
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={newMission}
                   onChange={(e) => setNewMission(e.target.value)}
-                  placeholder="Describí las funciones clave que realizará..."
-                  className="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 focus:border-primary resize-none font-medium"
+                  placeholder="Describí las responsabilidades principales..."
+                  className="w-full px-3 py-2 bg-surface-container-low rounded-xl text-xs text-on-surface outline-none border border-outline-variant/30 focus:border-primary resize-none font-medium"
                 />
               </div>
             </div>

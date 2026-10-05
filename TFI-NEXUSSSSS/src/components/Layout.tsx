@@ -10,6 +10,24 @@ import { APP_NAME } from '../routes';
 export const Layout: React.FC = () => {
   const [selectedCampus, setSelectedCampus] = useState<string>('Campus Central');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('nexus_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleSidebarCollapse = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('nexus_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
+  };
+
   const { pathname } = useLocation();
   const crumbs = useBreadcrumbs();
   const moduleKey = pathname.split('/')[1] ?? '';
@@ -41,13 +59,23 @@ export const Layout: React.FC = () => {
         Saltar al contenido
       </a>
 
-      <Sidebar isMobileOpen={isMobileSidebarOpen} onCloseMobile={() => setIsMobileSidebarOpen(false)} />
+      <Sidebar
+        isMobileOpen={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={handleToggleSidebarCollapse}
+      />
 
-      <div className="flex-1 ml-0 lg:ml-72 flex flex-col min-h-screen min-w-0 transition-all">
+      <div
+        className={`flex-1 ml-0 ${
+          isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'
+        } flex flex-col min-h-screen min-w-0 transition-all duration-300 ease-in-out`}
+      >
         <Header
           selectedCampus={selectedCampus}
           onSelectCampus={setSelectedCampus}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
+          isSidebarCollapsed={isSidebarCollapsed}
         />
 
         <main id="contenido" className="flex-1 mt-20 pb-16 overflow-x-hidden">

@@ -210,7 +210,7 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
   });
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -219,118 +219,106 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
         </div>
       )}
 
-      {/* Header & Friendly Guide */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs tracking-wider text-primary uppercase font-extrabold">
-                Crecimiento y Resultados &bull; Desempeño
-              </span>
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-on-surface-variant font-medium">
-                Calificaciones y potencial de colaboradores
-              </span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-on-surface tracking-tight font-headline flex items-center gap-3">
-              Evaluación de Desempeño y Matriz de Talento
-            </h1>
-            <p className="text-xs sm:text-sm text-outline mt-0.5 max-w-3xl">
-              Calificaciones de rendimiento, opiniones del equipo y mapa de potencial para planificar ascensos y capacitaciones.
-            </p>
+      {/* Compact Header & Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs uppercase tracking-wider text-primary font-bold font-headline">
+              Crecimiento y Resultados &bull; Desempeño
+            </span>
+            <span className="text-outline-variant">•</span>
+            <span className="text-xs text-on-surface-variant font-medium">
+              Calificaciones y matriz de talento
+            </span>
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              142 evaluados
+            </span>
           </div>
-
-          <div className="flex items-center gap-2 self-stretch xl:self-auto">
-            <select
-              value={selectedCycle}
-              onChange={(e) => setSelectedCycle(e.target.value)}
-              className="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-surface-container text-on-surface border border-outline-variant/40 outline-hidden cursor-pointer"
-            >
-              <option value="Ciclo Anual 2026 (Calibración Q4)">Ciclo Anual 2026 (Activo)</option>
-              <option value="Mid-Year Review 2026">Revisión de Mitad de Año 2026</option>
-              <option value="Ciclo Anual 2025">Ciclo Anterior 2025</option>
-            </select>
-            <button
-              onClick={() => setShowConfirmApproval(true)}
-              className="px-4 py-2.5 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-2 cursor-pointer shadow-xs"
-            >
-              <span className="material-symbols-outlined text-sm">assignment_turned_in</span>
-              Aprobar Evaluaciones
-            </button>
-          </div>
+          <h1 className="text-xl lg:text-2xl font-black text-on-surface tracking-tight font-headline">
+            Evaluación de Desempeño y Matriz de Talento
+          </h1>
         </div>
 
-        {/* Quick Guide Banner */}
-        <QuickGuideBanner
-          title="¿Cómo interpretar las evaluaciones y la matriz de 9 Cajas?"
-          description="Te permite ver con claridad el desempeño de cada empleado y su potencial de crecimiento futuro."
-          tips={[
-            'En "Lista de Evaluaciones" podés revisar la nota técnica y el feedback de compañeros de cada empleado.',
-            'En "Matriz de 9 Cajas" verás un cuadrante visual que cruza desempeño actual vs potencial futuro.',
-            'Al terminar las revisiones, usá "Aprobar Evaluaciones" para cerrar formalmente el período.',
-          ]}
-        />
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <select
+            value={selectedCycle}
+            onChange={(e) => setSelectedCycle(e.target.value)}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-surface-container text-on-surface border border-outline-variant/40 outline-none cursor-pointer"
+          >
+            <option value="Ciclo Anual 2026 (Calibración Q4)">Ciclo Anual 2026 (Activo)</option>
+            <option value="Mid-Year Review 2026">Revisión Mid-Year 2026</option>
+            <option value="Ciclo Anual 2025">Ciclo Anterior 2025</option>
+          </select>
+          <button
+            onClick={() => setShowConfirmApproval(true)}
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[16px]">assignment_turned_in</span>
+            Aprobar Evaluaciones
+          </button>
+        </div>
       </div>
 
-      {/* Confirmation Modal for Calibration Approval */}
-      <ConfirmationModal
-        isOpen={showConfirmApproval}
-        title="¿Confirmás la aprobación final de calificaciones?"
-        message={`Se cerrará formalmente el ${selectedCycle} y se guardarán los puntajes finales de los 142 colaboradores evaluados.`}
-        confirmLabel="Sí, aprobar calificaciones"
-        cancelLabel="Volver a revisar"
-        type="primary"
-        onConfirm={() => {
-          setShowConfirmApproval(false);
-          triggerToast('¡Listo! Calificaciones del período aprobadas con éxito.');
-        }}
-        onCancel={() => setShowConfirmApproval(false)}
+      {/* Slim Guide Bar */}
+      <QuickGuideBanner
+        title="Guía de Evaluaciones y Matriz 9-Box"
+        description="Rendimiento del colaborador y su potencial de crecimiento futuro mediante consenso 360°."
+        tips={[
+          'En "Fichas 360°" podés revisar la nota técnica, autoevaluación y feedback de pares.',
+          'En "Matriz de 9 Cajas" verás el cuadrante visual que cruza desempeño actual vs potencial.',
+          'Al finalizar las calibraciones, usá "Aprobar Evaluaciones" para cerrar el ciclo oficialmente.',
+        ]}
+        dismissible={true}
       />
 
-      {/* Ribbon Metrics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+      {/* Compact 4-Metric Status Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Colaboradores Evaluados</span>
-            <div className="text-xl font-black text-on-surface mt-0.5">142 de 156</div>
-            <div className="text-[11px] text-emerald-600 font-medium mt-0.5">91% Avance Global</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Colaboradores Evaluados</span>
+            <div className="text-base font-black text-on-surface">
+              142 <span className="text-[11px] font-normal text-outline">/ 156</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined">how_to_reg</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-secondary-container/40 text-on-secondary-container text-[10px] font-bold">
+            91% avance
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Promedio Desempeño</span>
-            <div className="text-xl font-black text-on-surface mt-0.5">4.62 / 5.0</div>
-            <div className="text-[11px] text-primary font-medium mt-0.5">Distribución Equilibrada</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Promedio Desempeño</span>
+            <div className="text-base font-black text-primary">
+              4.62 <span className="text-[11px] font-normal text-outline">/ 5.0</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-600">
-            <span className="material-symbols-outlined">insights</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[10px] font-bold">
+            Equilibrado
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Talento Destacado (Estrellas)</span>
-            <div className="text-xl font-black text-emerald-600 mt-0.5">18 Colaboradores</div>
-            <div className="text-[11px] text-emerald-700 font-medium mt-0.5">Elegibles a Promoción</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Talento Destacado</span>
+            <div className="text-base font-black text-on-secondary-container">
+              18 <span className="text-[11px] font-bold text-on-secondary-container">estrellas</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-            <span className="material-symbols-outlined">stars</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold">
+            12% elegibles
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Pendientes de Calibrar</span>
-            <div className="text-xl font-black text-amber-600 mt-0.5">14 Evaluaciones</div>
-            <div className="text-[11px] text-amber-700 font-medium mt-0.5">Comité Sesión 2</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Pendientes de Calibrar</span>
+            <div className="text-base font-black text-tertiary">
+              14 <span className="text-[11px] font-bold text-tertiary">casos</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-            <span className="material-symbols-outlined">pending_actions</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-error-container/40 text-tertiary text-[10px] font-bold">
+            Comité Sesión 2
+          </span>
         </div>
       </div>
 
@@ -421,9 +409,9 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
                   <div
                     key={r.id}
                     onClick={() => setSelectedRecordId(r.id)}
-                    className={`p-4 rounded-3xl border transition-all cursor-pointer flex flex-col gap-3 ${
+                    className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2.5 ${
                       isSelected
-                        ? 'bg-surface-container-lowest border-primary ring-2 ring-primary/25 shadow-md transform -translate-y-0.5'
+                        ? 'bg-surface-container-lowest border-primary ring-2 ring-primary/20 shadow-xs'
                         : 'bg-surface-container-lowest hover:bg-surface-container-low border-outline-variant/30'
                     }`}
                   >
@@ -491,7 +479,7 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
 
           {/* Columna Derecha: Inspector Detallado de Evaluación */}
           <div className="lg:col-span-5 flex flex-col gap-6">
-            <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs sticky top-6">
+            <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs sticky top-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <UserAvatar
@@ -575,7 +563,7 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
 
       {/* TAB 2: Matriz 9-Box Interactiva */}
       {activeTab === '9box' && (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">
@@ -699,7 +687,7 @@ export const EvaluacionScreen: React.FC<EvaluacionScreenProps> = ({
 
       {/* TAB 3: Curva Forzada y Sesión de Comité */}
       {activeTab === 'committee' && (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-6">
+        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">

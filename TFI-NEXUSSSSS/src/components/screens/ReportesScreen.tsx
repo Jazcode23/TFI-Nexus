@@ -47,7 +47,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
   }, []);
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6">
+    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-3 duration-200">
@@ -56,130 +56,130 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
         </div>
       )}
 
-      {/* Screen Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs tracking-wider text-primary uppercase font-extrabold">
-                Crecimiento y Resultados &bull; Informes y Estadísticas
-              </span>
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-on-surface-variant font-medium">
-                Analítica del Capital Humano
-              </span>
-            </div>
-            <h1 className="text-2xl lg:text-3xl font-black text-on-surface tracking-tight font-headline flex items-center gap-3">
-              Reportes y Estadísticas del Personal
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Datos Actualizados
-              </span>
-            </h1>
-            <p className="text-xs sm:text-sm text-outline mt-0.5 max-w-3xl">
-              Consultá el rendimiento de los equipos de trabajo, la estabilidad del personal y descargá informes en PDF o formato compatible con Excel.
-            </p>
+      {/* Compact Header & Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs uppercase tracking-wider text-primary font-bold font-headline">
+              Crecimiento y Resultados &bull; Informes y Estadísticas
+            </span>
+            <span className="text-outline-variant">•</span>
+            <span className="text-xs text-on-surface-variant font-medium">
+              Analítica del capital humano
+            </span>
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Actualizado
+            </span>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2 self-stretch xl:self-auto">
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-surface-container-high text-on-surface border border-outline-variant/40 outline-hidden cursor-pointer"
-              aria-label="Seleccionar período"
-            >
-              <option value="Año Fiscal 2026">Año Fiscal 2026 (Consolidado)</option>
-              <option value="Q4 2026">Q4 2026 (Último trimestre)</option>
-              <option value="Q3 2026">Q3 2026 (Trimestre previo)</option>
-            </select>
-            <button
-              onClick={async () => {
-                try {
-                  triggerToast('Generando reporte ejecutivo en PDF...');
-                  await reportsApi.downloadReport('pdf');
-                  triggerToast('Reporte en PDF descargado exitosamente.');
-                } catch {
-                  window.print();
-                }
-              }}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/40 transition-all flex items-center gap-2 cursor-pointer shadow-xs"
-            >
-              <span className="material-symbols-outlined text-sm text-primary">picture_as_pdf</span>
-              Exportar PDF
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  await reportsApi.downloadReport('xlsx');
-                  triggerToast('Reporte consolidado descargado en Excel.');
-                } catch {
-                  triggerToast('Datos exportados en archivo compatible con Excel.');
-                }
-              }}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-2 cursor-pointer shadow-xs"
-            >
-              <span className="material-symbols-outlined text-sm">table_view</span>
-              Descargar Excel
-            </button>
-          </div>
+          <h1 className="text-xl lg:text-2xl font-black text-on-surface tracking-tight font-headline">
+            Reportes y Estadísticas del Personal
+          </h1>
         </div>
 
-        {/* Quick Guide Banner */}
-        <QuickGuideBanner
-          title="¿Cómo consultar y exportar reportes?"
-          description="Elegí el período que deseás analizar y navegá entre las diferentes pestañas para ver gráficos y tablas detalladas."
-          tips={[
-            'Cambiá el período en el selector superior para comparar trimestres anteriores con el actual.',
-            'Hacé clic en "Rendimiento por Equipo", "Evolución en el Tiempo" o "Estabilidad del Personal" para cambiar de gráfico.',
-            'Usá "Exportar PDF" para generar un informe para reuniones o "Descargar Excel" para abrir la tabla de datos.',
-          ]}
-        />
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value)}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold bg-surface-container text-on-surface border border-outline-variant/40 outline-none cursor-pointer"
+            aria-label="Seleccionar período"
+          >
+            <option value="Año Fiscal 2026">Año Fiscal 2026 (Consolidado)</option>
+            <option value="Q4 2026">Q4 2026 (Último trimestre)</option>
+            <option value="Q3 2026">Q3 2026 (Trimestre previo)</option>
+          </select>
+          <button
+            onClick={async () => {
+              try {
+                triggerToast('Generando reporte ejecutivo en PDF...');
+                await reportsApi.downloadReport('pdf');
+                triggerToast('Reporte en PDF descargado exitosamente.');
+              } catch {
+                window.print();
+              }
+            }}
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          >
+            <span className="material-symbols-outlined text-[16px] text-primary">picture_as_pdf</span>
+            PDF
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await reportsApi.downloadReport('xlsx');
+                triggerToast('Reporte consolidado descargado en Excel.');
+              } catch {
+                triggerToast('Datos exportados en archivo compatible con Excel.');
+              }
+            }}
+            className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[16px]">table_view</span>
+            Excel
+          </button>
+        </div>
       </div>
 
-      {/* KPI Ribbon */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+      {/* Slim Guide Bar */}
+      <QuickGuideBanner
+        title="Guía de Reportes y Estadísticas"
+        description="Consultá el rendimiento de los equipos, estabilidad laboral y exportá métricas analíticas oficiales."
+        tips={[
+          'Cambiá el período en el selector superior para comparar trimestres anteriores con el actual.',
+          'Navegá entre las pestañas para ver mapas de calor, curvas de evolución y riesgos de continuidad.',
+          'Usá "PDF" para informes ejecutivos o "Excel" para análisis de datos tabulares.',
+        ]}
+        dismissible={true}
+      />
+
+      {/* Compact 4-Metric Status Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Rendimiento General</span>
-            <div className="text-xl font-black text-on-surface mt-0.5">94.8 / 100</div>
-            <div className="text-[11px] text-emerald-600 font-medium mt-0.5">+4.2 pts vs 2025</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Rendimiento General</span>
+            <div className="text-base font-black text-on-surface">
+              94.8 <span className="text-[11px] font-normal text-outline">/ 100</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-            <span className="material-symbols-outlined">health_and_safety</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-secondary-container/40 text-on-secondary-container text-[10px] font-bold">
+            +4.2 pts vs 2025
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Estabilidad del Personal</span>
-            <div className="text-xl font-black text-emerald-600 mt-0.5">97.9%</div>
-            <div className="text-[11px] text-emerald-700 font-medium mt-0.5">Muy baja rotación</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Estabilidad Personal</span>
+            <div className="text-base font-black text-emerald-600">
+              97.9% <span className="text-[11px] font-normal text-outline">retención</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-            <span className="material-symbols-outlined">security</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+            Baja rotación
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Tiempo para Contratar</span>
-            <div className="text-xl font-black text-primary mt-0.5">16 Días</div>
-            <div className="text-[11px] text-primary font-medium mt-0.5">Meta: menos de 21 días</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Tiempo Contratación</span>
+            <div className="text-base font-black text-primary">
+              16 <span className="text-[11px] font-normal text-outline">días</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-600">
-            <span className="material-symbols-outlined">timer</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-[10px] font-bold">
+            Meta &lt; 21d
+          </span>
         </div>
 
-        <div className="bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/30 flex items-center justify-between shadow-xs">
+        <div className="bg-surface-container-lowest px-3.5 py-2.5 rounded-xl border border-outline-variant/30 flex items-center justify-between shadow-2xs">
           <div>
-            <span className="text-xs font-semibold text-outline">Inversión en Cursos</span>
-            <div className="text-xl font-black text-on-surface mt-0.5">$3,420 USD</div>
-            <div className="text-[11px] text-emerald-600 font-medium mt-0.5">Por persona al año</div>
+            <span className="text-[10px] uppercase font-bold text-outline block">Inversión / Persona</span>
+            <div className="text-base font-black text-on-secondary-container">
+              $3,420 <span className="text-[11px] font-normal text-outline">USD</span>
+            </div>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-            <span className="material-symbols-outlined">payments</span>
-          </div>
+          <span className="px-2 py-0.5 rounded-md bg-secondary-container/30 text-on-secondary-container text-[10px] font-bold">
+            Anual
+          </span>
         </div>
       </div>
 
@@ -236,7 +236,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
 
       {/* TAB 1: Heatmap de Competencias por Squad */}
       {activeReportTab === 'heat' && (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">
@@ -343,7 +343,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
 
       {/* TAB 2: Evolución Histórica */}
       {activeReportTab === 'evolution' && (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-6">
+        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-5">
           <div>
             <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">show_chart</span>
@@ -411,7 +411,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
 
       {/* TAB 3: Riesgo de Fuga */}
       {activeReportTab === 'retention' && (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">
@@ -472,7 +472,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
 
       {/* TAB 4: Inventario de Habilidades */}
       {activeReportTab === 'skills' && (
-        <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/40 shadow-xs flex flex-col gap-4">
+        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-extrabold text-on-surface flex items-center gap-2">
