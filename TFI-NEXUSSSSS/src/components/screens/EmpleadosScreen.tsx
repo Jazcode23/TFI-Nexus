@@ -6,12 +6,40 @@ import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { useToast } from '../ToastProvider';
 import { employeesApi, trainingApi } from '../../services/api';
+import { EmptyState } from '../EmptyState';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
+import {
+  Download,
+  UserPlus,
+  Search,
+  Building2,
+  FilterX,
+  Users,
+  CheckCircle2,
+  ArrowRight,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  DollarSign,
+  GraduationCap,
+  Brain,
+  Award,
+  Terminal,
+  Check,
+  FileText,
+  UserCheck,
+  Clock,
+  Sparkles,
+} from 'lucide-react';
 
 interface EmpleadosScreenProps {
   onNavigate: (screen: ScreenId) => void;
   selectedEmployeeId?: string;
   onOpenEvaluationModal?: (employee: EmployeeProfile) => void;
-  /** Se llama cuando el usuario elige otra persona de la lista (la URL es la fuente de verdad). */
   onChangeEmployee?: (employeeId: string) => void;
 }
 
@@ -40,7 +68,7 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
     setEnrolled(false);
   }, [activeEmpId]);
 
-  // Carga inicial desde backend con fallback a mockData
+  // Carga inicial desde backend
   useEffect(() => {
     let isMounted = true;
     employeesApi
@@ -51,7 +79,7 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
         }
       })
       .catch(() => {
-        // Fallback local en memoria
+        // Fallback local
       });
     return () => {
       isMounted = false;
@@ -182,7 +210,6 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
       setEnrolled(true);
       showToast(`Plan formativo asignado a ${activeEmployee.name}`, 'success');
     } catch {
-      // Fallback local
       setEnrolled(true);
       showToast(`Plan formativo asignado a ${activeEmployee.name}`, 'success');
     } finally {
@@ -204,130 +231,139 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
   };
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
-      {/* Header & Main Global Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Header & Global Actions */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-outline-variant/40">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-on-surface tracking-tight font-headline">
-            Colaboradores
-          </h1>
-          <p className="text-xs text-on-surface-variant font-medium mt-0.5">
-            {totalEmployees} colaboradores registrados en el directorio activo
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-on-surface">
+              Directorio de Colaboradores
+            </h1>
+            <Badge variant="subtle">{totalEmployees} colaboradores</Badge>
+          </div>
+          <p className="text-xs text-on-surface-variant mt-0.5">
+            Ficha 360°, estructura de reporte, análisis de brechas de habilidades y desempeño.
           </p>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleDownloadPdf}
             disabled={isDownloadingPdf}
-            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-surface-container text-on-surface hover:bg-surface-container-high border border-outline-variant/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-            title="Descargar Ficha 360° en PDF"
           >
-            <span className="material-symbols-outlined text-outline text-[16px]">
-              {isDownloadingPdf ? 'progress_activity' : 'file_download'}
-            </span>
-            <span>Descargar PDF</span>
-          </button>
-          <button
+            <Download className="w-3.5 h-3.5 mr-1" />
+            <span>Descargar Ficha PDF</span>
+          </Button>
+
+          <Button
+            size="sm"
             onClick={() => onNavigate('reclutamiento')}
-            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-            title="Abrir selección de candidatos en Reclutamiento"
           >
-            <span className="material-symbols-outlined text-[16px]">person_add</span>
+            <UserPlus className="w-3.5 h-3.5 mr-1" />
             <span>Reclutar Talento</span>
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Slim Guide Bar */}
       <QuickGuideBanner
-        title="Guía de Navegación de Colaboradores"
-        description="Elegí a cualquier colaborador en la lista para ver su información de contacto, supervisor, competencias y evaluaciones."
+        title="Directorio de Colaboradores"
+        description="Seleccioná un colaborador para ver su ficha 360°, competencias y evaluaciones."
         tips={[
-          'Seleccioná a un empleado del directorio para cargar su ficha 360° completa.',
-          'En "Mapa de Habilidades" podés revisar las brechas contra el perfil requerido del puesto.',
-          'Hacé clic en "Nueva Evaluación" para abrir el formulario de feedback del ciclo.',
+          'Elegí a cualquier colaborador en la cuadrícula superior para cargar su legajo técnico.',
+          'Revisá el Radar de Habilidades para identificar brechas formativas inmediatas.',
+          'El botón "Nueva Evaluación" permite calificar el ciclo de desempeño actual.',
         ]}
         dismissible={true}
       />
 
-      {/* Clean 4-Metric Status Strip - Calculado 100% dinámicamente desde datos */}
+      {/* Clean 4-Metric Status Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Fuerza laboral</span>
-          <div className="text-xl font-bold text-on-surface">
+        <Card className="p-3.5">
+          <span className="text-[11px] font-medium text-outline uppercase tracking-wider block">
+            Fuerza laboral
+          </span>
+          <div className="text-xl font-bold text-on-surface mt-1 tabular-nums">
             {totalEmployees} <span className="text-xs font-normal text-outline">activos</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Alineación de rol</span>
-          <div className="text-xl font-bold text-on-surface">
+        <Card className="p-3.5">
+          <span className="text-[11px] font-medium text-outline uppercase tracking-wider block">
+            Alineación con el rol
+          </span>
+          <div className="text-xl font-bold text-secondary mt-1 tabular-nums">
             {avgRoleMatch}% <span className="text-xs font-normal text-outline">promedio</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Brechas identificadas</span>
-          <div className="text-xl font-bold text-amber-600">
-            {employeesWithGaps} <span className="text-xs font-normal text-outline">con foco</span>
+        <Card className="p-3.5">
+          <span className="text-[11px] font-medium text-outline uppercase tracking-wider block">
+            Brechas con foco
+          </span>
+          <div className="text-xl font-bold text-amber-700 mt-1 tabular-nums">
+            {employeesWithGaps} <span className="text-xs font-normal text-outline">requieren plan</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Puntaje medio 360°</span>
-          <div className="text-xl font-bold text-primary">
+        <Card className="p-3.5">
+          <span className="text-[11px] font-medium text-outline uppercase tracking-wider block">
+            Puntaje medio 360°
+          </span>
+          <div className="text-xl font-bold text-primary mt-1 tabular-nums">
             {avg360Score} <span className="text-xs font-normal text-outline">/ 5.0</span>
           </div>
-        </div>
+        </Card>
       </div>
 
-      {/* Search & Area Filters + Directory Cards */}
-      <div className="flex flex-col gap-3">
-        <div className="bg-surface-container-lowest p-3 rounded-2xl shadow-2xs border border-outline-variant/30 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative w-full sm:w-80 flex items-center">
-            <span className="material-symbols-outlined absolute left-3 text-outline text-[18px]">
-              search
-            </span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="Buscar por nombre, cargo o ID..."
-              className="w-full pl-9 pr-3 py-1.5 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs outline-hidden focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary border border-outline-variant/30"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex items-center gap-1.5 bg-surface-container-low px-2.5 py-1.5 rounded-xl border border-outline-variant/20 flex-1 sm:flex-initial">
-              <span className="material-symbols-outlined text-outline text-[16px]">domain</span>
-              <select
-                value={selectedArea}
-                onChange={(e) => handleAreaChange(e.target.value)}
-                className="bg-transparent text-xs font-medium text-on-surface outline-hidden cursor-pointer w-full sm:w-auto"
-              >
-                <option value="all">Todas las áreas ({availableAreas.length})</option>
-                {availableAreas.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
+      {/* Filter Toolbar & Quick Directory */}
+      <div className="space-y-3">
+        <Card className="p-3">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="relative w-full sm:w-72 flex items-center">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 text-outline pointer-events-none" />
+              <Input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Buscar por nombre, cargo o ID..."
+                className="pl-8 h-8"
+              />
             </div>
 
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="px-2.5 py-1.5 rounded-xl bg-surface-container-low text-on-surface-variant hover:text-error transition-all flex items-center gap-1 text-xs font-medium cursor-pointer"
-                title="Restablecer filtros"
-              >
-                <span className="material-symbols-outlined text-[15px]">filter_alt_off</span>
-                <span className="hidden sm:inline">Limpiar</span>
-              </button>
-            )}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="flex items-center gap-1.5 bg-surface-dim px-2.5 py-1 rounded-lg border border-outline-variant/60 flex-1 sm:flex-initial">
+                <Building2 className="w-3.5 h-3.5 text-outline" />
+                <select
+                  value={selectedArea}
+                  onChange={(e) => handleAreaChange(e.target.value)}
+                  className="bg-transparent text-xs font-medium text-on-surface outline-none cursor-pointer w-full sm:w-auto"
+                >
+                  <option value="all">Todas las áreas ({availableAreas.length})</option>
+                  {availableAreas.map((area) => (
+                    <option key={area} value={area}>
+                      {area}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="h-8 px-2 text-xs text-outline hover:text-error flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Restablecer filtros"
+                >
+                  <FilterX className="w-3.5 h-3.5" />
+                  <span>Limpiar</span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        </Card>
 
         {/* Directory Cards Grid */}
         {filteredEmployees.length > 0 ? (
@@ -339,10 +375,10 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
                   key={emp.id}
                   type="button"
                   onClick={() => setActiveEmpId(emp.id)}
-                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 relative ${
+                  className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer flex items-center gap-2.5 relative ${
                     isSelected
-                      ? 'bg-primary/5 border-primary ring-1 ring-primary/30 shadow-xs'
-                      : 'bg-surface-container-lowest border-outline-variant/30 hover:border-outline-variant hover:bg-surface-container-low'
+                      ? 'bg-primary/5 border-primary shadow-2xs font-semibold'
+                      : 'bg-surface-bright border-outline-variant/60 hover:border-outline-variant hover:bg-surface-dim'
                   }`}
                 >
                   <UserAvatar name={emp.name} size="sm" shape="rounded" />
@@ -352,15 +388,13 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
                         {emp.name}
                       </span>
                       {isSelected && (
-                        <span className="material-symbols-outlined text-primary text-[15px] shrink-0">
-                          check_circle
-                        </span>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
                       )}
                     </div>
-                    <span className="text-xs text-primary font-medium truncate block">
+                    <span className="text-[11px] text-primary truncate block font-medium">
                       {emp.role}
                     </span>
-                    <span className="text-xs text-outline truncate block">
+                    <span className="text-[10px] text-outline truncate block font-normal">
                       {emp.area}
                     </span>
                   </div>
@@ -369,107 +403,85 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
             })}
           </div>
         ) : (
-          <div className="p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/30 text-center flex flex-col items-center justify-center gap-2">
-            <span className="material-symbols-outlined text-outline text-3xl">person_search</span>
-            <p className="text-xs font-semibold text-on-surface">
-              No se encontraron colaboradores con los filtros aplicados
-            </p>
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="px-3 py-1.5 rounded-xl bg-primary text-on-primary text-xs font-semibold cursor-pointer"
-            >
-              Ver todos los colaboradores
-            </button>
-          </div>
+          <EmptyState
+            title="No se encontraron colaboradores"
+            description="No hay personas que coincidan con la búsqueda o el área seleccionada."
+            actionLabel="Ver todos los colaboradores"
+            onAction={resetFilters}
+          />
         )}
       </div>
 
       {/* Profile Detail Tabs */}
-      <div className="flex items-center gap-1.5 bg-surface-container-low p-1.5 rounded-2xl border border-outline-variant/20 shadow-2xs">
+      <div className="flex items-center gap-1 bg-surface-dim p-1 rounded-lg border border-outline-variant/60">
         {([
-          { key: 'perfil', label: 'Ficha 360° & Contacto', icon: 'person' },
-          { key: 'competencias', label: 'Brechas de Competencias', icon: 'psychology' },
-          { key: 'evaluaciones', label: 'Evaluaciones & Plan Formativo', icon: 'fact_check' },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveEmpTab(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-              activeEmpTab === tab.key
-                ? 'bg-surface-container-lowest text-primary shadow-xs ring-1 ring-primary/20 font-semibold'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]">{tab.icon}</span>
-            <span className="hidden sm:inline">{tab.label}</span>
-          </button>
-        ))}
+          { key: 'perfil', label: 'Ficha 360° & Datos', icon: FileText },
+          { key: 'competencias', label: 'Brechas de Habilidades', icon: Brain },
+          { key: 'evaluaciones', label: 'Evaluaciones & Capacitación', icon: Award },
+        ] as const).map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeEmpTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveEmpTab(tab.key)}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-surface-bright text-on-surface shadow-2xs font-semibold'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-primary' : 'text-outline'}`} />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* TAB 1: 360° ACTIVE PROFILE CARD */}
+      {/* TAB 1: 360° ACTIVE PROFILE */}
       {activeEmpTab === 'perfil' && (
-        <section className="bg-surface-container-lowest rounded-2xl p-5 lg:p-6 shadow-2xs border border-outline-variant/30 relative overflow-hidden flex flex-col gap-5 animate-in fade-in duration-150">
+        <Card className="p-5 space-y-5">
           {/* Profile Header */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-5 border-b border-outline-variant/20">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-outline-variant/40">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <UserAvatar
                 name={activeEmployee.name}
-                size="xl"
+                size="lg"
                 shape="rounded"
                 showStatus={true}
                 statusColor="emerald"
               />
-              <div className="flex flex-col">
-                <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                  <h2 className="text-xl sm:text-2xl text-on-surface font-bold tracking-tight">
+              <div className="space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg font-bold text-on-surface tracking-tight">
                     {activeEmployee.name}
                   </h2>
-                  <span className="text-outline-variant">&bull;</span>
-                  <span className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    {activeEmployee.status}
-                  </span>
-                  <span className="text-outline-variant">&bull;</span>
-                  <span className="text-xs text-on-surface-variant font-medium">
-                    {activeEmployee.badge}
+                  <Badge variant="subtle">{activeEmployee.status}</Badge>
+                  <span className="text-xs text-outline font-mono">
+                    ID: {activeEmployee.empId}
                   </span>
                 </div>
-
                 <p className="text-xs font-semibold text-primary">{activeEmployee.role}</p>
-
-                <div className="flex flex-wrap items-center gap-2.5 mt-1.5 text-on-surface-variant text-xs">
-                  <div className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-outline text-[15px]">account_tree</span>
-                    <span>{activeEmployee.area}</span>
-                  </div>
-                  <span className="text-outline-variant">&bull;</span>
-                  <div className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-outline text-[15px]">schedule</span>
-                    <span>Antigüedad: {activeEmployee.tenure}</span>
-                  </div>
-                  <span className="text-outline-variant">&bull;</span>
-                  <div className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-outline text-[15px]">badge</span>
-                    <span>ID: {activeEmployee.empId}</span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-outline pt-0.5">
+                  <span>{activeEmployee.area}</span>
+                  <span>•</span>
+                  <span>Antigüedad: {activeEmployee.tenure}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto self-stretch lg:self-center justify-end">
-              <button
-                type="button"
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setActiveEmpTab('evaluaciones')}
-                className="px-3.5 py-2 bg-surface-container text-on-surface text-xs font-semibold rounded-xl flex items-center gap-1.5 hover:bg-surface-container-high transition-all cursor-pointer"
-                title="Ver desempeño 360° y revisiones del colaborador"
               >
-                <span className="material-symbols-outlined text-primary text-[16px]">history_edu</span>
-                <span>Desempeño 360°</span>
-              </button>
-              <button
-                type="button"
+                <Award className="w-3.5 h-3.5 mr-1 text-primary" />
+                Historial 360°
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
                   if (onOpenEvaluationModal) {
                     onOpenEvaluationModal(activeEmployee);
@@ -477,73 +489,58 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
                     showToast('Abriendo formulario de evaluación', 'info');
                   }
                 }}
-                className="px-3.5 py-2 bg-primary text-on-primary text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-xs hover:bg-primary-container transition-all cursor-pointer"
-                title="Completar formulario de feedback de desempeño"
               >
-                <span className="material-symbols-outlined text-[16px]">edit_square</span>
-                <span>Nueva Evaluación</span>
-              </button>
+                <UserCheck className="w-3.5 h-3.5 mr-1" />
+                Nueva Evaluación
+              </Button>
             </div>
           </div>
 
           {/* 4 Sleek Info Boxes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-surface-container-low/70 p-3 rounded-xl flex flex-col justify-between border border-outline-variant/20">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-on-surface-variant font-medium">Contacto</span>
-                <span className="material-symbols-outlined text-outline text-[18px]">alternate_email</span>
-              </div>
-              <div>
-                <span className="text-xs text-on-surface font-semibold block truncate" title={activeEmployee.email}>
-                  {activeEmployee.email}
-                </span>
-                <span className="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
-                  <span className="material-symbols-outlined text-[13px] text-secondary">phone_iphone</span>
-                  {activeEmployee.phone}
-                </span>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div className="p-3 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-1">
+              <span className="text-[11px] font-medium text-outline flex items-center gap-1">
+                <Mail className="w-3 h-3" /> Contacto
+              </span>
+              <span className="font-semibold text-on-surface block truncate" title={activeEmployee.email}>
+                {activeEmployee.email}
+              </span>
+              <span className="text-on-surface-variant flex items-center gap-1 text-[11px]">
+                <Phone className="w-3 h-3 text-outline" /> {activeEmployee.phone}
+              </span>
             </div>
 
-            <div className="bg-surface-container-low/70 p-3 rounded-xl flex flex-col justify-between border border-outline-variant/20">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-on-surface-variant font-medium">Contratación</span>
-                <span className="material-symbols-outlined text-outline text-[18px]">contract</span>
-              </div>
-              <div>
-                <span className="text-xs text-on-surface font-semibold">{activeEmployee.contract}</span>
-                <span className="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
-                  <span className="material-symbols-outlined text-[13px] text-outline">location_on</span>
-                  {activeEmployee.location}
-                </span>
-              </div>
+            <div className="p-3 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-1">
+              <span className="text-[11px] font-medium text-outline flex items-center gap-1">
+                <Calendar className="w-3 h-3" /> Contratación
+              </span>
+              <span className="font-semibold text-on-surface block">{activeEmployee.contract}</span>
+              <span className="text-on-surface-variant flex items-center gap-1 text-[11px]">
+                <MapPin className="w-3 h-3 text-outline" /> {activeEmployee.location}
+              </span>
             </div>
 
-            <div className="bg-surface-container-low/70 p-3 rounded-xl flex flex-col justify-between border border-outline-variant/20">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-on-surface-variant font-medium">Compensación</span>
-                <span className="material-symbols-outlined text-outline text-[18px]">payments</span>
-              </div>
-              <div>
-                <span className="text-xs text-on-surface font-semibold">{activeEmployee.salaryBand}</span>
-                <span className="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">
-                  <span className="material-symbols-outlined text-[13px] text-on-secondary-container">trending_up</span>
-                  {activeEmployee.percentile}
-                </span>
-              </div>
+            <div className="p-3 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-1">
+              <span className="text-[11px] font-medium text-outline flex items-center gap-1">
+                <DollarSign className="w-3 h-3" /> Compensación
+              </span>
+              <span className="font-semibold text-on-surface block">{activeEmployee.salaryBand}</span>
+              <span className="text-secondary font-medium text-[11px]">
+                {activeEmployee.percentile}
+              </span>
             </div>
 
-            <div className="bg-surface-container-low/70 p-3 rounded-xl flex flex-col justify-between border border-outline-variant/20">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-on-surface-variant font-medium">Supervisor directo</span>
-                <span className="material-symbols-outlined text-outline text-[18px]">supervised_user_circle</span>
-              </div>
-              <div className="flex items-center gap-2">
+            <div className="p-3 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-1">
+              <span className="text-[11px] font-medium text-outline flex items-center gap-1">
+                <Users className="w-3 h-3" /> Supervisor Directo
+              </span>
+              <div className="flex items-center gap-1.5 pt-0.5">
                 <UserAvatar name={activeEmployee.supervisor.name} size="xs" shape="circle" />
-                <div className="flex flex-col min-w-0">
-                  <span className="text-xs text-on-surface font-semibold truncate">
+                <div className="min-w-0">
+                  <span className="font-semibold text-on-surface block truncate">
                     {activeEmployee.supervisor.name}
                   </span>
-                  <span className="text-xs text-on-surface-variant truncate">
+                  <span className="text-[10px] text-outline block truncate">
                     {activeEmployee.supervisor.role}
                   </span>
                 </div>
@@ -553,187 +550,73 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
 
           {/* Proyectos Asignados */}
           {activeEmployee.projects && activeEmployee.projects.length > 0 && (
-            <div className="p-3 bg-surface-container-low/50 rounded-xl border border-outline-variant/20 flex flex-wrap items-center gap-2">
-              <span className="text-xs text-on-surface-variant font-medium mr-1 flex items-center gap-1">
-                <span className="material-symbols-outlined text-[15px] text-primary">rocket_launch</span>
-                Proyectos asignados:
-              </span>
+            <div className="p-3 bg-surface-dim rounded-lg border border-outline-variant/40 flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-medium text-outline mr-1">Proyectos activos:</span>
               {activeEmployee.projects.map((proj, idx) => (
                 <span
                   key={idx}
-                  className="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface text-xs font-medium flex items-center gap-1 border border-outline-variant/20 shadow-2xs"
+                  className="px-2.5 py-0.5 rounded-md bg-surface-bright text-on-surface text-[11px] font-medium border border-outline-variant/60"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   {proj}
                 </span>
               ))}
             </div>
           )}
-        </section>
+        </Card>
       )}
 
-      {/* TAB 2: SKILLS & COMPETENCIES SECTION */}
+      {/* TAB 2: COMPETENCIES & GAPS */}
       {activeEmpTab === 'competencias' && (
-        <div className="flex flex-col gap-5 animate-in fade-in duration-150">
-          <section className="bg-surface-container-lowest rounded-2xl p-5 lg:p-6 shadow-2xs border border-outline-variant/30 flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-5">
+          <Card className="p-5 space-y-4">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-3 border-b border-outline-variant/40">
               <div>
-                <h3 className="text-base font-bold text-on-surface tracking-tight">
-                  Mapa de habilidades y competencias
+                <h3 className="text-sm font-semibold text-on-surface">
+                  Mapa de Habilidades y Competencias
                 </h3>
-                <p className="text-xs text-outline mt-0.5">
-                  Comparación entre habilidades requeridas por el cargo y el nivel actual demostrado por el colaborador.
+                <p className="text-xs text-outline">
+                  Comparación entre el estándar del puesto y el dominio demostrado.
                 </p>
               </div>
 
-              {/* Circular Role Match Indicator */}
-              <div className="bg-surface-container-low px-4 py-2 rounded-xl border border-outline-variant/20 flex items-center gap-3 shrink-0">
-                <div className="relative w-10 h-10 flex items-center justify-center">
-                  <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                    <path
-                      className="text-surface-container"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3.5"
-                    />
-                    <path
-                      className="text-primary"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeDasharray={`${activeEmployee.roleMatch}, 100`}
-                      strokeLinecap="round"
-                      strokeWidth="3.5"
-                    />
-                  </svg>
-                  <span className="absolute text-xs font-bold text-on-surface">
+              <div className="flex items-center gap-3 bg-surface-dim px-3 py-1.5 rounded-lg border border-outline-variant/60">
+                <div className="text-right">
+                  <span className="text-[10px] text-outline block uppercase">Alineación</span>
+                  <span className="text-xs font-bold text-primary tabular-nums">
                     {activeEmployee.roleMatch}%
                   </span>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs text-on-surface-variant font-medium">Alineación</span>
-                  <span className="text-xs font-semibold text-primary">Nivel Óptimo</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Spectrum Waveform */}
-            <div className="bg-surface-container-low/70 rounded-xl p-4 border border-outline-variant/20">
-              <div className="flex items-center justify-between mb-3 text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-xs text-on-surface font-medium">Técnicas</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-secondary" />
-                    <span className="text-xs text-on-surface font-medium">Liderazgo</span>
-                  </div>
-                </div>
-                <span className="text-xs text-outline font-normal hidden sm:inline">
-                  Escala de nivel: 1.0 a 5.0
-                </span>
-              </div>
-
-              {/* Spectrum Bars */}
-              <div className="relative w-full h-28 flex items-end justify-between gap-1.5 sm:gap-2 px-1 pt-2">
-                {activeEmployee.spectrumSkills.map((sk, idx) => (
+                <div className="w-12 h-2 bg-surface-container rounded-full overflow-hidden">
                   <div
-                    key={idx}
-                    className="flex-1 flex flex-col items-center gap-1 group cursor-pointer"
-                    title={`${sk.label}: ${sk.value}%`}
-                  >
-                    <div
-                      className={`w-full rounded-t transition-all duration-300 group-hover:scale-105 shadow-2xs ${
-                        sk.category === 'gap'
-                          ? 'bg-gradient-to-t from-tertiary-container/80 to-tertiary-fixed-dim'
-                          : sk.category === 'soft'
-                          ? 'bg-gradient-to-t from-primary to-secondary'
-                          : 'bg-gradient-to-t from-primary to-primary-container'
-                      }`}
-                      style={{ height: `${sk.value}%` }}
-                    />
-                    <span className="text-xs text-outline group-hover:text-primary transition-colors text-center hidden md:block truncate w-full font-normal">
-                      {sk.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-surface-container text-xs text-on-surface font-medium">
-                    G-Factor: {activeEmployee.gFactor}
-                  </span>
-                  <span className="text-xs text-on-surface-variant">
-                    Resolución de problemas en sistemas complejos.
-                  </span>
-                </div>
-                <span className="text-xs text-secondary font-medium">
-                  Equilibrio de habilidades: Óptimo (&lt; 0.4)
-                </span>
-              </div>
-            </div>
-          </section>
-
-          {/* SKILL GAP ANALYSIS MATRIX */}
-          <section className="bg-surface-container-lowest rounded-2xl p-5 lg:p-6 shadow-2xs border border-outline-variant/30 flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div>
-                <h3 className="text-base font-bold text-on-surface tracking-tight">
-                  Comparación de brechas por competencia
-                </h3>
-                <p className="text-xs text-outline">Nivel observado frente al estándar requerido del puesto</p>
-              </div>
-
-              {/* Legend */}
-              <div className="flex flex-wrap items-center gap-2.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-outline-variant/20 text-xs">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-secondary" />
-                  <span className="text-xs text-on-surface font-medium">Óptimo (0)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  <span className="text-xs text-on-surface font-medium">Supera (+1)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500" />
-                  <span className="text-xs text-on-surface font-medium">Brecha (-1)</span>
+                    className="h-full bg-primary rounded-full"
+                    style={{ width: `${activeEmployee.roleMatch}%` }}
+                  />
                 </div>
               </div>
             </div>
 
+            {/* Gap Analysis Tables */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
               {/* Hard Skills */}
-              <div className="bg-surface-container-low/50 p-4 rounded-xl flex flex-col gap-3 border border-outline-variant/20">
-                <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
-                  <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-primary text-[18px]">terminal</span>
-                    <h4 className="text-xs font-semibold text-on-surface">Habilidades técnicas</h4>
-                  </div>
-                  <span className="text-xs text-outline font-normal">Requerido: 4.5 Promedio</span>
+              <div className="p-4 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-outline-variant/40">
+                  <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-primary" />
+                    Habilidades Técnicas
+                  </span>
+                  <span className="text-[11px] text-outline">Estándar: 4.5</span>
                 </div>
 
-                <div className="flex flex-col gap-2.5">
+                <div className="space-y-2">
                   {activeEmployee.hardSkills.map((skill, idx) => (
                     <div
                       key={idx}
-                      className={`bg-surface-container-lowest p-3 rounded-xl shadow-2xs flex flex-col gap-1.5 border ${
-                        skill.gap < 0
-                          ? 'border-amber-300 ring-1 ring-amber-100'
-                          : 'border-outline-variant/20'
-                      }`}
+                      className="p-2.5 bg-surface-bright rounded-lg border border-outline-variant/40 space-y-1 text-xs"
                     >
                       <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xs font-semibold text-on-surface">{skill.name}</span>
-                          {skill.technicalName && (
-                            <span className="text-xs text-outline ml-1.5">({skill.technicalName})</span>
-                          )}
-                        </div>
+                        <span className="font-medium text-on-surface">{skill.name}</span>
                         <span
-                          className={`text-xs font-medium flex items-center gap-1 ${
+                          className={`text-[11px] font-medium ${
                             skill.gap === 0
                               ? 'text-emerald-700'
                               : skill.gap > 0
@@ -741,41 +624,24 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
                               : 'text-amber-700'
                           }`}
                         >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              skill.gap === 0
-                                ? 'bg-emerald-500'
-                                : skill.gap > 0
-                                ? 'bg-primary'
-                                : 'bg-amber-500'
-                            }`}
-                          />
                           {skill.statusText}
                         </span>
                       </div>
-
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center justify-between text-xs text-on-surface-variant">
-                          <span>
-                            Nivel Actual:{' '}
-                            <strong className="text-on-surface font-semibold">{skill.actual} / 5</strong>
-                          </span>
-                          <span>
-                            Requerido: <strong>{skill.required} / 5</strong>
-                          </span>
-                        </div>
-                        <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden flex relative">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              skill.gap === 0
-                                ? 'bg-emerald-500'
-                                : skill.gap > 0
-                                ? 'bg-primary'
-                                : 'bg-amber-500'
-                            }`}
-                            style={{ width: `${(skill.actual / 5) * 100}%` }}
-                          />
-                        </div>
+                      <div className="flex items-center justify-between text-[11px] text-outline pt-0.5">
+                        <span>Actual: <strong className="text-on-surface">{skill.actual}</strong> / 5</span>
+                        <span>Requerido: {skill.required} / 5</span>
+                      </div>
+                      <div className="w-full bg-surface-dim h-1 rounded-full overflow-hidden mt-1">
+                        <div
+                          className={`h-full rounded-full ${
+                            skill.gap === 0
+                              ? 'bg-emerald-500'
+                              : skill.gap > 0
+                              ? 'bg-primary'
+                              : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${(skill.actual / 5) * 100}%` }}
+                        />
                       </div>
                     </div>
                   ))}
@@ -783,25 +649,25 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
               </div>
 
               {/* Soft Skills */}
-              <div className="bg-surface-container-low/50 p-4 rounded-xl flex flex-col gap-3 border border-outline-variant/20">
-                <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
-                  <div className="flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-secondary text-[18px]">psychology</span>
-                    <h4 className="text-xs font-semibold text-on-surface">Habilidades de liderazgo y humanas</h4>
-                  </div>
-                  <span className="text-xs text-outline font-normal">Requerido: 4.2 Promedio</span>
+              <div className="p-4 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-outline-variant/40">
+                  <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
+                    <Brain className="w-3.5 h-3.5 text-secondary" />
+                    Habilidades Humanas y Liderazgo
+                  </span>
+                  <span className="text-[11px] text-outline">Estándar: 4.2</span>
                 </div>
 
-                <div className="flex flex-col gap-2.5">
+                <div className="space-y-2">
                   {activeEmployee.softSkills.map((skill, idx) => (
                     <div
                       key={idx}
-                      className="bg-surface-container-lowest p-3 rounded-xl shadow-2xs flex flex-col gap-1.5 border border-outline-variant/20"
+                      className="p-2.5 bg-surface-bright rounded-lg border border-outline-variant/40 space-y-1 text-xs"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-on-surface">{skill.name}</span>
+                        <span className="font-medium text-on-surface">{skill.name}</span>
                         <span
-                          className={`text-xs font-medium flex items-center gap-1 ${
+                          className={`text-[11px] font-medium ${
                             skill.gap === 0
                               ? 'text-emerald-700'
                               : skill.gap > 0
@@ -809,84 +675,64 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
                               : 'text-outline'
                           }`}
                         >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              skill.gap === 0
-                                ? 'bg-emerald-500'
-                                : skill.gap > 0
-                                ? 'bg-primary'
-                                : 'bg-slate-400'
-                            }`}
-                          />
                           {skill.statusText}
                         </span>
                       </div>
-
-                      <div className="flex flex-col gap-1">
-                        <div className="flex items-center justify-between text-xs text-on-surface-variant">
-                          <span>
-                            Nivel Actual:{' '}
-                            <strong className="text-on-surface font-semibold">{skill.actual} / 5</strong>
-                          </span>
-                          <span>
-                            Requerido: <strong>{skill.required} / 5</strong>
-                          </span>
-                        </div>
-                        <div className="w-full bg-surface-container h-1.5 rounded-full overflow-hidden flex relative">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              skill.gap === 0
-                                ? 'bg-emerald-500'
-                                : skill.gap > 0
-                                ? 'bg-primary'
-                                : 'bg-slate-400'
-                            }`}
-                            style={{ width: `${(skill.actual / 5) * 100}%` }}
-                          />
-                        </div>
+                      <div className="flex items-center justify-between text-[11px] text-outline pt-0.5">
+                        <span>Actual: <strong className="text-on-surface">{skill.actual}</strong> / 5</span>
+                        <span>Requerido: {skill.required} / 5</span>
+                      </div>
+                      <div className="w-full bg-surface-dim h-1 rounded-full overflow-hidden mt-1">
+                        <div
+                          className={`h-full rounded-full ${
+                            skill.gap === 0
+                              ? 'bg-emerald-500'
+                              : skill.gap > 0
+                              ? 'bg-primary'
+                              : 'bg-outline'
+                          }`}
+                          style={{ width: `${(skill.actual / 5) * 100}%` }}
+                        />
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          </section>
+          </Card>
         </div>
       )}
 
-      {/* TAB 3: TRAINING & 360 REVIEWS (SPLIT VIEW) */}
+      {/* TAB 3: TRAINING & 360 REVIEWS */}
       {activeEmpTab === 'evaluaciones' && (
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-in fade-in duration-150">
-          {/* Training Card */}
-          <div className="lg:col-span-6 bg-surface-container-lowest p-5 lg:p-6 rounded-2xl shadow-2xs border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs text-primary font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[15px]">school</span> Plan formativo
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          {/* Training Plan Card */}
+          <Card className="lg:col-span-6 p-5 flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div className="pb-2 border-b border-outline-variant/40 flex items-center justify-between">
+                <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
+                  <GraduationCap className="w-4 h-4 text-primary" />
+                  Plan Formativo Recomendado
                 </span>
-                <span className="text-xs text-outline">&bull; Cierre de brecha</span>
+                <Badge variant="secondary">Cierre de Brecha</Badge>
               </div>
 
-              <h4 className="text-sm font-bold text-on-surface tracking-tight">
-                Capacitación recomendada para cerrar brecha
-              </h4>
-
-              <div className="mt-3 p-3.5 bg-surface-container-low/70 rounded-xl border border-outline-variant/20 flex flex-col gap-2">
+              <div className="p-3 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-primary">
+                  <span className="font-semibold text-primary">
                     {activeEmployee.recommendedTraining.title}
                   </span>
-                  <span className="text-xs text-outline font-medium">
+                  <span className="text-outline text-[11px]">
                     {activeEmployee.recommendedTraining.hours}
                   </span>
                 </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed">
+                <p className="text-on-surface-variant leading-relaxed text-[11px]">
                   {activeEmployee.recommendedTraining.description}
                 </p>
-                <div className="flex flex-wrap items-center gap-2 mt-1 text-on-surface-variant text-xs">
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-outline">
                   {activeEmployee.recommendedTraining.perks.map((perk, i) => (
-                    <span key={i} className="flex items-center gap-1 font-normal">
-                      <span className="material-symbols-outlined text-[13px] text-secondary">check</span>
+                    <span key={i} className="flex items-center gap-1">
+                      <Check className="w-3 h-3 text-secondary" />
                       {perk}
                     </span>
                   ))}
@@ -894,97 +740,88 @@ export const EmpleadosScreen: React.FC<EmpleadosScreenProps> = ({
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center gap-2.5">
-              <button
-                type="button"
-                onClick={handleEnroll}
+            <div className="pt-3 border-t border-outline-variant/40 flex flex-wrap items-center gap-2">
+              <Button
+                size="sm"
+                variant={enrolled ? 'secondary' : 'default'}
                 disabled={enrolling || enrolled}
-                className={`w-full sm:w-auto px-4 py-2 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer ${
-                  enrolled
-                    ? 'bg-secondary-container text-on-secondary-container'
-                    : 'bg-primary text-on-primary hover:bg-primary-container'
-                }`}
+                onClick={handleEnroll}
               >
-                <span className="material-symbols-outlined text-[16px]">
-                  {enrolling ? 'sync' : enrolled ? 'check_circle' : 'add_task'}
-                </span>
-                {enrolling
-                  ? 'Inscribiendo...'
-                  : enrolled
-                  ? 'Inscripción Confirmada'
-                  : 'Inscribir en Plan de Desarrollo'}
-              </button>
-              <button
-                type="button"
+                {enrolled ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                    Inscripción Confirmada
+                  </>
+                ) : (
+                  'Inscribir en Plan'
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => onNavigate('capacitacion-upskilling')}
-                className="w-full sm:w-auto px-3.5 py-2 bg-surface-container text-on-surface text-xs font-medium rounded-xl flex items-center justify-center gap-1 hover:bg-surface-container-high transition-all cursor-pointer"
               >
-                <span>Ver catálogo en Capacitación</span>
-                <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
-              </button>
+                <span>Ver Catálogo</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
             </div>
-          </div>
+          </Card>
 
-          {/* 360 Reviews & Performance Link */}
-          <div className="lg:col-span-6 bg-surface-container-lowest p-5 lg:p-6 rounded-2xl shadow-2xs border border-outline-variant/30 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-outline text-[18px]">reviews</span>
-                  <h4 className="text-xs font-semibold text-on-surface">Evaluaciones 360° Recientes</h4>
-                </div>
-                <span className="text-xs text-outline font-normal">
-                  Promedio global: {avg360Score} / 5.0
+          {/* 360 Reviews Card */}
+          <Card className="lg:col-span-6 p-5 flex flex-col justify-between space-y-4">
+            <div className="space-y-3">
+              <div className="pb-2 border-b border-outline-variant/40 flex items-center justify-between">
+                <span className="text-xs font-semibold text-on-surface flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-outline" />
+                  Evaluaciones 360° Recientes
+                </span>
+                <span className="text-xs text-outline tabular-nums">
+                  Promedio: {avg360Score} / 5.0
                 </span>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div className="space-y-2 text-xs">
                 {activeEmployee.reviews.map((rev, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-2.5 pb-2.5 border-b border-outline-variant/10 last:border-b-0"
+                    className="p-2.5 bg-surface-dim rounded-lg border border-outline-variant/40 space-y-1"
                   >
-                    <UserAvatar name={rev.author} size="xs" shape="circle" />
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-on-surface">{rev.author}</span>
-                        <span className="text-xs text-outline">{rev.timeAgo}</span>
-                      </div>
-                      <p className="text-xs text-on-surface-variant mt-0.5 leading-snug">{rev.comment}</p>
-                      {rev.scores && (
-                        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                          {Object.entries(rev.scores).map(([k, v]) => (
-                            <span
-                              key={k}
-                              className="px-1.5 py-0.5 rounded bg-surface-container text-xs text-on-surface font-medium"
-                            >
-                              {k}: {v}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-on-surface">{rev.author}</span>
+                      <span className="text-[10px] text-outline">{rev.timeAgo}</span>
                     </div>
+                    <p className="text-on-surface-variant text-[11px] leading-relaxed">
+                      "{rev.comment}"
+                    </p>
+                    {rev.scores && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                        {Object.entries(rev.scores).map(([k, v]) => (
+                          <span
+                            key={k}
+                            className="px-1.5 py-0.2 rounded bg-surface-bright text-[10px] text-outline font-medium border border-outline-variant/60"
+                          >
+                            {k}: {v}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Direct navigation to Evaluacion de Desempeno */}
-            <div className="mt-4 pt-3 border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-2">
-              <span className="text-xs text-on-surface-variant font-medium">
-                Matriz 9-Box y Ciclos de Evaluación
-              </span>
-              <button
-                type="button"
+            <div className="pt-3 border-t border-outline-variant/40 flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => onNavigate('evaluacion-desempeno')}
-                className="w-full sm:w-auto px-3.5 py-1.5 bg-surface-container hover:bg-surface-container-high text-primary rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
               >
-                <span>Ver en Evaluación de Desempeño</span>
-                <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
-              </button>
+                <span>Calibración 9-Box</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
             </div>
-          </div>
-        </section>
+          </Card>
+        </div>
       )}
     </div>
   );

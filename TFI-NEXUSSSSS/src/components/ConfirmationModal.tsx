@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFocusTrap } from './useFocusTrap';
+import { AlertTriangle, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -17,7 +19,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   title,
   message,
   confirmLabel = 'Sí, confirmar',
-  cancelLabel = 'Volver / Cancelar',
+  cancelLabel = 'Cancelar',
   type = 'primary',
   onConfirm,
   onCancel,
@@ -37,40 +39,45 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   if (!isOpen) return null;
 
-  const iconName =
-    type === 'danger'
-      ? 'warning'
-      : type === 'warning'
-      ? 'help_outline'
-      : 'check_circle';
-
-  const iconColor =
-    type === 'danger'
-      ? 'bg-rose-100 text-rose-700'
-      : type === 'warning'
-      ? 'bg-amber-100 text-amber-800'
-      : 'bg-primary-fixed text-primary';
-
-  const confirmBtnStyle =
-    type === 'danger'
-      ? 'bg-rose-600 hover:bg-rose-700 text-white'
-      : 'bg-primary hover:bg-primary-container text-on-primary';
+  const renderIcon = () => {
+    if (type === 'danger') {
+      return (
+        <div className="w-10 h-10 rounded-xl bg-error-container text-error flex items-center justify-center shrink-0">
+          <AlertTriangle className="w-5 h-5" />
+        </div>
+      );
+    }
+    if (type === 'warning') {
+      return (
+        <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-200">
+          <HelpCircle className="w-5 h-5" />
+        </div>
+      );
+    }
+    return (
+      <div className="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+        <CheckCircle2 className="w-5 h-5" />
+      </div>
+    );
+  };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+    <div
+      className="fixed inset-0 z-[90] bg-on-surface/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150"
+      onClick={onCancel}
+    >
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirmation-title"
-        className="bg-surface-container-lowest max-w-md w-full rounded-3xl p-6 shadow-2xl border border-outline-variant/40 flex flex-col gap-4 animate-in zoom-in-95 duration-150"
+        className="bg-surface-bright max-w-md w-full rounded-xl p-5 shadow-xl border border-outline-variant/70 flex flex-col gap-4 animate-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3.5">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${iconColor}`}>
-            <span className="material-symbols-outlined text-2xl">{iconName}</span>
-          </div>
+          {renderIcon()}
           <div className="flex-1">
-            <h3 id="confirmation-title" className="text-base font-black text-on-surface leading-tight mb-1">
+            <h3 id="confirmation-title" className="text-sm font-semibold text-on-surface leading-snug mb-1">
               {title}
             </h3>
             <p className="text-xs text-on-surface-variant leading-relaxed">
@@ -79,21 +86,17 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-outline-variant/20">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
-          >
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-outline-variant/40">
+          <Button variant="ghost" size="sm" onClick={onCancel}>
             {cancelLabel}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={type === 'danger' ? 'destructive' : 'default'}
+            size="sm"
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition-all cursor-pointer flex items-center gap-1.5 ${confirmBtnStyle}`}
           >
-            <span>{confirmLabel}</span>
-          </button>
+            {confirmLabel}
+          </Button>
         </div>
       </div>
     </div>

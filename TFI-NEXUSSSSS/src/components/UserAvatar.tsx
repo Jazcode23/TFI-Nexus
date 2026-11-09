@@ -10,10 +10,10 @@ interface UserAvatarProps {
 }
 
 const COLOR_PALETTES = [
-  { bg: 'bg-indigo-700', text: 'text-white', border: 'border-indigo-500/30' },
+  { bg: 'bg-primary', text: 'text-on-primary', border: 'border-primary/30' },
   { bg: 'bg-violet-800', text: 'text-white', border: 'border-violet-600/30' },
   { bg: 'bg-teal-700', text: 'text-white', border: 'border-teal-500/30' },
-  { bg: 'bg-slate-800', text: 'text-slate-100', border: 'border-slate-600/30' },
+  { bg: 'bg-on-surface', text: 'text-surface-bright', border: 'border-outline-variant/30' },
   { bg: 'bg-emerald-700', text: 'text-white', border: 'border-emerald-500/30' },
   { bg: 'bg-blue-800', text: 'text-blue-50', border: 'border-blue-600/30' },
   { bg: 'bg-amber-700', text: 'text-white', border: 'border-amber-600/30' },
@@ -59,7 +59,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   const initials = getInitials(name);
   const palette = getPalette(name);
   const sizeClass = SIZE_CLASSES[size] || SIZE_CLASSES.md;
-  const radiusClass = shape === 'circle' ? 'rounded-full' : 'rounded-2xl';
+  const radiusClass = shape === 'circle' ? 'rounded-full' : size === 'lg' || size === 'xl' || size === '2xl' ? 'rounded-xl' : 'rounded-lg';
 
   const statusBg = {
     emerald: 'bg-emerald-500',
@@ -71,7 +71,7 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
   return (
     <div className={`relative inline-flex shrink-0 select-none ${className}`}>
       <div
-        className={`${sizeClass} ${radiusClass} ${palette.bg} ${palette.text} border ${palette.border} flex items-center justify-center font-black font-mono tracking-wider shadow-xs relative overflow-hidden`}
+        className={`${sizeClass} ${radiusClass} ${palette.bg} ${palette.text} border ${palette.border} flex items-center justify-center font-bold tracking-tight shadow-2xs relative overflow-hidden`}
         title={name}
       >
         {/* Subtle geometric gradient overlay */}

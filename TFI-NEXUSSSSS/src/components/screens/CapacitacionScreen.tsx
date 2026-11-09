@@ -1,11 +1,31 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import {
+  GraduationCap,
+  Clock,
+  Users,
+  Award,
+  Search,
+  UserPlus,
+  Target,
+  BookOpen,
+  Download,
+  X,
+  TrendingUp,
+  CheckCircle2,
+  Calendar,
+} from 'lucide-react';
 import { EmployeeProfile, ScreenId } from '../../types';
 import { EMPLOYEES_DATA } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { useToast } from '../ToastProvider';
 import { useFocusTrap } from '../useFocusTrap';
+import { EmptyState } from '../EmptyState';
 import { downloadFile, trainingApi, employeesApi } from '../../services/api';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
 
 interface CapacitacionScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -162,10 +182,10 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
   const [selectedEmpName, setSelectedEmpName] = useState<string>(EMPLOYEES_DATA[0].name);
   const [isEnrolling, setIsEnrolling] = useState<boolean>(false);
 
-  // Accesibilidad: atrapar foco en modal de inscripción
+  // Modal focus trap for accessibility
   const enrollModalRef = useFocusTrap<HTMLDivElement>(showEnrollModal);
 
-  // Carga inicial de rutas y empleados desde backend
+  // Initial load of learning tracks and employees from backend
   useEffect(() => {
     let isMounted = true;
     trainingApi
@@ -191,7 +211,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
         }
       })
       .catch(() => {
-        // Fallback local en memoria
+        // Local state fallback
       });
 
     employeesApi
@@ -203,7 +223,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
         }
       })
       .catch(() => {
-        // Fallback local
+        // Local state fallback
       });
 
     return () => {
@@ -215,11 +235,10 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
     return tracks.find((t) => t.id === selectedTrackId) || tracks[0] || INITIAL_TRACKS[0];
   }, [tracks, selectedTrackId]);
 
-  // Manejo de inscripción real
   const handleEnroll = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsEnrolling(true);
-    const matchedEmp = employees.find((e) => e.name === selectedEmpName);
+    const matchedEmp = employees.find((emp) => emp.name === selectedEmpName);
     const empAvatar =
       matchedEmp?.avatar ||
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80';
@@ -227,7 +246,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
     try {
       await trainingApi.enroll(activeTrack.id, selectedEmpName);
     } catch {
-      // Modo local
+      // Local mode fallback
     } finally {
       setTracks((prev) =>
         prev.map((t) =>
@@ -253,7 +272,6 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
     }
   };
 
-  // Categorías dinámicas
   const availableCategories = useMemo(() => {
     const set = new Set<string>();
     tracks.forEach((t) => {
@@ -262,7 +280,6 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
     return Array.from(set).sort();
   }, [tracks]);
 
-  // Filtro de rutas formativas
   const filteredTracks = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return tracks.filter((t) => {
@@ -277,7 +294,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
     });
   }, [tracks, selectedCategory, searchQuery]);
 
-  // Métricas dinámicas calculadas 100% desde los datos
+  // Dynamic calculated metrics
   const totalHours = useMemo(() => {
     return tracks.reduce((acc, t) => acc + (t.hours || 0), 0);
   }, [tracks]);
@@ -297,11 +314,11 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
   }, [tracks]);
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 max-w-7xl mx-auto pb-20">
       {/* Header & Global Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-on-surface tracking-tight font-headline">
+          <h1 className="text-xl sm:text-2xl font-bold text-on-surface tracking-tight">
             Capacitación y Formación
           </h1>
           <p className="text-xs text-on-surface-variant font-medium mt-0.5">
@@ -310,15 +327,14 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
-            type="button"
+          <Button
             onClick={() => setShowEnrollModal(true)}
-            className="flex-1 sm:flex-none px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-            title="Inscribir a un colaborador en el programa seleccionado"
+            size="sm"
+            className="w-full sm:w-auto"
           >
-            <span className="material-symbols-outlined text-[16px]">person_add</span>
+            <UserPlus className="w-3.5 h-3.5 mr-1.5" />
             <span>Inscribir Colaborador</span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -334,49 +350,62 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
         dismissible={true}
       />
 
-      {/* Clean 4-Metric Status Strip - Calculado 100% dinámicamente desde datos */}
+      {/* Minimalist 4-Metric Status Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Horas de formación</span>
-          <div className="text-xl font-bold text-on-surface">
-            {totalHours} <span className="text-xs font-normal text-outline">hrs lectivas</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-on-surface-variant font-medium">Horas de formación</span>
+            <Clock className="w-3.5 h-3.5 text-outline" />
           </div>
-        </div>
+          <div className="text-xl font-bold text-on-surface">
+            {totalHours}{' '}
+            <span className="text-xs font-normal text-outline">hrs lectivas</span>
+          </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Alumnos asignados</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-on-surface-variant font-medium">Alumnos asignados</span>
+            <Users className="w-3.5 h-3.5 text-primary" />
+          </div>
           <div className="text-xl font-bold text-primary">
-            {totalEnrolled} <span className="text-xs font-normal text-outline">colaboradores</span>
+            {totalEnrolled}{' '}
+            <span className="text-xs font-normal text-outline">colaboradores</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Tasa de finalización</span>
-          <div className="text-xl font-bold text-emerald-600">
-            {avgCompletionRate}% <span className="text-xs font-normal text-outline">promedio</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-on-surface-variant font-medium">Tasa de finalización</span>
+            <TrendingUp className="w-3.5 h-3.5 text-secondary" />
           </div>
-        </div>
+          <div className="text-xl font-bold text-secondary">
+            {avgCompletionRate}%{' '}
+            <span className="text-xs font-normal text-outline">promedio</span>
+          </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Certificaciones oficiales</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-on-surface-variant font-medium">Certificaciones oficiales</span>
+            <Award className="w-3.5 h-3.5 text-outline" />
+          </div>
           <div className="text-xl font-bold text-on-surface">
-            {totalCertifications} <span className="text-xs font-normal text-outline">acreditadas</span>
+            {totalCertifications}{' '}
+            <span className="text-xs font-normal text-outline">acreditadas</span>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Search & Category Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-2xs">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-bright p-3 rounded-xl border border-outline-variant/60 shadow-2xs">
         <div className="relative flex-1 sm:max-w-xs">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">
-            search
-          </span>
-          <input
-            type="text"
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
+          <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar programa o competencia..."
-            className="w-full pl-9 pr-3 py-1.5 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs outline-hidden focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary border border-outline-variant/30 font-medium"
+            className="pl-8 text-xs h-8"
           />
         </div>
 
@@ -385,10 +414,10 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
           <button
             type="button"
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-primary text-on-primary shadow-xs font-semibold'
-                : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                ? 'bg-primary text-on-primary shadow-2xs font-semibold'
+                : 'bg-surface-dim text-on-surface-variant hover:bg-surface-dim'
             }`}
           >
             Todas ({tracks.length})
@@ -400,10 +429,10 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-primary text-on-primary shadow-xs font-semibold'
-                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                    ? 'bg-primary text-on-primary shadow-2xs font-semibold'
+                    : 'bg-surface-dim text-on-surface-variant hover:bg-surface-dim'
                 }`}
               >
                 {cat} ({count})
@@ -417,8 +446,8 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-7 flex flex-col gap-3">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-semibold text-on-surface-variant flex items-center gap-2">
-              <span className="material-symbols-outlined text-outline text-[18px]">auto_stories</span>
+            <h2 className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-outline" />
               Catálogo de rutas formativas activas
             </h2>
             <span className="text-xs text-outline font-normal">
@@ -427,22 +456,16 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
           </div>
 
           {filteredTracks.length === 0 ? (
-            <div className="p-8 text-center bg-surface-container-lowest rounded-2xl border border-outline-variant/30 flex flex-col items-center gap-2 shadow-2xs">
-              <span className="material-symbols-outlined text-outline text-3xl">school</span>
-              <p className="text-xs font-semibold text-on-surface">
-                No se encontraron cursos con los filtros aplicados
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategory('all');
-                }}
-                className="text-xs text-primary font-semibold hover:underline cursor-pointer"
-              >
-                Ver todos los programas
-              </button>
-            </div>
+            <EmptyState
+              icon="school"
+              title="No se encontraron programas de formación"
+              description="No hay rutas formativas que coincidan con los criterios de búsqueda o categoría."
+              actionLabel="Ver todos los programas"
+              onAction={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+              }}
+            />
           ) : (
             <div className="space-y-3">
               {filteredTracks.map((track) => {
@@ -451,33 +474,33 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                   <div
                     key={track.id}
                     onClick={() => setSelectedTrackId(track.id)}
-                    className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2.5 ${
+                    className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col gap-2.5 ${
                       isSelected
-                        ? 'bg-surface-container-lowest border-primary ring-1 ring-primary/30 shadow-xs'
-                        : 'bg-surface-container-lowest hover:bg-surface-container-low border-outline-variant/30'
+                        ? 'bg-surface-bright border-primary ring-1 ring-primary/30 shadow-xs'
+                        : 'bg-surface-bright hover:bg-surface-dim border-outline-variant/60 shadow-2xs'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 text-xs">
-                          <span className="font-semibold text-primary truncate">
+                          <Badge variant="subtle" className="text-[10px] font-semibold">
                             {track.category}
-                          </span>
-                          <span className="text-outline-variant">&bull;</span>
-                          <span className="text-outline font-normal shrink-0">{track.level}</span>
+                          </Badge>
+                          <span className="text-outline/40">&bull;</span>
+                          <span className="text-outline text-[11px] font-normal">{track.level}</span>
                         </div>
                         <h3 className="text-sm font-semibold text-on-surface mt-1 truncate">
                           {track.title}
                         </h3>
                         {track.technicalTitle && (
-                          <p className="text-xs text-outline truncate">{track.technicalTitle}</p>
+                          <p className="text-xs text-outline truncate mt-0.5">{track.technicalTitle}</p>
                         )}
-                        <p className="text-xs text-outline mt-0.5 truncate">{track.provider}</p>
+                        <p className="text-xs text-on-surface-variant mt-0.5 truncate">{track.provider}</p>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-lg font-bold text-primary">{track.hours} hrs</span>
-                        <span className="block text-xs text-outline font-normal">Carga horaria</span>
+                        <span className="text-base font-bold text-primary">{track.hours} hrs</span>
+                        <span className="block text-[10px] text-outline font-normal">Carga horaria</span>
                       </div>
                     </div>
 
@@ -485,25 +508,23 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                       {track.description}
                     </p>
 
-                    <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/20 text-xs text-on-surface font-medium flex items-center gap-2">
-                      <span className="material-symbols-outlined text-primary text-sm shrink-0">
-                        target
-                      </span>
+                    <div className="p-2.5 bg-surface-dim rounded-lg border border-outline-variant/40 text-xs text-on-surface-variant font-medium flex items-center gap-2">
+                      <Target className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span className="truncate">{track.gapTarget}</span>
                     </div>
 
                     {/* Progress and Enrolled */}
-                    <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20 text-xs">
+                    <div className="flex items-center justify-between pt-2 border-t border-outline-variant/40 text-xs">
                       <div className="flex items-center gap-2">
                         <span className="text-outline font-normal">Inscritos:</span>
-                        <div className="flex -space-x-2">
+                        <div className="flex -space-x-1.5">
                           {track.enrolledEmployees.map((emp, i) => (
                             <UserAvatar
                               key={i}
                               name={emp.name}
                               size="xs"
                               shape="circle"
-                              className="ring-2 ring-surface-container-lowest"
+                              className="ring-2 ring-surface-bright"
                             />
                           ))}
                         </div>
@@ -514,7 +535,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
 
                       <div className="flex items-center gap-1.5">
                         <span className="text-outline">Finalización:</span>
-                        <span className="font-semibold text-emerald-600">
+                        <span className="font-semibold text-secondary">
                           {track.completionRate}%
                         </span>
                       </div>
@@ -528,46 +549,52 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
 
         {/* Right Column: Track Deep Dive Inspector (Sticky) */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs sticky top-6">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-primary">{activeTrack.level}</span>
-              <span className="text-xs text-outline font-normal">{activeTrack.hours} Horas Lectivas</span>
+          <Card className="p-5 sticky top-6 shadow-xs">
+            <div className="flex items-center justify-between mb-3">
+              <Badge variant="secondary" className="text-[10px]">
+                {activeTrack.level}
+              </Badge>
+              <span className="text-xs text-outline font-medium">
+                {activeTrack.hours} Horas Lectivas
+              </span>
             </div>
 
-            <h3 className="text-base font-bold text-on-surface">{activeTrack.title}</h3>
+            <h3 className="text-base font-bold text-on-surface leading-snug">{activeTrack.title}</h3>
             {activeTrack.technicalTitle && (
-              <p className="text-xs text-outline">{activeTrack.technicalTitle}</p>
+              <p className="text-xs text-on-surface-variant mt-0.5">{activeTrack.technicalTitle}</p>
             )}
-            <p className="text-xs text-primary font-medium mt-0.5">{activeTrack.provider}</p>
+            <p className="text-xs text-primary font-medium mt-1">{activeTrack.provider}</p>
 
-            <div className="p-3 bg-surface-container-low rounded-xl my-4 text-xs space-y-2 border border-outline-variant/20">
-              <div className="flex justify-between">
+            <div className="p-3 bg-surface-dim rounded-xl my-4 text-xs space-y-2 border border-outline-variant/40">
+              <div className="flex justify-between items-center">
                 <span className="text-outline">Certificación:</span>
                 <span className="font-semibold text-on-surface text-right truncate max-w-[200px]">
                   {activeTrack.certification}
                 </span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-outline">Alumnos en curso:</span>
                 <span className="font-semibold text-primary">{activeTrack.enrolledCount} colaboradores</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-outline">Finalización promedio:</span>
-                <span className="font-semibold text-emerald-600">{activeTrack.completionRate}%</span>
+                <span className="font-semibold text-secondary">{activeTrack.completionRate}%</span>
               </div>
             </div>
 
-            <h4 className="text-xs font-semibold text-on-surface mb-1">Objetivo del programa</h4>
+            <h4 className="text-xs font-semibold text-on-surface uppercase tracking-wider mb-1.5">
+              Objetivo del programa
+            </h4>
             <p className="text-xs text-on-surface-variant leading-relaxed mb-4">
               {activeTrack.description}
             </p>
 
-            <h4 className="text-xs font-semibold text-on-surface mb-2">
+            <h4 className="text-xs font-semibold text-on-surface uppercase tracking-wider mb-2">
               Colaboradores destacados matriculados
             </h4>
-            <div className="space-y-2 mb-5 max-h-56 overflow-y-auto">
+            <div className="space-y-2 mb-5 max-h-56 overflow-y-auto pr-1">
               {activeTrack.enrolledEmployees.length === 0 ? (
-                <div className="p-3 text-center bg-surface-container-low rounded-xl text-xs text-outline">
+                <div className="p-3 text-center bg-surface-dim rounded-xl text-xs text-outline">
                   Aún no hay colaboradores matriculados en esta ruta.
                 </div>
               ) : (
@@ -576,7 +603,7 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                   return (
                     <div
                       key={idx}
-                      className="p-2.5 bg-surface-container-low rounded-xl flex items-center justify-between text-xs border border-outline-variant/20"
+                      className="p-2.5 bg-surface-dim rounded-xl flex items-center justify-between text-xs border border-outline-variant/40"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <UserAvatar name={emp.name} size="sm" shape="rounded" />
@@ -593,12 +620,12 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                           ) : (
                             <span className="font-semibold text-on-surface block truncate">{emp.name}</span>
                           )}
-                          <span className="text-xs text-outline">En progreso</span>
+                          <span className="text-[10px] text-outline">En progreso</span>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
                         <span className="font-semibold text-primary">{emp.progress}%</span>
-                        <div className="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden mt-1">
+                        <div className="w-16 h-1.5 bg-outline-variant rounded-full overflow-hidden mt-1">
                           <div
                             className="h-full bg-primary rounded-full"
                             style={{ width: `${emp.progress}%` }}
@@ -612,16 +639,17 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
             </div>
 
             <div className="flex flex-col gap-2">
-              <button
-                type="button"
+              <Button
                 onClick={() => setShowEnrollModal(true)}
-                className="w-full py-2.5 px-4 rounded-xl bg-primary text-on-primary text-xs font-semibold hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full"
+                size="sm"
               >
-                <span className="material-symbols-outlined text-sm">assignment_ind</span>
+                <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                 <span>Asignar a un Colaborador</span>
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   try {
                     const content = JSON.stringify(activeTrack, null, 2);
@@ -632,58 +660,63 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
                     showToast('Contenido del curso descargado.', 'info');
                   }
                 }}
-                className="w-full py-2 px-4 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-xs font-medium border border-outline-variant/40 transition-all flex items-center justify-center gap-1 cursor-pointer"
+                className="w-full"
               >
-                <span className="material-symbols-outlined text-sm">download</span>
+                <Download className="w-3.5 h-3.5 mr-1.5" />
                 <span>Descargar Programa Completo</span>
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 
       {/* Modal Inscribir Colaborador */}
       {showEnrollModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 bg-on-surface/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div
             ref={enrollModalRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="enroll-training-title"
-            className="bg-surface-container-lowest max-w-md w-full rounded-2xl p-6 shadow-2xl border border-outline-variant/30 animate-in zoom-in-95 duration-150"
+            className="bg-surface-bright max-w-md w-full rounded-2xl p-6 shadow-2xl border border-outline-variant/60 animate-in zoom-in-95 duration-150"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant/40">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">school</span>
-                <h3 id="enroll-training-title" className="text-base font-bold text-on-surface">
-                  Asignar Capacitación
-                </h3>
+                <div className="w-8 h-8 rounded-lg bg-primary-fixed text-primary flex items-center justify-center">
+                  <GraduationCap className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 id="enroll-training-title" className="text-sm font-bold text-on-surface">
+                    Asignar Capacitación
+                  </h3>
+                  <span className="text-[11px] text-outline">Inscripción directa a programa oficial</span>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowEnrollModal(false)}
-                className="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-outline cursor-pointer"
+                className="w-8 h-8 rounded-lg hover:bg-surface-dim flex items-center justify-center text-outline hover:text-on-surface-variant cursor-pointer transition-colors"
               >
-                <span className="material-symbols-outlined text-base">close</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <form onSubmit={handleEnroll} className="flex flex-col gap-4 text-xs">
               <div>
-                <label className="font-semibold text-on-surface block mb-1">Ruta Formativa:</label>
-                <div className="p-2.5 bg-surface-container-low rounded-xl font-semibold text-primary">
+                <label className="font-semibold text-on-surface-variant block mb-1">Ruta Formativa:</label>
+                <div className="p-2.5 bg-surface-dim rounded-xl font-semibold text-primary border border-outline-variant/40">
                   {activeTrack.title}
                 </div>
               </div>
 
               <div>
-                <label className="font-semibold text-on-surface block mb-1">
+                <label className="font-semibold text-on-surface-variant block mb-1">
                   Seleccionar Colaborador:
                 </label>
                 <select
                   value={selectedEmpName}
                   onChange={(e) => setSelectedEmpName(e.target.value)}
-                  className="w-full p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary cursor-pointer"
+                  className="w-full p-2.5 bg-surface-dim rounded-xl border border-outline-variant/60 text-on-surface outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                 >
                   {employees.map((emp) => (
                     <option key={emp.id} value={emp.name}>
@@ -694,35 +727,37 @@ export const CapacitacionScreen: React.FC<CapacitacionScreenProps> = ({
               </div>
 
               <div>
-                <label className="font-semibold text-on-surface block mb-1">
+                <label className="font-semibold text-on-surface-variant block mb-1">
                   Fecha Límite Sugerida:
                 </label>
                 <input
                   type="date"
                   defaultValue="2026-12-15"
-                  className="w-full p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/40 text-on-surface outline-hidden focus:border-primary"
+                  className="w-full p-2.5 bg-surface-dim rounded-xl border border-outline-variant/60 text-on-surface outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
-              <div className="p-3 bg-surface-container-low rounded-xl text-on-surface-variant text-xs">
-                El colaborador recibirá un correo automático con credenciales y fechas de inicio.
+              <div className="p-3 bg-surface-dim rounded-xl text-on-surface-variant text-xs border border-outline-variant/40 flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                <span>El colaborador recibirá un correo automático con credenciales y fechas de inicio.</span>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/40">
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowEnrollModal(false)}
-                  className="px-4 py-2 rounded-xl text-on-surface-variant font-medium hover:bg-surface-container cursor-pointer"
                 >
                   Cancelar
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  size="sm"
                   disabled={isEnrolling}
-                  className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-semibold hover:bg-primary-container shadow-xs cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  <span>{isEnrolling ? 'Inscribiendo...' : 'Confirmar Inscripción'}</span>
-                </button>
+                  {isEnrolling ? 'Inscribiendo...' : 'Confirmar Inscripción'}
+                </Button>
               </div>
             </form>
           </div>

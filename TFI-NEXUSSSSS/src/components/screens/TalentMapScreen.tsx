@@ -14,12 +14,40 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
+import {
+  GitFork,
+  Users,
+  Search,
+  Building2,
+  AlertTriangle,
+  Shield,
+  ShieldCheck,
+  CheckCircle2,
+  Download,
+  Eye,
+  User,
+  X,
+  Sparkles,
+  TrendingUp,
+  Zap,
+  Heart,
+  Maximize2,
+  Move,
+  Briefcase,
+  Layers,
+  ArrowRight,
+} from 'lucide-react';
+
 import { ScreenId, TalentPerson } from '../../types';
 import { TALENT_PERSONS } from '../../data/mockData';
 import { UserAvatar } from '../UserAvatar';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { useToast } from '../ToastProvider';
 import { employeesApi } from '../../services/api';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
 
 interface TalentMapScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -28,7 +56,6 @@ interface TalentMapScreenProps {
 
 // ============================================================================
 // COMPONENTES DE NODOS PERSONALIZADOS PARA REACT FLOW
-// Con Handles invisibles para que las puntas de flecha conecten limpiamente al borde
 // ============================================================================
 
 interface PersonNodeData extends Record<string, unknown> {
@@ -45,12 +72,12 @@ const PersonNodeComponent: React.FC<NodeProps<Node<PersonNodeData>>> = ({ data }
   return (
     <div
       onClick={() => data.onSelect(data.id)}
-      className={`relative w-64 p-3 rounded-2xl bg-surface-container-lowest transition-all cursor-pointer shadow-xs border text-left ${
+      className={`relative w-64 p-3 rounded-xl bg-surface-bright transition-all cursor-pointer shadow-2xs border text-left ${
         data.isSelected
           ? data.isSpof
-            ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-50/50 shadow-md scale-102'
-            : 'ring-2 ring-primary border-primary bg-primary/5 shadow-md scale-102'
-          : 'border-outline-variant/30 hover:border-outline-variant/60 hover:shadow-sm'
+            ? 'ring-2 ring-amber-500 border-amber-500 bg-amber-50/50 shadow-xs'
+            : 'ring-2 ring-primary border-primary bg-primary/5 shadow-xs'
+          : 'border-outline-variant hover:border-outline hover:shadow-2xs'
       }`}
     >
       <div className="flex items-center gap-2.5">
@@ -63,16 +90,15 @@ const PersonNodeComponent: React.FC<NodeProps<Node<PersonNodeData>>> = ({ data }
         />
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center justify-between gap-1">
-            <span className="text-xs font-bold text-on-surface leading-tight">
+            <span className="text-xs font-semibold text-on-surface leading-tight">
               {data.name}
             </span>
-            <span
-              className={`text-[9px] font-bold px-1.5 py-0.5 rounded-sm shrink-0 ${
-                data.isSpof ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-              }`}
+            <Badge
+              variant={data.isSpof ? 'destructive' : 'success'}
+              className="text-[9px] px-1.5 py-0 shrink-0"
             >
               {data.isSpof ? 'SPOF' : 'Óptimo'}
-            </span>
+            </Badge>
           </div>
           <span className="text-[11px] text-primary font-medium leading-tight mt-0.5">
             {data.role}
@@ -82,7 +108,6 @@ const PersonNodeComponent: React.FC<NodeProps<Node<PersonNodeData>>> = ({ data }
           </span>
         </div>
       </div>
-      {/* Handle invisible en el borde derecho para atraque limpio de la flecha */}
       <Handle
         type="source"
         position={Position.Right}
@@ -104,12 +129,12 @@ interface SkillNodeData extends Record<string, unknown> {
 const SkillNodeComponent: React.FC<NodeProps<Node<SkillNodeData>>> = ({ data }) => {
   return (
     <div
-      className={`relative w-60 p-3 rounded-xl bg-surface-container-lowest transition-all shadow-xs border flex flex-col gap-1.5 text-left ${
+      className={`relative w-60 p-3 rounded-xl bg-surface-bright transition-all shadow-2xs border flex flex-col gap-1.5 text-left ${
         data.isActive
           ? data.isSpof
-            ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50/40 shadow-md scale-102'
-            : 'border-primary ring-2 ring-primary/40 bg-primary/5 shadow-md scale-102'
-          : 'border-outline-variant/30 opacity-70'
+            ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50/40 shadow-xs'
+            : 'border-primary ring-2 ring-primary/40 bg-primary/5 shadow-xs'
+          : 'border-outline-variant/80 opacity-70'
       }`}
     >
       <Handle
@@ -118,29 +143,24 @@ const SkillNodeComponent: React.FC<NodeProps<Node<SkillNodeData>>> = ({ data }) 
         className="!w-1 !h-1 !opacity-0 !border-0 !left-0"
       />
       <div className="flex items-center justify-between gap-1">
-        <span className="text-xs font-bold text-on-surface leading-tight">
+        <span className="text-xs font-semibold text-on-surface leading-tight">
           {data.title}
         </span>
-        <span
-          className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold shrink-0 ${
-            data.isActive
-              ? data.isSpof
-                ? 'bg-amber-500 text-white'
-                : 'bg-primary text-on-primary'
-              : 'bg-primary-container text-on-primary'
-          }`}
+        <Badge
+          variant={data.isActive ? (data.isSpof ? 'destructive' : 'default') : 'outline'}
+          className="text-[10px] shrink-0"
         >
           {data.level}
-        </span>
+        </Badge>
       </div>
-      <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+      <div className="w-full bg-surface-dim h-1.5 rounded-full overflow-hidden">
         <div
           className={`h-full w-[90%] rounded-full ${
             data.isActive
               ? data.isSpof
                 ? 'bg-amber-500'
                 : 'bg-primary'
-              : 'bg-primary/50'
+              : 'bg-primary-fixed-dim'
           }`}
         />
       </div>
@@ -167,12 +187,12 @@ interface SquadNodeData extends Record<string, unknown> {
 const SquadNodeComponent: React.FC<NodeProps<Node<SquadNodeData>>> = ({ data }) => {
   return (
     <div
-      className={`relative w-64 p-3.5 rounded-2xl bg-surface-container-lowest transition-all shadow-xs border flex flex-col gap-1 text-left ${
+      className={`relative w-64 p-3.5 rounded-xl bg-surface-bright transition-all shadow-2xs border flex flex-col gap-1 text-left ${
         data.isActive
           ? data.isSpof
-            ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50/40 shadow-md scale-102'
-            : 'border-primary ring-2 ring-primary/40 bg-primary/5 shadow-md scale-102'
-          : 'border-outline-variant/30 opacity-70'
+            ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50/40 shadow-xs'
+            : 'border-primary ring-2 ring-primary/40 bg-primary/5 shadow-xs'
+          : 'border-outline-variant/80 opacity-70'
       }`}
     >
       <Handle
@@ -181,22 +201,20 @@ const SquadNodeComponent: React.FC<NodeProps<Node<SquadNodeData>>> = ({ data }) 
         className="!w-1 !h-1 !opacity-0 !border-0 !left-0"
       />
       <div className="flex items-center gap-1.5">
-        <span
-          className={`material-symbols-outlined text-[18px] ${
+        <Users
+          className={`w-4 h-4 ${
             data.isActive && data.isSpof ? 'text-amber-600' : 'text-primary'
           }`}
-        >
-          groups
-        </span>
-        <span className="text-xs font-bold text-on-surface">{data.name}</span>
+        />
+        <span className="text-xs font-semibold text-on-surface">{data.name}</span>
       </div>
       <span className="text-[11px] text-on-surface-variant leading-tight">
         {data.desc}
       </span>
-      <div className="flex items-center justify-between text-outline text-[10px] pt-1.5 border-t border-outline-variant/20 mt-1">
+      <div className="flex items-center justify-between text-outline text-[10px] pt-1.5 border-t border-outline-variant/40 mt-1">
         <span>{data.members}</span>
         <span
-          className={`font-bold ${
+          className={`font-semibold ${
             data.isActive && data.isSpof ? 'text-amber-700' : 'text-secondary'
           }`}
         >
@@ -224,12 +242,12 @@ interface ActivityNodeData extends Record<string, unknown> {
 const ActivityNodeComponent: React.FC<NodeProps<Node<ActivityNodeData>>> = ({ data }) => {
   return (
     <div
-      className={`relative w-64 p-3.5 rounded-2xl bg-surface-container-lowest transition-all shadow-xs border flex flex-col gap-1 text-left ${
+      className={`relative w-64 p-3.5 rounded-xl bg-surface-bright transition-all shadow-2xs border flex flex-col gap-1 text-left ${
         data.isActive
           ? data.isSpof
-            ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50/40 shadow-md scale-102'
-            : 'border-primary ring-2 ring-primary/40 bg-primary/5 shadow-md scale-102'
-          : 'border-outline-variant/30 opacity-70'
+            ? 'border-amber-500 ring-2 ring-amber-500/40 bg-amber-50/40 shadow-xs'
+            : 'border-primary ring-2 ring-primary/40 bg-primary/5 shadow-xs'
+          : 'border-outline-variant/80 opacity-70'
       }`}
     >
       <Handle
@@ -237,16 +255,13 @@ const ActivityNodeComponent: React.FC<NodeProps<Node<ActivityNodeData>>> = ({ da
         position={Position.Left}
         className="!w-1 !h-1 !opacity-0 !border-0 !left-0"
       />
-      <span
-        className={`px-2 py-0.5 rounded-full text-[10px] font-bold w-max ${
-          data.isActive && data.isSpof
-            ? 'bg-amber-100 text-amber-800'
-            : 'bg-primary/10 text-primary'
-        }`}
+      <Badge
+        variant={data.isActive && data.isSpof ? 'destructive' : 'subtle'}
+        className="text-[10px] w-max font-semibold"
       >
         {data.type}
-      </span>
-      <span className="text-xs font-bold text-on-surface leading-tight">
+      </Badge>
+      <span className="text-xs font-semibold text-on-surface leading-tight">
         {data.title}
       </span>
       <span className="text-[11px] text-on-surface-variant leading-tight">
@@ -271,12 +286,25 @@ interface ImpactNodeData extends Record<string, unknown> {
 }
 
 const ImpactNodeComponent: React.FC<NodeProps<Node<ImpactNodeData>>> = ({ data }) => {
+  const renderImpactIcon = () => {
+    switch (data.icon) {
+      case 'trending_up':
+        return <TrendingUp className="w-4 h-4 text-secondary" />;
+      case 'speed':
+        return <Zap className="w-4 h-4 text-secondary" />;
+      case 'loyalty':
+        return <Heart className="w-4 h-4 text-secondary" />;
+      default:
+        return <Sparkles className="w-4 h-4 text-secondary" />;
+    }
+  };
+
   return (
     <div
-      className={`relative w-56 p-3.5 rounded-2xl bg-surface-container-lowest transition-all shadow-xs border flex flex-col gap-1 text-left ${
+      className={`relative w-56 p-3.5 rounded-xl bg-surface-bright transition-all shadow-2xs border flex flex-col gap-1 text-left ${
         data.isActive
-          ? 'border-secondary ring-2 ring-secondary/50 shadow-md bg-secondary/5 scale-102'
-          : 'border-outline-variant/30 opacity-70'
+          ? 'border-secondary ring-2 ring-secondary/50 shadow-xs bg-secondary-container/30'
+          : 'border-outline-variant/80 opacity-70'
       }`}
     >
       <Handle
@@ -285,10 +313,10 @@ const ImpactNodeComponent: React.FC<NodeProps<Node<ImpactNodeData>>> = ({ data }
         className="!w-1 !h-1 !opacity-0 !border-0 !left-0"
       />
       <div className="flex items-center gap-1.5 text-secondary">
-        <span className="material-symbols-outlined text-[18px]">{data.icon}</span>
-        <span className="text-[10px] font-bold uppercase">{data.label}</span>
+        {renderImpactIcon()}
+        <span className="text-[10px] font-semibold uppercase">{data.label}</span>
       </div>
-      <span className="text-2xl font-black text-on-surface leading-none">
+      <span className="text-xl font-bold text-on-surface leading-none tabular-nums">
         {data.value}
       </span>
       <span className="text-[11px] text-on-surface-variant leading-tight">
@@ -307,7 +335,7 @@ const nodeTypes = {
 };
 
 // ============================================================================
-// DATOS MAESTROS Y CADENAS DE VALOR COMPLETAS (Sin saltos ni desconexiones)
+// DATOS MAESTROS Y CADENAS DE VALOR COMPLETAS
 // ============================================================================
 
 const MASTER_PEOPLE = [
@@ -344,7 +372,6 @@ const MASTER_IMPACTS = [
   { id: 'retention', label: 'Retención', value: '98.4%', desc: 'Cuentas corporativas clave', icon: 'loyalty' },
 ];
 
-// Mapa unificado de cadenas de valor completas (garantiza continuidad de extremo a extremo)
 const CHAINS_BY_PERSON: Record<
   string,
   {
@@ -472,7 +499,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
     };
   }, [selectedDomain, searchFilter, onlySpof]);
 
-  // Listener para cerrar modal con Escape
+  // Escape key listener for modal
   useEffect(() => {
     if (!isSynapticModalOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
@@ -537,7 +564,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
   const flowNodes: Node[] = useMemo(() => {
     const nodes: Node[] = [];
 
-    // Columna 1: Personas (x: 20, paso vertical: 110px)
+    // Columna 1: Personas
     MASTER_PEOPLE.forEach((p, i) => {
       nodes.push({
         id: `person-${p.id}`,
@@ -555,7 +582,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
       });
     });
 
-    // Columna 2: Habilidades DNA (x: 340, alineadas exactamente frente a cada persona)
+    // Columna 2: Habilidades DNA
     MASTER_SKILLS.forEach((s, i) => {
       nodes.push({
         id: `skill-${s.id}`,
@@ -572,7 +599,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
       });
     });
 
-    // Columna 3: Squads (x: 650, alineados con Fila 0, Fila 2, Fila 4)
+    // Columna 3: Squads
     const squadY = [35, 200, 365];
     MASTER_SQUADS.forEach((sq, i) => {
       nodes.push({
@@ -591,7 +618,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
       });
     });
 
-    // Columna 4: Actividades (x: 970, alineadas perfectamente con Squads)
+    // Columna 4: Actividades
     MASTER_ACTIVITIES.forEach((act, i) => {
       nodes.push({
         id: `activity-${act.id}`,
@@ -608,7 +635,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
       });
     });
 
-    // Columna 5: Impacto (x: 1290, alineadas perfectamente con Actividades)
+    // Columna 5: Impacto
     MASTER_IMPACTS.forEach((imp, i) => {
       nodes.push({
         id: `impact-${imp.id}`,
@@ -628,7 +655,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
     return nodes;
   }, [activePersonId, currentChain]);
 
-  // ARISTAS (EDGES) CON PUNTA DE FLECHA PRECISA Y FLUJO COMPLETO GARANTIZADO
+  // ARISTAS (EDGES)
   const flowEdges: Edge[] = useMemo(() => {
     const rawEdges: Array<{
       id: string;
@@ -670,7 +697,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
       { id: 'e-b2b-profit', source: 'activity-b2b-growth', target: 'impact-profit' },
     ];
 
-    const activeColor = currentChain.isSpof ? '#D97706' : '#7C3AED';
+    const activeColor = currentChain.isSpof ? '#D97706' : '#4F46E5';
 
     return rawEdges.map((e) => {
       const isActive = currentChain.activeEdges.includes(e.id);
@@ -697,26 +724,25 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
   }, [currentChain]);
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 max-w-7xl mx-auto">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 max-w-7xl mx-auto pb-20">
       {/* Cabecera & Controles Globales */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-outline-variant/30">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-on-surface tracking-tight">
             Mapa de Talento y Competencias
           </h1>
-          <p className="text-xs text-outline mt-0.5">
-            Relación de colaboradores, competencias verificadas, unidades operativas y valor.
+          <p className="text-xs text-on-surface-variant font-medium mt-0.5">
+            Relación de colaboradores, competencias verificadas, unidades operativas y valor
           </p>
         </div>
 
         {/* Acciones principales de la cabecera */}
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <div className="relative flex items-center bg-surface-container-lowest px-3 py-1.5 rounded-xl border border-outline-variant/40 text-xs font-medium">
-            <span className="material-symbols-outlined text-outline text-[16px] mr-1.5">domain</span>
+          <div className="relative">
             <select
               value={selectedDomain}
               onChange={(e) => setSelectedDomain(e.target.value)}
-              className="bg-transparent text-xs font-medium text-on-surface outline-hidden cursor-pointer pr-2"
+              className="h-8 pl-3 pr-8 rounded-lg text-xs font-medium bg-surface-bright text-on-surface border border-outline-variant outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs"
               aria-label="Seleccionar dominio"
             >
               <option value="Todos">Todos los Dominios</option>
@@ -727,15 +753,13 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
             </select>
           </div>
 
-          <button
-            type="button"
+          <Button
+            size="sm"
             onClick={() => setIsSynapticModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
-            title="Abrir mapa sináptico interactivo (React Flow)"
           >
-            <span className="material-symbols-outlined text-[16px]">hub</span>
+            <GitFork className="w-3.5 h-3.5 mr-1.5" />
             <span>Ver Mapa Sináptico</span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -751,59 +775,68 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
         dismissible={true}
       />
 
-      {/* Métricas Resumen Dinámicas */}
+      {/* Minimalist 4-Metric Status Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/40 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Colaboradores mapeados</span>
-          <div className="text-xl font-bold text-on-surface">
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Colaboradores mapeados</span>
+            <Users className="w-3.5 h-3.5 text-outline" />
+          </div>
+          <div className="text-xl font-bold text-on-surface tabular-nums">
             {metrics.total} <span className="text-xs font-normal text-outline">activos</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/40 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Criticidad promedio</span>
-          <div className="text-xl font-bold text-primary">
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Criticidad promedio</span>
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+          </div>
+          <div className="text-xl font-bold text-primary tabular-nums">
             {metrics.avgCrit} <span className="text-xs font-normal text-outline">/ 10.0</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/40 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Equipos y squads</span>
-          <div className="text-xl font-bold text-on-surface">
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Equipos y squads</span>
+            <Building2 className="w-3.5 h-3.5 text-outline" />
+          </div>
+          <div className="text-xl font-bold text-on-surface tabular-nums">
             {metrics.distinctSquads} <span className="text-xs font-normal text-outline">unidades</span>
           </div>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/40 flex flex-col gap-1 shadow-2xs">
-          <span className="text-xs text-on-surface-variant font-medium">Puntos únicos de falla (SPOF)</span>
-          <div className="text-xl font-bold text-amber-600">
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Puntos únicos de falla (SPOF)</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+          </div>
+          <div className="text-xl font-bold text-amber-600 tabular-nums">
             {metrics.spofCount} <span className="text-xs font-normal text-outline">roles con riesgo</span>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* WORKSPACE PRINCIPAL: Directorio Lateral + Panel Central */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* PANEL IZQUIERDO: Directorio de Talento (4 cols) */}
-        <div className="lg:col-span-4 bg-surface-container-lowest rounded-2xl shadow-xs border border-outline-variant/40 p-4 flex flex-col gap-3">
-          <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
-            <h2 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+        <Card className="lg:col-span-4 p-4 flex flex-col gap-3 shadow-2xs">
+          <div className="flex items-center justify-between pb-2 border-b border-outline-variant/40">
+            <h2 className="text-xs font-semibold text-on-surface uppercase tracking-wider">
               Colaboradores ({filteredPersons.length})
             </h2>
             <span className="text-[11px] text-outline">Seleccioná para inspeccionar</span>
           </div>
 
           {/* Búsqueda en el listado */}
-          <div className="relative flex items-center">
-            <span className="material-symbols-outlined absolute left-2.5 text-outline text-[16px]">
-              search
-            </span>
-            <input
-              type="text"
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-outline" />
+            <Input
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
               placeholder="Buscar colaborador o puesto..."
-              className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-surface-container-low text-on-surface placeholder:text-outline text-xs outline-hidden focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary border border-outline-variant/30"
+              className="pl-8 text-xs h-8"
             />
           </div>
 
@@ -819,8 +852,8 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                   onClick={() => setActivePersonId(person.id)}
                   className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center gap-3 ${
                     isSelected
-                      ? 'bg-primary/5 border-primary ring-1 ring-primary/40 shadow-xs'
-                      : 'bg-surface-container-lowest hover:bg-surface-container-low border-outline-variant/30'
+                      ? 'bg-surface-bright border-primary ring-1 ring-primary/30 shadow-xs'
+                      : 'bg-surface-bright hover:bg-surface-dim border-outline-variant/70 shadow-2xs'
                   }`}
                 >
                   <UserAvatar
@@ -832,23 +865,20 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                   />
                   <div className="flex flex-col min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-1">
-                      <span className="text-xs font-bold text-on-surface truncate">
+                      <span className="text-xs font-semibold text-on-surface truncate">
                         {person.name}
                       </span>
-                      <span
-                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-md ${
-                          isSpof
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-emerald-100 text-emerald-800'
-                        }`}
+                      <Badge
+                        variant={isSpof ? 'destructive' : 'success'}
+                        className="text-[9px] px-1.5 py-0"
                       >
                         {isSpof ? 'SPOF' : 'Óptimo'}
-                      </span>
+                      </Badge>
                     </div>
-                    <span className="text-xs text-primary font-medium leading-snug line-clamp-1">
+                    <span className="text-xs text-primary font-medium leading-snug line-clamp-1 mt-0.5">
                       {person.role}
                     </span>
-                    <div className="flex items-center justify-between text-[11px] text-outline mt-0.5">
+                    <div className="flex items-center justify-between text-[11px] text-outline mt-1">
                       <span className="truncate">{person.squad.split('•')[0]?.trim()}</span>
                       <span className="font-semibold text-on-surface shrink-0">
                         Crit. {person.criticality}
@@ -859,12 +889,12 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
               );
             })}
           </div>
-        </div>
+        </Card>
 
         {/* PANEL DERECHO: Tarjeta Hero del Colaborador Activo + Detalle Reestructurado (8 cols) */}
         <div className="lg:col-span-8 flex flex-col gap-4">
           {/* Tarjeta Hero del Colaborador Activo */}
-          <div className="bg-surface-container-lowest rounded-2xl shadow-xs border border-outline-variant/40 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <Card className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
             <div className="flex items-center gap-3.5">
               <UserAvatar
                 name={activePerson.name}
@@ -876,15 +906,12 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base font-bold text-on-surface">{activePerson.name}</h2>
-                  <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
-                      activePerson.riskStatus === 'spof'
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-emerald-100 text-emerald-800'
-                    }`}
+                  <Badge
+                    variant={activePerson.riskStatus === 'spof' ? 'destructive' : 'success'}
+                    className="text-[10px] font-semibold"
                   >
                     {activePerson.riskStatus === 'spof' ? 'Punto Único de Falla (SPOF)' : 'Sin riesgo'}
-                  </span>
+                  </Badge>
                 </div>
                 <p className="text-xs text-primary font-medium mt-0.5">{activePerson.role}</p>
                 <p className="text-xs text-outline">{activePerson.squad} &bull; Sede: {activePerson.location}</p>
@@ -892,25 +919,24 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-              <button
-                type="button"
+              <Button
+                size="sm"
                 onClick={() => setIsSynapticModalOpen(true)}
-                className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                title="Abrir mapa sináptico interactivo con flechas"
               >
-                <span className="material-symbols-outlined text-[16px]">hub</span>
+                <GitFork className="w-3.5 h-3.5 mr-1.5" />
                 <span>Mapa Sináptico</span>
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleGoToEmployee}
-                className="px-3 py-2 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]">person</span>
+                <User className="w-3.5 h-3.5 mr-1.5" />
                 <span>Perfil 360°</span>
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={async () => {
                   try {
                     showToast(`Descargando Ficha de ${activePerson.name}...`);
@@ -920,23 +946,22 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                     window.print();
                   }
                 }}
-                className="px-3 py-2 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                 title="Exportar ficha técnica en PDF"
               >
-                <span className="material-symbols-outlined text-[16px] text-primary">download</span>
+                <Download className="w-3.5 h-3.5 mr-1 text-primary" />
                 <span className="hidden sm:inline">PDF</span>
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
 
           {/* Banner de Invitación al Mapa Sináptico */}
-          <div className="bg-gradient-to-r from-primary/10 via-surface-container-lowest to-surface-container-lowest rounded-2xl border border-primary/20 p-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+          <div className="bg-gradient-to-r from-primary/5 via-surface-bright to-surface-bright rounded-xl border border-primary/20 p-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-xs">
-                <span className="material-symbols-outlined text-2xl">alt_route</span>
+              <div className="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-xs">
+                <GitFork className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-xs sm:text-sm font-bold text-on-surface">
+                <h3 className="text-xs sm:text-sm font-semibold text-on-surface">
                   Red Sináptica de Valor y Competencias (Diagrama Interactivo)
                 </h3>
                 <p className="text-xs text-on-surface-variant mt-0.5">
@@ -945,53 +970,53 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
               </div>
             </div>
 
-            <button
-              type="button"
+            <Button
+              size="sm"
               onClick={() => setIsSynapticModalOpen(true)}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="w-full sm:w-auto shrink-0"
             >
-              <span className="material-symbols-outlined text-[18px]">open_in_full</span>
+              <Maximize2 className="w-3.5 h-3.5 mr-1.5" />
               <span>Abrir Diagrama Interactivo</span>
-            </button>
+            </Button>
           </div>
 
           {/* Selector de Pestañas de Detalle */}
-          <div className="bg-surface-container-lowest px-4 py-2 rounded-2xl border border-outline-variant/40 shadow-2xs flex items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-outline-variant/20 w-full sm:w-auto">
+          <div className="bg-surface-bright px-4 py-2 rounded-xl border border-outline-variant shadow-2xs flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-1 bg-surface-dim p-1 rounded-lg w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setActiveTab('actions')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   activeTab === 'actions'
-                    ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                    : 'text-outline hover:text-on-surface'
+                    ? 'bg-surface-bright text-primary shadow-2xs font-semibold'
+                    : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                <span className="material-symbols-outlined text-[16px]">task_alt</span>
+                <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Iniciativas Clave ({activePerson.activities.length})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('skills')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   activeTab === 'skills'
-                    ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                    : 'text-outline hover:text-on-surface'
+                    ? 'bg-surface-bright text-primary shadow-2xs font-semibold'
+                    : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                <span className="material-symbols-outlined text-[16px]">psychology</span>
+                <Sparkles className="w-3.5 h-3.5" />
                 <span>Competencias DNA ({activePerson.skills.length})</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('spof')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   activeTab === 'spof'
-                    ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                    : 'text-outline hover:text-on-surface'
+                    ? 'bg-surface-bright text-primary shadow-2xs font-semibold'
+                    : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                <span className="material-symbols-outlined text-[16px]">shield</span>
+                <Shield className="w-3.5 h-3.5" />
                 <span>Análisis SPOF</span>
               </button>
             </div>
@@ -999,78 +1024,78 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
 
           {/* PESTAÑA 1: Iniciativas y Tareas Clave */}
           {activeTab === 'actions' && (
-            <div className="bg-surface-container-lowest rounded-2xl shadow-xs border border-outline-variant/40 p-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
+            <Card className="p-5 flex flex-col gap-4 shadow-2xs">
+              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/40">
                 <div>
-                  <h3 className="text-sm font-bold text-on-surface">
+                  <h3 className="text-sm font-semibold text-on-surface">
                     Iniciativas y Tareas Asignadas a {activePerson.name}
                   </h3>
                   <p className="text-xs text-outline mt-0.5">
                     Procesos directos de negocio, custodia técnica y proyectos en curso.
                   </p>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-primary/10 text-primary">
+                <Badge variant="subtle" className="text-xs">
                   {activePerson.activities.length} Asignaciones
-                </span>
+                </Badge>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activePerson.activities.map((act, idx) => (
                   <div
                     key={idx}
-                    className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 flex flex-col justify-between gap-3 shadow-2xs"
+                    className="p-4 bg-surface-dim/60 rounded-xl border border-outline-variant/60 flex flex-col justify-between gap-3 shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                        <span className="w-7 h-7 rounded-lg bg-primary-fixed text-primary flex items-center justify-center font-semibold text-xs shrink-0">
                           {idx + 1}
                         </span>
-                        <h4 className="text-xs font-bold text-on-surface leading-snug">
+                        <h4 className="text-xs font-semibold text-on-surface leading-snug">
                           {act.title}
                         </h4>
                       </div>
-                      <p className="text-xs text-on-surface-variant leading-relaxed pl-10">
+                      <p className="text-xs text-on-surface-variant leading-relaxed pl-9">
                         {act.description}
                       </p>
                     </div>
 
-                    <div className="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-xs text-outline pl-10">
+                    <div className="mt-2 pt-2 border-t border-outline-variant/40 flex items-center justify-between text-xs text-outline pl-9">
                       <span>Puesto: {activePerson.role}</span>
                       <span className="font-semibold text-primary">Activa</span>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* PESTAÑA 2: Competencias DNA */}
           {activeTab === 'skills' && (
-            <div className="bg-surface-container-lowest rounded-2xl shadow-xs border border-outline-variant/40 p-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
+            <Card className="p-5 flex flex-col gap-4 shadow-2xs">
+              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/40">
                 <div>
-                  <h3 className="text-sm font-bold text-on-surface">
+                  <h3 className="text-sm font-semibold text-on-surface">
                     Matriz de Competencias Verificadas de {activePerson.name}
                   </h3>
                   <p className="text-xs text-outline mt-0.5">
                     Nivel técnico comprobado y stack operativo validado.
                   </p>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800">
+                <Badge variant="success" className="text-xs">
                   {activePerson.skills.length} Verificadas
-                </span>
+                </Badge>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {activePerson.skills.map((skill, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/20 flex flex-col justify-between gap-2.5 shadow-2xs"
+                    className="p-3.5 bg-surface-dim/60 rounded-xl border border-outline-variant/60 flex flex-col justify-between gap-2.5 shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-bold text-on-surface">{skill.name}</span>
-                        <span className="text-xs font-bold text-primary">Nv. {skill.level} / 5</span>
+                        <span className="text-xs font-semibold text-on-surface">{skill.name}</span>
+                        <span className="text-xs font-bold text-primary tabular-nums">Nv. {skill.level} / 5</span>
                       </div>
                       {skill.technicalName && (
                         <span className="text-[11px] text-outline block mt-0.5">
@@ -1079,7 +1104,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                       )}
                     </div>
 
-                    <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
                       <div
                         className="bg-primary h-full rounded-full transition-all duration-300"
                         style={{ width: `${(skill.level / 5) * 100}%` }}
@@ -1089,57 +1114,54 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                     <div className="flex items-center justify-between text-[11px] text-outline">
                       <span className="font-mono">{skill.dna || 'Validado por comité'}</span>
                       <span className="text-emerald-700 font-medium flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[13px]">verified</span>
+                        <CheckCircle2 className="w-3.5 h-3.5" />
                         Verificada
                       </span>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* PESTAÑA 3: Análisis de Continuidad y Riesgo SPOF */}
           {activeTab === 'spof' && (
-            <div className="bg-surface-container-lowest rounded-2xl shadow-xs border border-outline-variant/40 p-5 flex flex-col gap-4">
-              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/20">
+            <Card className="p-5 flex flex-col gap-4 shadow-2xs">
+              <div className="flex items-center justify-between pb-2 border-b border-outline-variant/40">
                 <div>
-                  <h3 className="text-sm font-bold text-on-surface">
+                  <h3 className="text-sm font-semibold text-on-surface">
                     Evaluación de Continuidad Operativa &amp; SPOF
                   </h3>
                   <p className="text-xs text-outline mt-0.5">
                     Índice de criticidad y resiliencia ante ausencias o relevos.
                   </p>
                 </div>
-                <span
-                  className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${
-                    activePerson.riskStatus === 'spof'
-                      ? 'bg-amber-100 text-amber-800'
-                      : 'bg-emerald-100 text-emerald-800'
-                  }`}
+                <Badge
+                  variant={activePerson.riskStatus === 'spof' ? 'destructive' : 'success'}
+                  className="text-xs"
                 >
                   {activePerson.riskStatus === 'spof' ? 'Riesgo Detectado' : 'Continuidad Segura'}
-                </span>
+                </Badge>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/20 flex flex-col gap-1">
+                <div className="p-3.5 bg-surface-dim/60 rounded-xl border border-outline-variant/60 flex flex-col gap-1">
                   <span className="text-[11px] text-outline">Índice de Criticidad</span>
-                  <div className="text-xl font-bold text-primary">{activePerson.criticality} / 10</div>
-                  <span className="text-[10px] text-on-surface-variant">Prioridad alta en la unidad</span>
+                  <div className="text-xl font-bold text-primary tabular-nums">{activePerson.criticality} / 10</div>
+                  <span className="text-[10px] text-on-surface-variant font-medium">Prioridad alta en la unidad</span>
                 </div>
 
-                <div className="p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/20 flex flex-col gap-1">
+                <div className="p-3.5 bg-surface-dim/60 rounded-xl border border-outline-variant/60 flex flex-col gap-1">
                   <span className="text-[11px] text-outline">Unidad de Dependencia</span>
-                  <div className="text-sm font-bold text-on-surface leading-tight mt-1">
+                  <div className="text-sm font-semibold text-on-surface leading-tight mt-1">
                     {activePerson.squad.split('•')[0]?.trim()}
                   </div>
                   <span className="text-[10px] text-outline">Sede: {activePerson.location}</span>
                 </div>
 
-                <div className="p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/20 flex flex-col gap-1">
+                <div className="p-3.5 bg-surface-dim/60 rounded-xl border border-outline-variant/60 flex flex-col gap-1">
                   <span className="text-[11px] text-outline">Plan de Relevo</span>
-                  <div className="text-sm font-bold text-on-surface leading-tight mt-1">
+                  <div className="text-sm font-semibold text-on-surface leading-tight mt-1">
                     {activePerson.riskStatus === 'spof' ? 'Requerido URGENTE' : 'Cobertura 100%'}
                   </div>
                   <span className="text-[10px] text-outline">
@@ -1149,7 +1171,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                   </span>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
         </div>
       </div>
@@ -1158,21 +1180,21 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
       {/* MODAL SINÁPTICO: REACT FLOW CON FLECHAS FLUIDAS Y SIN CORTES              */}
       {/* ========================================================================= */}
       {isSynapticModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-on-surface/50 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="synaptic-modal-title"
-            className="bg-surface-container-lowest w-full max-w-[96vw] xl:max-w-7xl h-[92vh] max-h-[860px] rounded-3xl shadow-2xl border border-outline-variant/40 flex flex-col justify-between overflow-hidden"
+            className="bg-surface-bright w-full max-w-[96vw] xl:max-w-7xl h-[92vh] max-h-[860px] rounded-2xl shadow-2xl border border-outline-variant flex flex-col justify-between overflow-hidden animate-in zoom-in-95 duration-150"
           >
             {/* Header del Modal */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-6 py-3.5 border-b border-outline-variant/20 bg-surface-container-lowest shrink-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-6 py-3.5 border-b border-outline-variant/60 bg-surface-bright shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-2xl">hub</span>
+                <div className="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+                  <GitFork className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 id="synaptic-modal-title" className="text-base font-bold text-on-surface">
+                  <h3 id="synaptic-modal-title" className="text-base font-semibold text-on-surface">
                     Mapa Sináptico de Acciones, Competencias y Valor
                   </h3>
                   <p className="text-xs text-outline">
@@ -1183,24 +1205,24 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
 
               {/* Controles de Cierre */}
               <div className="flex items-center gap-2 self-end sm:self-auto">
-                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-container-low text-xs text-outline font-medium">
-                  <span className="material-symbols-outlined text-[15px] text-primary">drag_pan</span>
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg bg-surface-dim text-xs text-on-surface-variant font-medium border border-outline-variant/60">
+                  <Move className="w-3.5 h-3.5 text-primary" />
                   <span>Arrastrá el lienzo para moverte o usá la rueda para zoom</span>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setIsSynapticModalOpen(false)}
-                  className="w-9 h-9 rounded-full hover:bg-surface-container flex items-center justify-center text-outline hover:text-on-surface cursor-pointer transition-colors"
+                  className="w-8 h-8 rounded-lg hover:bg-surface-dim flex items-center justify-center text-outline hover:text-on-surface cursor-pointer transition-colors"
                   title="Cerrar modal (Esc)"
                 >
-                  <span className="material-symbols-outlined text-xl">close</span>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
             {/* Lienzo Interactivo con React Flow */}
-            <div className="flex-1 w-full h-[66vh] min-h-[500px] relative bg-surface-container-low/20">
+            <div className="flex-1 w-full h-[66vh] min-h-[500px] relative bg-surface-dim/40">
               <ReactFlow
                 nodes={flowNodes}
                 edges={flowEdges}
@@ -1214,32 +1236,32 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                 <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#CBD5E1" />
                 <Controls
                   showInteractive={false}
-                  className="!bg-surface-container-lowest !border-outline-variant/30 !shadow-md !rounded-xl overflow-hidden"
+                  className="!bg-surface-bright !border-outline-variant !shadow-md !rounded-xl overflow-hidden"
                 />
 
                 {/* Panel Superior con Leyendas de Columnas */}
                 <Panel position="top-left" className="!m-4 flex items-center gap-6 pointer-events-none">
-                  <div className="flex items-center gap-4 bg-surface-container-lowest/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-xs border border-outline-variant/30 text-xs font-bold text-on-surface">
+                  <div className="flex items-center gap-4 bg-surface-bright/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-xs border border-outline-variant text-xs font-semibold text-on-surface">
                     <span className="flex items-center gap-1.5 text-primary">
                       <span className="w-2 h-2 rounded-full bg-primary" />
                       1. Personas
                     </span>
-                    <span className="text-outline">&rarr;</span>
+                    <span className="text-outline/50">&rarr;</span>
                     <span className="flex items-center gap-1.5 text-primary">
                       <span className="w-2 h-2 rounded-full bg-primary" />
                       2. Habilidades
                     </span>
-                    <span className="text-outline">&rarr;</span>
+                    <span className="text-outline/50">&rarr;</span>
                     <span className="flex items-center gap-1.5 text-primary">
                       <span className="w-2 h-2 rounded-full bg-primary" />
                       3. Squads
                     </span>
-                    <span className="text-outline">&rarr;</span>
+                    <span className="text-outline/50">&rarr;</span>
                     <span className="flex items-center gap-1.5 text-primary">
                       <span className="w-2 h-2 rounded-full bg-primary" />
                       4. Actividades
                     </span>
-                    <span className="text-outline">&rarr;</span>
+                    <span className="text-outline/50">&rarr;</span>
                     <span className="flex items-center gap-1.5 text-secondary">
                       <span className="w-2 h-2 rounded-full bg-secondary" />
                       5. Impacto
@@ -1250,7 +1272,7 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
             </div>
 
             {/* Footer del Modal: Leyenda y Controles de Acción */}
-            <div className="px-6 py-3 border-t border-outline-variant/20 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0">
+            <div className="px-6 py-3 border-t border-outline-variant/60 bg-surface-bright flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0">
               <div className="flex flex-wrap items-center gap-4 text-xs">
                 <div className="flex items-center gap-1.5">
                   <span
@@ -1263,34 +1285,33 @@ export const TalentMapScreen: React.FC<TalentMapScreenProps> = ({
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-3.5 h-1 bg-outline-variant/60 rounded-full" />
+                  <span className="w-3.5 h-1 bg-outline-variant rounded-full" />
                   <span className="text-outline">Otras conexiones</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span className="text-outline">Óptimo</span>
+                  <span className="text-on-surface-variant">Óptimo</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span className="text-outline">SPOF (Riesgo)</span>
+                  <span className="text-on-surface-variant">SPOF (Riesgo)</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
+                <Button
+                  size="sm"
                   onClick={handleGoToEmployee}
-                  className="px-3.5 py-1.5 rounded-xl bg-primary text-on-primary font-semibold text-xs hover:bg-primary-container transition-all cursor-pointer"
                 >
                   Ver Ficha 360°
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => setIsSynapticModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs transition-colors cursor-pointer"
                 >
                   Cerrar
-                </button>
+                </Button>
               </div>
             </div>
           </div>

@@ -2,6 +2,23 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { JOB_POSITIONS, EMPLOYEES_DATA } from '../data/mockData';
 import { MODULES } from '../routes';
+import { EmptyState } from './EmptyState';
+import {
+  Search,
+  X,
+  Briefcase,
+  User,
+  LayoutDashboard,
+  GitFork,
+  Workflow,
+  Users,
+  UserCheck,
+  Award,
+  GraduationCap,
+  BarChart3,
+  CornerDownLeft,
+  Key,
+} from 'lucide-react';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -12,9 +29,21 @@ type ResultItem = {
   id: string;
   label: string;
   sublabel?: string;
-  icon: string;
+  icon: React.ElementType;
   path: string;
   category: 'Navegación' | 'Puestos' | 'Colaboradores';
+};
+
+const navIconMap: Record<string, React.ElementType> = {
+  'dashboard-ejecutivo': LayoutDashboard,
+  'talent-map': GitFork,
+  'value-map': Workflow,
+  'puestos': Briefcase,
+  'empleados': Users,
+  'reclutamiento': UserCheck,
+  'evaluacion-desempeno': Award,
+  'capacitacion-upskilling': GraduationCap,
+  'reportes-metricas': BarChart3,
 };
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
@@ -42,7 +71,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         id: m.path,
         label: m.title,
         sublabel: m.subtitle,
-        icon: m.icon,
+        icon: navIconMap[m.id] || LayoutDashboard,
         path: m.path,
         category: 'Navegación' as const,
       }));
@@ -54,7 +83,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       id: m.path,
       label: m.title,
       sublabel: m.subtitle,
-      icon: m.icon,
+      icon: navIconMap[m.id] || LayoutDashboard,
       path: m.path,
       category: 'Navegación' as const,
     }));
@@ -70,7 +99,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         id: j.code,
         label: j.title,
         sublabel: `${j.code} • ${j.department}`,
-        icon: j.status === 'critical' ? 'vpn_key' : 'work',
+        icon: j.status === 'critical' ? Key : Briefcase,
         path: `/puestos/${j.code}`,
         category: 'Puestos' as const,
       }));
@@ -87,7 +116,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         id: e.id,
         label: e.name,
         sublabel: `${e.role} • ${e.area}`,
-        icon: 'person',
+        icon: User,
         path: `/personas/${e.id}`,
         category: 'Colaboradores' as const,
       }));
@@ -146,20 +175,20 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
       className="fixed inset-0 z-[80] flex items-start justify-center pt-16 sm:pt-24 px-4 animate-in fade-in duration-150"
       onClick={onClose}
     >
-      {/* Fondo borroso */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-xs" aria-hidden="true" />
+      {/* Fondo sutil */}
+      <div className="absolute inset-0 bg-on-surface/40 backdrop-blur-xs" aria-hidden="true" />
 
       {/* Panel flotante de comandos */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Paleta de comandos"
-        className="relative w-full max-w-xl bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/40 flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
+        className="relative w-full max-w-lg bg-surface-bright rounded-xl shadow-xl border border-outline-variant/70 flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra de entrada */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-outline-variant/20">
-          <span className="material-symbols-outlined text-primary text-xl">search</span>
+        <div className="flex items-center gap-2.5 px-3.5 py-3 border-b border-outline-variant/50 bg-surface-bright">
+          <Search className="w-4 h-4 text-primary shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -168,8 +197,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
               setQuery(e.target.value);
               setSelectedIdx(0);
             }}
-            placeholder="Buscar módulos, puestos, colaboradores (ej: Lucas, Arquitecto, Cadena)..."
-            className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-outline outline-hidden font-medium"
+            placeholder="Buscar puestos, colaboradores, módulos..."
+            className="flex-1 bg-transparent text-xs text-on-surface placeholder:text-outline outline-none font-medium"
             aria-label="Buscar en NEXUS"
           />
           {query && (
@@ -179,35 +208,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container cursor-pointer"
+              className="p-1 rounded-md text-outline hover:text-on-surface hover:bg-surface-dim cursor-pointer"
               title="Borrar texto"
             >
-              <span className="material-symbols-outlined text-sm">close</span>
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono font-bold text-outline border border-outline-variant/30">
+          <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-dim text-[9px] font-mono font-medium text-outline border border-outline-variant/50">
             ESC
           </kbd>
         </div>
 
         {/* Lista de resultados */}
-        <div className="overflow-y-auto max-h-96 p-2" role="listbox">
+        <div className="overflow-y-auto max-h-80 p-2" role="listbox">
           {results.length === 0 ? (
-            <div className="py-10 text-center text-sm text-on-surface-variant flex flex-col items-center gap-2">
-              <span className="material-symbols-outlined text-outline text-3xl">search_off</span>
-              <p>
-                No se encontraron resultados para <strong>«{query}»</strong>
-              </p>
-              <p className="text-xs text-outline">Probá buscando por nombre, código de puesto o módulo.</p>
+            <div className="p-4">
+              <EmptyState
+                icon="search_off"
+                title={`Sin resultados para «${query}»`}
+                description="Probá buscando por nombre de colaborador, código de puesto (ej: PUE-2026), área o módulo del sistema."
+                actionLabel="Borrar búsqueda"
+                onAction={() => {
+                  setQuery('');
+                  inputRef.current?.focus();
+                }}
+              />
             </div>
           ) : (
             Object.entries(grouped).map(([category, entries]) => (
               <div key={category} className="mb-2">
-                <div className="px-3 py-1 text-[10px] font-black uppercase tracking-wider text-outline">
-                  {category}
+                <div className="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-outline flex items-center justify-between">
+                  <span>{category}</span>
+                  <span className="text-[10px] font-medium text-outline/60">{entries.length}</span>
                 </div>
                 {entries.map(({ item, globalIdx }) => {
                   const isActive = globalIdx === clampedIdx;
+                  const Icon = item.icon;
                   return (
                     <button
                       key={item.id}
@@ -216,30 +252,29 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                       aria-selected={isActive}
                       onClick={() => handleSelect(item)}
                       onMouseEnter={() => setSelectedIdx(globalIdx)}
-                      className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all cursor-pointer ${
+                      className={`w-full text-left flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
-                          : 'hover:bg-surface-container-low text-on-surface'
+                          ? 'bg-primary/10 text-primary font-medium'
+                          : 'hover:bg-surface-dim text-on-surface'
                       }`}
                     >
-                      <span
-                        className={`material-symbols-outlined text-[20px] ${
+                      <Icon
+                        className={`w-4 h-4 shrink-0 ${
                           isActive ? 'text-primary' : 'text-outline'
                         }`}
-                      >
-                        {item.icon}
-                      </span>
+                      />
                       <div className="flex-1 min-w-0">
-                        <span className="text-xs sm:text-sm font-bold block truncate">{item.label}</span>
+                        <span className="text-xs font-medium block truncate">{item.label}</span>
                         {item.sublabel && (
-                          <span className="text-[11px] text-on-surface-variant truncate block">
+                          <span className="text-[11px] text-on-surface-variant truncate block font-normal">
                             {item.sublabel}
                           </span>
                         )}
                       </div>
                       {isActive && (
-                        <span className="hidden sm:inline text-[10px] font-mono text-primary font-bold bg-primary-fixed/50 px-1.5 py-0.5 rounded">
-                          Enter ↵
+                        <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-primary font-medium bg-primary-fixed/60 px-1.5 py-0.2 rounded">
+                          <CornerDownLeft className="w-2.5 h-2.5" />
+                          Abrir
                         </span>
                       )}
                     </button>
@@ -251,28 +286,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
         </div>
 
         {/* Pie informativo */}
-        <div className="px-4 py-2 border-t border-outline-variant/20 bg-surface-container-low/50 flex items-center justify-between text-[11px] text-outline">
+        <div className="px-3 py-2 border-t border-outline-variant/40 bg-surface-dim/40 flex items-center justify-between text-[11px] text-outline">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <kbd className="bg-surface-container border border-outline-variant/30 rounded px-1 font-mono text-[10px]">
-                ↑↓
-              </kbd>
-              Navegar
-            </span>
-            <span className="flex items-center gap-1">
-              <kbd className="bg-surface-container border border-outline-variant/30 rounded px-1 font-mono text-[10px]">
-                ↵
-              </kbd>
-              Abrir
-            </span>
-            <span className="flex items-center gap-1">
-              <kbd className="bg-surface-container border border-outline-variant/30 rounded px-1 font-mono text-[10px]">
-                Esc
-              </kbd>
-              Cerrar
-            </span>
+            <span>↑↓ Navegar</span>
+            <span>↵ Seleccionar</span>
+            <span>Esc Cerrar</span>
           </div>
-          <span className="font-semibold text-primary">NEXUS QuickNav</span>
+          <span className="font-medium text-primary">NEXUS Omnibox</span>
         </div>
       </div>
     </div>

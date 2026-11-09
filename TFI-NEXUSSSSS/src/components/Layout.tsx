@@ -93,7 +93,7 @@ export const Layout: React.FC = () => {
 
       <div
         className={`flex-1 ml-0 ${
-          isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'
+          isSidebarCollapsed ? 'lg:ml-[72px]' : 'lg:ml-64'
         } flex flex-col min-h-screen min-w-0 transition-all duration-300 ease-in-out`}
       >
         <Header
@@ -104,7 +104,7 @@ export const Layout: React.FC = () => {
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         />
 
-        <main id="contenido" className="flex-1 mt-16 pb-16 overflow-x-hidden">
+        <main id="contenido" className="flex-1 mt-14 pb-16 overflow-x-hidden">
           <Breadcrumbs />
           <Suspense fallback={<PageLoader />}>
             <Outlet context={{ selectedCampus }} />

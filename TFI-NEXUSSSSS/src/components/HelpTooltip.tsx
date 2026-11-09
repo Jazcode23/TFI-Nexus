@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { HelpCircle } from 'lucide-react';
 
 interface HelpTooltipProps {
   text: string;
@@ -16,11 +17,11 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ text, label }) => {
         onClick={() => setShow(!show)}
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
-        className="w-4 h-4 rounded-full bg-surface-container-high hover:bg-primary-fixed hover:text-primary text-outline text-[11px] font-bold inline-flex items-center justify-center transition-colors cursor-help focus:outline-none"
+        className="inline-flex items-center justify-center text-outline hover:text-primary transition-colors cursor-help focus:outline-none p-0.5 rounded"
         title="Clic para ver explicación sencilla"
         aria-label="Ayuda"
       >
-        ?
+        <HelpCircle className="w-3.5 h-3.5" />
       </button>
 
       {show && (

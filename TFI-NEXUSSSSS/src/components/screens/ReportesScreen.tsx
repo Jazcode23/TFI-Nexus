@@ -1,5 +1,25 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import {
+  BarChart3,
+  FileText,
+  FileSpreadsheet,
+  Activity,
+  Shield,
+  ShieldCheck,
+  TrendingUp,
+  Search,
+  Download,
+  Printer,
+  Eye,
+  X,
+  CheckCircle2,
+  ExternalLink,
+  Code2,
+  Calendar,
+  Layers,
+  Sparkles,
+} from 'lucide-react';
 import { ScreenId } from '../../types';
 import { ETIQUETAS_DEMANDA } from '../../data/glosario';
 import { QuickGuideBanner } from '../QuickGuideBanner';
@@ -8,6 +28,10 @@ import { useToast } from '../ToastProvider';
 import { reportsApi, jobsApi, evaluationsApi, employeesApi } from '../../services/api';
 import { EMPLOYEES_DATA, JOB_POSITIONS, TALENT_PERSONS } from '../../data/mockData';
 import { useFocusTrap } from '../useFocusTrap';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
 
 interface ReportesScreenProps {
   onNavigate: (screen: ScreenId) => void;
@@ -60,19 +84,25 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
   // Synchronize Tab with URL
   const handleTabChange = (tab: ReportTab) => {
     setActiveReportTab(tab);
-    setSearchParams((prev) => {
-      prev.set('tab', tab);
-      return prev;
-    }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        prev.set('tab', tab);
+        return prev;
+      },
+      { replace: true }
+    );
   };
 
   // Synchronize Period with URL
   const handlePeriodChange = (period: string) => {
     setSelectedPeriod(period);
-    setSearchParams((prev) => {
-      prev.set('period', period);
-      return prev;
-    }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        prev.set('period', period);
+        return prev;
+      },
+      { replace: true }
+    );
   };
 
   // Backend KPIs & Squads Data
@@ -98,7 +128,6 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Fetch Dashboard KPIs
     reportsApi
       .getDashboardKpis(selectedPeriod)
       .then((res: any) => {
@@ -107,10 +136,9 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
         }
       })
       .catch(() => {
-        // Fallback gracefully to computed values
+        // Fallback gracefully
       });
 
-    // 2. Fetch Squads Heatmap
     reportsApi
       .getSquadsHeatmap()
       .then((res: any) => {
@@ -119,10 +147,9 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
         }
       })
       .catch(() => {
-        // Keep initial squads fallback
+        // Fallback gracefully
       });
 
-    // 3. Fetch Skills Inventory
     reportsApi
       .getSkillsInventory()
       .then((res: any) => {
@@ -131,7 +158,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
         }
       })
       .catch(() => {
-        // Keep initial skills fallback
+        // Fallback gracefully
       });
 
     return () => {
@@ -142,15 +169,15 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
   // Dynamic Calculated Metrics
   const dynamicMetrics = useMemo(() => {
     const totalJobs = JOB_POSITIONS.length;
-    const avgCompliance = totalJobs > 0
-      ? (JOB_POSITIONS.reduce((acc, j) => acc + (j.complianceRate || 90), 0) / totalJobs).toFixed(1)
-      : '94.8';
+    const avgCompliance =
+      totalJobs > 0
+        ? (JOB_POSITIONS.reduce((acc, j) => acc + (j.complianceRate || 90), 0) / totalJobs).toFixed(1)
+        : '94.8';
 
     const totalTalent = TALENT_PERSONS.length;
     const stableCount = TALENT_PERSONS.filter((e) => e.riskStatus !== 'spof').length;
-    const retentionRate = totalTalent > 0
-      ? ((stableCount / totalTalent) * 100).toFixed(1)
-      : '97.9';
+    const retentionRate =
+      totalTalent > 0 ? ((stableCount / totalTalent) * 100).toFixed(1) : '97.9';
 
     const criticalPositions = JOB_POSITIONS.filter((j) => j.status === 'critical');
     const coveredCritical = criticalPositions.filter((j) => j.activeIncumbentsCount > 0).length;
@@ -181,7 +208,9 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
   const filteredSkills = useMemo(() => {
     if (!skillSearch.trim()) return skillsList;
     const q = skillSearch.toLowerCase();
-    return skillsList.filter((s) => s.skill.toLowerCase().includes(q) || s.demand.toLowerCase().includes(q));
+    return skillsList.filter(
+      (s) => s.skill.toLowerCase().includes(q) || s.demand.toLowerCase().includes(q)
+    );
   }, [skillsList, skillSearch]);
 
   // Key Talent & Succession Map
@@ -207,13 +236,12 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
   };
 
   return (
-    <div className="w-full px-6 lg:px-8 py-6 flex flex-col gap-6 pb-20">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 max-w-7xl mx-auto pb-20">
       {/* Master Header & Fast Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-1">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-1">
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold text-on-surface tracking-tight font-headline flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-2xl" aria-hidden="true">query_stats</span>
-            Informes y Fichas
+          <h1 className="text-xl sm:text-2xl font-bold text-on-surface tracking-tight">
+            Informes y Fichas Técnicas
           </h1>
           <p className="text-xs text-on-surface-variant font-medium mt-0.5">
             Fichas técnicas de puestos, actas oficiales de calibración y analítica de capital humano
@@ -221,20 +249,23 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <select
-            value={selectedPeriod}
-            onChange={(e) => handlePeriodChange(e.target.value)}
-            className="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/40 outline-none cursor-pointer"
-            aria-label="Seleccionar período fiscal"
-          >
-            <option value="Año Fiscal 2026">Año Fiscal 2026 (Consolidado)</option>
-            <option value="Q4 2026">Q4 2026 (Último trimestre)</option>
-            <option value="Q3 2026">Q3 2026 (Trimestre previo)</option>
-            <option value="Q2 2026">Q2 2026 (Semestre 1)</option>
-          </select>
+          <div className="relative">
+            <select
+              value={selectedPeriod}
+              onChange={(e) => handlePeriodChange(e.target.value)}
+              className="h-8 pl-3 pr-8 rounded-lg text-xs font-medium bg-surface-bright text-on-surface border border-outline-variant outline-none focus:ring-1 focus:ring-primary cursor-pointer shadow-2xs"
+              aria-label="Seleccionar período fiscal"
+            >
+              <option value="Año Fiscal 2026">Año Fiscal 2026 (Consolidado)</option>
+              <option value="Q4 2026">Q4 2026 (Último trimestre)</option>
+              <option value="Q3 2026">Q3 2026 (Trimestre previo)</option>
+              <option value="Q2 2026">Q2 2026 (Semestre 1)</option>
+            </select>
+          </div>
 
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
             disabled={isExporting}
             onClick={() =>
               handleDownload(
@@ -243,15 +274,13 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                 true
               )
             }
-            className="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs disabled:opacity-50"
-            title="Exportar informe consolidado en PDF"
           >
-            <span className="material-symbols-outlined text-[16px] text-primary" aria-hidden="true">picture_as_pdf</span>
+            <FileText className="w-3.5 h-3.5 mr-1.5 text-primary" />
             PDF
-          </button>
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            size="sm"
             disabled={isExporting}
             onClick={() =>
               handleDownload(
@@ -259,12 +288,10 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                 'Reporte consolidado descargado en formato Excel.'
               )
             }
-            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
-            title="Exportar base analítica en Excel"
           >
-            <span className="material-symbols-outlined text-[16px]" aria-hidden="true">table_view</span>
+            <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" />
             Excel
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -280,244 +307,234 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
         dismissible={true}
       />
 
-      {/* Dynamic 4-Metric Status Strip */}
+      {/* Minimalist 4-Metric Status Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">Rendimiento general</span>
-            <span className="material-symbols-outlined text-outline text-sm" aria-hidden="true">speed</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Rendimiento general</span>
+            <Activity className="w-3.5 h-3.5 text-outline" />
           </div>
-          <div className="text-xl font-bold text-on-surface">
-            {dynamicMetrics.performance}
-          </div>
+          <div className="text-xl font-bold text-on-surface">{dynamicMetrics.performance}</div>
           <span className="text-[10px] text-outline font-medium">
             {JOB_POSITIONS.length} puestos evaluados
           </span>
-        </div>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">Estabilidad de personal</span>
-            <span className="material-symbols-outlined text-emerald-600 text-sm" aria-hidden="true">verified_user</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Estabilidad de personal</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
           </div>
-          <div className="text-xl font-bold text-emerald-600">
-            {dynamicMetrics.retention}
-          </div>
-          <span className="text-[10px] text-outline font-medium">
-            Tasa de retención global
-          </span>
-        </div>
+          <div className="text-xl font-bold text-emerald-600">{dynamicMetrics.retention}</div>
+          <span className="text-[10px] text-outline font-medium">Tasa de retención global</span>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">Puestos críticos cubiertos</span>
-            <span className="material-symbols-outlined text-primary text-sm" aria-hidden="true">shield</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Puestos críticos cubiertos</span>
+            <Shield className="w-3.5 h-3.5 text-primary" />
           </div>
-          <div className="text-xl font-bold text-primary">
-            {dynamicMetrics.criticalCoverage}
-          </div>
-          <span className="text-[10px] text-outline font-medium">
-            100% con relevo o backup
-          </span>
-        </div>
+          <div className="text-xl font-bold text-primary">{dynamicMetrics.criticalCoverage}</div>
+          <span className="text-[10px] text-outline font-medium">100% con relevo o backup</span>
+        </Card>
 
-        <div className="bg-surface-container-lowest px-4 py-3 rounded-xl border border-outline-variant/30 flex flex-col gap-1 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-on-surface-variant font-medium">Fichas & Actas oficiales</span>
-            <span className="material-symbols-outlined text-outline text-sm" aria-hidden="true">description</span>
+        <Card className="p-3.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-outline font-medium">Fichas & Actas oficiales</span>
+            <FileText className="w-3.5 h-3.5 text-outline" />
           </div>
-          <div className="text-xl font-bold text-on-surface">
-            {dynamicMetrics.totalDocs}
-          </div>
-          <span className="text-[10px] text-outline font-medium">
-            Documentos disponibles
-          </span>
-        </div>
+          <div className="text-xl font-bold text-on-surface">{dynamicMetrics.totalDocs}</div>
+          <span className="text-[10px] text-outline font-medium">Documentos disponibles</span>
+        </Card>
       </div>
 
       {/* Tabs Navigation Strip */}
-      <div className="flex items-center gap-1.5 bg-surface-container-low p-1.5 rounded-2xl border border-outline-variant/20 shadow-2xs overflow-x-auto">
+      <div className="flex items-center gap-1.5 bg-surface-dim p-1 rounded-xl border border-outline-variant/60 overflow-x-auto shadow-2xs">
         {([
-          { key: 'actas', label: 'Fichas y Actas Oficiales', icon: 'description' },
-          { key: 'heat', label: 'Rendimiento por Equipo', icon: 'grid_on' },
-          { key: 'evolution', label: 'Evolución Temporal', icon: 'show_chart' },
-          { key: 'retention', label: 'Continuidad y Sucesión', icon: 'shield' },
-          { key: 'skills', label: 'Inventario de Competencias', icon: 'inventory_2' },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => handleTabChange(tab.key)}
-            className={`flex-1 min-w-[140px] flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-              activeReportTab === tab.key
-                ? 'bg-surface-container-lowest text-primary shadow-xs ring-1 ring-primary/20 font-semibold'
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]" aria-hidden="true">{tab.icon}</span>
-            <span>{tab.label}</span>
-          </button>
-        ))}
+          { key: 'actas', label: 'Fichas y Actas Oficiales', icon: FileText },
+          { key: 'heat', label: 'Rendimiento por Equipo', icon: Layers },
+          { key: 'evolution', label: 'Evolución Temporal', icon: TrendingUp },
+          { key: 'retention', label: 'Continuidad y Sucesión', icon: Shield },
+          { key: 'skills', label: 'Inventario de Competencias', icon: Sparkles },
+        ] as const).map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeReportTab === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => handleTabChange(tab.key)}
+              className={`flex-1 min-w-[140px] flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-surface-bright text-primary shadow-2xs font-semibold'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5 shrink-0" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* TAB 1: Fichas y Actas Oficiales (Hub Central) */}
       {activeReportTab === 'actas' && (
         <div className="flex flex-col gap-5">
-          <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <Card className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
             <div>
               <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">verified</span>
+                <CheckCircle2 className="w-4 h-4 text-primary" />
                 Centro de Fichas de Puestos y Actas Oficiales
               </h2>
               <p className="text-xs text-on-surface-variant mt-0.5">
                 Emisión y descarga de documentación técnica regulada bajo estándares corporativos e ISO 9001.
               </p>
             </div>
-            <button
-              type="button"
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setShowActaModal(true)}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-surface-container text-primary hover:bg-surface-container-high border border-primary/20 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">visibility</span>
+              <Eye className="w-3.5 h-3.5 mr-1.5" />
               Vista Previa de Acta de Calibración
-            </button>
-          </div>
+            </Button>
+          </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Tarjeta 1: Acta Oficial 9-Box */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col justify-between gap-4">
+            <Card className="p-5 flex flex-col justify-between gap-4 shadow-2xs">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">
+                  <Badge variant="subtle" className="text-[10px]">
                     Comité de Talento
-                  </span>
+                  </Badge>
                   <span className="text-[11px] text-outline font-medium">Ciclo Q4 2026</span>
                 </div>
-                <h3 className="text-sm font-bold text-on-surface">
-                  Acta Oficial de Calibración 9-Box
-                </h3>
+                <h3 className="text-sm font-bold text-on-surface">Acta Oficial de Calibración 9-Box</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   Acta resolutiva del Comité de Calibración con la distribución de los 9 cuadrantes, promociones aprobadas y firmas digitales de validación.
                 </p>
-                <div className="mt-1 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-[11px] text-outline font-medium">
+                <div className="mt-1 pt-2 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-outline font-medium">
                   <span>9 Cuadrantes Calibrados</span>
-                  <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
-                    <span className="material-symbols-outlined text-[13px]" aria-hidden="true">check_circle</span>
+                  <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
                     Aprobada
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/20">
-                <button
-                  type="button"
+              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => evaluationsApi.download9Box('xlsx'),
                       'Acta de calibración 9-Box descargada en Excel.'
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[15px] text-emerald-600" aria-hidden="true">table_view</span>
+                  <FileSpreadsheet className="w-3.5 h-3.5 mr-1 text-emerald-600" />
                   Excel
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => evaluationsApi.download9Box('pdf'),
                       'Acta de calibración 9-Box descargada en PDF.'
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                 >
-                  <span className="material-symbols-outlined text-[15px]" aria-hidden="true">picture_as_pdf</span>
+                  <FileText className="w-3.5 h-3.5 mr-1" />
                   PDF
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
 
             {/* Tarjeta 2: Matriz Consolidada de Puestos (DPT) */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col justify-between gap-4">
+            <Card className="p-5 flex flex-col justify-between gap-4 shadow-2xs">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 border border-amber-500/20">
+                  <Badge variant="secondary" className="text-[10px]">
                     Norma ISO 9001
-                  </span>
+                  </Badge>
                   <span className="text-[11px] text-outline font-medium">DPT Vigente</span>
                 </div>
-                <h3 className="text-sm font-bold text-on-surface">
-                  Matriz Consolidada de Puestos (DPT)
-                </h3>
+                <h3 className="text-sm font-bold text-on-surface">Matriz Consolidada de Puestos (DPT)</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   Catálogo integral de descripciones de puestos, competencias requeridas, bandas salariales y estructura de supervisión de la organización.
                 </p>
-                <div className="mt-1 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-[11px] text-outline font-medium">
+                <div className="mt-1 pt-2 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-outline font-medium">
                   <span>{JOB_POSITIONS.length} Puestos Activos</span>
                   <button
                     type="button"
                     onClick={() => onNavigate('puestos')}
-                    className="text-primary hover:underline flex items-center gap-0.5 cursor-pointer"
+                    className="text-primary hover:underline flex items-center gap-1 cursor-pointer font-medium"
                   >
-                    Ver catálogo &rarr;
+                    <span>Ver catálogo</span>
+                    <ExternalLink className="w-3 h-3" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/20">
-                <button
-                  type="button"
+              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => jobsApi.downloadMatrix('xlsx'),
                       'Matriz consolidada de puestos descargada en Excel.'
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[15px] text-emerald-600" aria-hidden="true">table_view</span>
+                  <FileSpreadsheet className="w-3.5 h-3.5 mr-1 text-emerald-600" />
                   Excel
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => jobsApi.downloadMatrix('pdf'),
                       'Matriz consolidada de puestos descargada en PDF.'
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                 >
-                  <span className="material-symbols-outlined text-[15px]" aria-hidden="true">picture_as_pdf</span>
+                  <FileText className="w-3.5 h-3.5 mr-1" />
                   PDF
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
 
             {/* Tarjeta 3: Ficha Técnica 360° de Colaborador */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col justify-between gap-4">
+            <Card className="p-5 flex flex-col justify-between gap-4 shadow-2xs">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-700 border border-indigo-500/20">
+                  <Badge variant="tertiary" className="text-[10px]">
                     Expediente 360°
-                  </span>
+                  </Badge>
                   <span className="text-[11px] text-outline font-medium">Individual</span>
                 </div>
-                <h3 className="text-sm font-bold text-on-surface">
-                  Ficha Técnica 360° de Colaborador
-                </h3>
+                <h3 className="text-sm font-bold text-on-surface">Ficha Técnica 360° de Colaborador</h3>
 
                 {/* Employee Selector */}
                 <div className="mt-1">
-                  <label htmlFor="select-colaborador-ficha" className="text-[10px] text-outline font-semibold uppercase tracking-wider block mb-1">
+                  <label
+                    htmlFor="select-colaborador-ficha"
+                    className="text-[10px] text-outline font-semibold uppercase tracking-wider block mb-1"
+                  >
                     Seleccionar Colaborador:
                   </label>
                   <select
                     id="select-colaborador-ficha"
                     value={selectedEmployeeId}
                     onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-xl text-xs font-medium bg-surface-container text-on-surface border border-outline-variant/40 outline-none cursor-pointer"
+                    className="w-full px-2.5 py-1.5 rounded-lg text-xs font-medium bg-surface-dim text-on-surface border border-outline-variant outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                   >
                     {EMPLOYEES_DATA.map((emp) => (
                       <option key={emp.id} value={emp.id}>
@@ -528,7 +545,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                 </div>
 
                 {selectedEmployee && (
-                  <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/20 flex items-center gap-2 mt-1">
+                  <div className="p-2.5 bg-surface-dim rounded-xl border border-outline-variant/40 flex items-center gap-2 mt-1">
                     <img
                       src={selectedEmployee.avatar}
                       alt={selectedEmployee.name}
@@ -538,76 +555,74 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                       <div className="text-xs font-semibold text-on-surface truncate">
                         {selectedEmployee.name}
                       </div>
-                      <div className="text-[10px] text-outline truncate">
-                        {selectedEmployee.role}
-                      </div>
+                      <div className="text-[10px] text-outline truncate">{selectedEmployee.role}</div>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/20">
-                <button
-                  type="button"
+              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
                   onClick={() => onNavigate('empleados')}
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[15px] text-primary" aria-hidden="true">person</span>
                   Ver Perfil
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => employeesApi.downloadPdf(selectedEmployee.id, selectedEmployee.name),
                       `Ficha técnica de ${selectedEmployee.name} descargada en PDF.`
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                 >
-                  <span className="material-symbols-outlined text-[15px]" aria-hidden="true">picture_as_pdf</span>
+                  <FileText className="w-3.5 h-3.5 mr-1" />
                   Ficha PDF
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
 
             {/* Tarjeta 4: Informe Ejecutivo Consolidado */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col justify-between gap-4">
+            <Card className="p-5 flex flex-col justify-between gap-4 shadow-2xs">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                  <Badge variant="success" className="text-[10px]">
                     Junta Directiva
-                  </span>
+                  </Badge>
                   <span className="text-[11px] text-outline font-medium">{selectedPeriod}</span>
                 </div>
-                <h3 className="text-sm font-bold text-on-surface">
-                  Informe Ejecutivo de Capital Humano
-                </h3>
+                <h3 className="text-sm font-bold text-on-surface">Informe Ejecutivo de Capital Humano</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   Diagnóstico estratégico global con resumen de rotación, índice de madurez técnica, mapa de calor de equipos y retorno de inversión en capacitación.
                 </p>
-                <div className="mt-1 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-[11px] text-outline font-medium">
+                <div className="mt-1 pt-2 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-outline font-medium">
                   <span>Período Seleccionado</span>
                   <span className="text-primary font-semibold">{selectedPeriod}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/20">
-                <button
-                  type="button"
+              <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => reportsApi.downloadReport('xlsx'),
                       'Informe ejecutivo descargado en Excel.'
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[15px] text-emerald-600" aria-hidden="true">table_view</span>
+                  <FileSpreadsheet className="w-3.5 h-3.5 mr-1 text-emerald-600" />
                   Excel
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1"
                   onClick={() =>
                     handleDownload(
                       () => reportsApi.downloadReport('pdf'),
@@ -615,62 +630,60 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                       true
                     )
                   }
-                  className="flex-1 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center justify-center gap-1 cursor-pointer shadow-2xs"
                 >
-                  <span className="material-symbols-outlined text-[15px]" aria-hidden="true">picture_as_pdf</span>
+                  <FileText className="w-3.5 h-3.5 mr-1" />
                   PDF
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
 
             {/* Tarjeta 5: Inventario Oficial de Competencias (JSON) */}
-            <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col justify-between gap-4">
+            <Card className="p-5 flex flex-col justify-between gap-4 shadow-2xs">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-700 border border-purple-500/20">
+                  <Badge variant="outline" className="text-[10px]">
                     Esquema API / ERP
-                  </span>
+                  </Badge>
                   <span className="text-[11px] text-outline font-medium">Interoperabilidad</span>
                 </div>
-                <h3 className="text-sm font-bold text-on-surface">
-                  Inventario Oficial de Habilidades (JSON)
-                </h3>
+                <h3 className="text-sm font-bold text-on-surface">Inventario Oficial de Habilidades (JSON)</h3>
                 <p className="text-xs text-on-surface-variant leading-relaxed">
                   Dataset estructurado en JSON con el catálogo de competencias verificadas, taxonomía interna, niveles alcanzados y demanda estratégica.
                 </p>
-                <div className="mt-1 pt-2 border-t border-outline-variant/20 flex items-center justify-between text-[11px] text-outline font-medium">
+                <div className="mt-1 pt-2 border-t border-outline-variant/40 flex items-center justify-between text-[11px] text-outline font-medium">
                   <span>Formato JSON UTF-8</span>
-                  <span className="text-purple-700 font-semibold">{skillsList.length} Competencias</span>
+                  <span className="text-primary font-semibold">{skillsList.length} Competencias</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-outline-variant/20">
-                <button
-                  type="button"
+              <div className="pt-2 border-t border-outline-variant/40">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
                   onClick={() =>
                     handleDownload(
                       () => reportsApi.downloadSkillsJson(),
                       'Inventario oficial de competencias descargado en JSON.'
                     )
                   }
-                  className="w-full px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                 >
-                  <span className="material-symbols-outlined text-[16px] text-purple-600" aria-hidden="true">data_object</span>
+                  <Code2 className="w-3.5 h-3.5 mr-1.5 text-primary" />
                   Exportar JSON Estructurado
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       )}
 
       {/* TAB 2: Rendimiento por Equipo (Heatmap) */}
       {activeReportTab === 'heat' && (
-        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
+        <Card className="p-5 flex flex-col gap-4 shadow-2xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">grid_on</span>
+                <Layers className="w-4 h-4 text-primary" />
                 Mapa de Calor: Cumplimiento de Competencias por Equipo
               </h2>
               <p className="text-xs text-on-surface-variant mt-0.5">
@@ -679,29 +692,26 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              {/* Squad Search Input */}
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]" aria-hidden="true">search</span>
-                <input
-                  type="text"
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-outline" />
+                <Input
                   value={squadSearch}
                   onChange={(e) => setSquadSearch(e.target.value)}
                   placeholder="Buscar equipo..."
-                  className="pl-8 pr-3 py-1.5 rounded-xl text-xs bg-surface-container text-on-surface border border-outline-variant/40 outline-none w-44"
+                  className="pl-8 text-xs h-8 w-44"
                 />
               </div>
 
-              {/* Legends */}
               <div className="flex items-center gap-2.5 text-xs">
-                <span className="flex items-center gap-1 text-on-surface-variant font-medium text-[11px]">
+                <span className="flex items-center gap-1.5 text-on-surface-variant font-medium text-[11px]">
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                   Óptimo (&gt;90%)
                 </span>
-                <span className="flex items-center gap-1 text-on-surface-variant font-medium text-[11px]">
+                <span className="flex items-center gap-1.5 text-on-surface-variant font-medium text-[11px]">
                   <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                   Atención (80-90%)
                 </span>
-                <span className="flex items-center gap-1 text-on-surface-variant font-medium text-[11px]">
+                <span className="flex items-center gap-1.5 text-on-surface-variant font-medium text-[11px]">
                   <span className="w-2 h-2 rounded-full bg-rose-500"></span>
                   Brecha (&lt;80%)
                 </span>
@@ -712,7 +722,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-outline-variant/30 text-outline font-semibold">
+                <tr className="border-b border-outline-variant text-outline font-semibold">
                   <th className="py-2.5 px-3">Equipo / Squad</th>
                   <th className="py-2.5 px-3 text-center">
                     <CompetenciaNombre competencia="kubernetes" technicalClassName="text-xs font-normal normal-case text-outline" />
@@ -730,9 +740,9 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                   <th className="py-2.5 px-3 text-center">Riesgo Global</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/15">
+              <tbody className="divide-y divide-outline-variant/40">
                 {filteredSquads.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-surface-container-low transition-colors">
+                  <tr key={idx} className="hover:bg-surface-dim/80 transition-colors">
                     <td className="py-3 px-3 font-semibold text-on-surface">{row.squad}</td>
                     <td className="py-3 px-3 text-center">
                       <span className={`font-semibold ${row.k8s >= 90 ? 'text-emerald-700' : 'text-amber-700'}`}>
@@ -750,13 +760,15 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`font-semibold ${
-                        row.finops >= 90
-                          ? 'text-emerald-700'
-                          : row.finops >= 80
-                          ? 'text-amber-700'
-                          : 'text-rose-700'
-                      }`}>
+                      <span
+                        className={`font-semibold ${
+                          row.finops >= 90
+                            ? 'text-emerald-700'
+                            : row.finops >= 80
+                            ? 'text-amber-700'
+                            : 'text-rose-700'
+                        }`}
+                      >
                         {row.finops}%
                       </span>
                     </td>
@@ -766,29 +778,28 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        row.risk === 'Bajo'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-amber-50 text-amber-700 border border-amber-200'
-                      }`}>
+                      <Badge
+                        variant={row.risk === 'Bajo' ? 'success' : 'secondary'}
+                        className="text-[10px]"
+                      >
                         {row.risk}
-                      </span>
+                      </Badge>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* TAB 3: Evolución Temporal */}
       {activeReportTab === 'evolution' && (
-        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-5">
+        <Card className="p-5 flex flex-col gap-5 shadow-2xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">show_chart</span>
+                <TrendingUp className="w-4 h-4 text-primary" />
                 Evolución Trimestral del Índice de Aptitud y Cobertura
               </h2>
               <p className="text-xs text-on-surface-variant mt-0.5">
@@ -797,33 +808,33 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
             </div>
             <div className="flex items-center gap-3 text-xs">
               <span className="flex items-center gap-1.5 text-on-surface-variant font-medium">
-                <span className="w-3 h-0.5 bg-[#4f46e5]"></span>
+                <span className="w-3 h-0.5 bg-primary"></span>
                 Índice de Aptitud General
               </span>
               <span className="flex items-center gap-1.5 text-on-surface-variant font-medium">
-                <span className="w-3 h-0.5 bg-[#10b981] border-b border-dashed border-[#10b981]"></span>
+                <span className="w-3 h-0.5 bg-emerald-500 border-b border-dashed border-emerald-500"></span>
                 Tasa de Cobertura
               </span>
             </div>
           </div>
 
-          <div className="h-64 w-full bg-surface-container-low rounded-xl p-6 flex flex-col justify-between border border-outline-variant/30 relative">
+          <div className="h-64 w-full bg-surface-dim rounded-xl p-6 flex flex-col justify-between border border-outline-variant relative">
             {/* SVG Trend Lines */}
             <svg className="w-full h-44 overflow-visible" viewBox="0 0 400 120" preserveAspectRatio="none">
-              <line x1="0" y1="20" x2="400" y2="20" stroke="#e0e0e0" strokeDasharray="3 3" />
-              <line x1="0" y1="60" x2="400" y2="60" stroke="#e0e0e0" strokeDasharray="3 3" />
-              <line x1="0" y1="100" x2="400" y2="100" stroke="#e0e0e0" strokeDasharray="3 3" />
+              <line x1="0" y1="20" x2="400" y2="20" stroke="currentColor" className="text-outline-variant/60" strokeDasharray="3 3" />
+              <line x1="0" y1="60" x2="400" y2="60" stroke="currentColor" className="text-outline-variant/60" strokeDasharray="3 3" />
+              <line x1="0" y1="100" x2="400" y2="100" stroke="currentColor" className="text-outline-variant/60" strokeDasharray="3 3" />
 
               <polyline
                 fill="none"
-                stroke="#4f46e5"
+                stroke="var(--color-primary)"
                 strokeWidth="2.5"
                 points="20,95 130,75 250,45 370,25"
               />
-              <circle cx="20" cy="95" r="4" fill="#4f46e5" />
-              <circle cx="130" cy="75" r="4" fill="#4f46e5" />
-              <circle cx="250" cy="45" r="4" fill="#4f46e5" />
-              <circle cx="370" cy="25" r="5" fill="#4f46e5" />
+              <circle cx="20" cy="95" r="4" fill="var(--color-primary)" />
+              <circle cx="130" cy="75" r="4" fill="var(--color-primary)" />
+              <circle cx="250" cy="45" r="4" fill="var(--color-primary)" />
+              <circle cx="370" cy="25" r="5" fill="var(--color-primary)" />
 
               <polyline
                 fill="none"
@@ -834,7 +845,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               />
             </svg>
 
-            <div className="flex justify-between text-xs font-medium text-outline pt-2 border-t border-outline-variant/30">
+            <div className="flex justify-between text-xs font-medium text-outline pt-2 border-t border-outline-variant">
               <span>Q1 2026 (84.1 pts)</span>
               <span>Q2 2026 (88.5 pts)</span>
               <span>Q3 2026 (91.8 pts)</span>
@@ -843,18 +854,18 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-            <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/20">
+            <div className="p-4 bg-surface-dim rounded-xl border border-outline-variant/40">
               <div className="flex items-center gap-1.5 font-bold text-on-surface mb-1">
-                <span className="material-symbols-outlined text-primary text-[17px]" aria-hidden="true">school</span>
+                <Sparkles className="w-4 h-4 text-primary" />
                 Impacto de la Academia de Capacitación:
               </div>
               <p className="text-on-surface-variant leading-relaxed">
                 El incremento de 10.7 puntos en el nivel de madurez técnica desde Q1 está directamente correlacionado con los programas de upskilling y certificación continua ejecutados durante el ciclo.
               </p>
             </div>
-            <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/20">
+            <div className="p-4 bg-surface-dim rounded-xl border border-outline-variant/40">
               <div className="flex items-center gap-1.5 font-bold text-on-surface mb-1">
-                <span className="material-symbols-outlined text-emerald-600 text-[17px]" aria-hidden="true">trending_up</span>
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
                 Proyección para Q1 2027:
               </div>
               <p className="text-on-surface-variant leading-relaxed">
@@ -862,32 +873,32 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               </p>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* TAB 4: Continuidad y Sucesión */}
       {activeReportTab === 'retention' && (
-        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
+        <Card className="p-5 flex flex-col gap-4 shadow-2xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">shield</span>
+                <Shield className="w-4 h-4 text-primary" />
                 Mapa de Continuidad: Personal Clave y Planes de Sucesión
               </h2>
               <p className="text-xs text-on-surface-variant mt-0.5">
                 Identificación de colaboradores indispensables, criticidad operativa y planes de retención activos.
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+            <Badge variant="success" className="text-xs font-semibold">
               100% de puestos con respaldo
-            </span>
+            </Badge>
           </div>
 
           <div className="space-y-3">
             {keyTalentList.map((emp) => (
               <div
                 key={emp.id}
-                className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs"
+                className="p-4 bg-surface-dim rounded-xl border border-outline-variant/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs"
               >
                 <div className="flex items-center gap-3">
                   <img
@@ -897,7 +908,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                   />
                   <div>
                     <h4 className="font-bold text-on-surface text-xs">{emp.name}</h4>
-                    <p className="text-on-surface-variant text-[11px]">{emp.role} • {emp.squad}</p>
+                    <p className="text-outline text-[11px]">{emp.role} • {emp.squad}</p>
                     <span className="text-[11px] text-primary font-semibold">
                       Criticidad: {emp.criticality} / 10.0
                     </span>
@@ -909,32 +920,33 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                     <div className="font-semibold text-emerald-700">
                       Riesgo de Fuga: {emp.riskStatus === 'spof' ? 'Bajo (Atención por SPOF)' : 'Muy Bajo (< 2%)'}
                     </div>
-                    <p className="text-on-surface-variant text-[11px] mt-0.5">
+                    <p className="text-outline text-[11px] mt-0.5">
                       {emp.activities?.[0]?.title ? `Plan: ${emp.activities[0].title}` : 'Plan de retención a 3 años + mentoría activa.'}
                     </p>
                   </div>
 
-                  <button
-                    type="button"
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => onNavigate('empleados')}
-                    className="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container-lowest hover:bg-surface-container text-primary border border-primary/20 transition-all cursor-pointer whitespace-nowrap"
+                    className="whitespace-nowrap"
                   >
                     Ver Ficha 360°
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* TAB 5: Inventario de Competencias */}
       {activeReportTab === 'skills' && (
-        <div className="bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/30 shadow-2xs flex flex-col gap-4">
+        <Card className="p-5 flex flex-col gap-4 shadow-2xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">inventory_2</span>
+                <Sparkles className="w-4 h-4 text-primary" />
                 Inventario de Competencias Clave Verificadas
               </h2>
               <p className="text-xs text-on-surface-variant mt-0.5">
@@ -944,35 +956,34 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
 
             <div className="flex items-center gap-2">
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px]" aria-hidden="true">search</span>
-                <input
-                  type="text"
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-outline" />
+                <Input
                   value={skillSearch}
                   onChange={(e) => setSkillSearch(e.target.value)}
                   placeholder="Filtrar competencia..."
-                  className="pl-8 pr-3 py-1.5 rounded-xl text-xs bg-surface-container text-on-surface border border-outline-variant/40 outline-none w-44"
+                  className="pl-8 text-xs h-8 w-44"
                 />
               </div>
 
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() =>
                   handleDownload(
                     () => reportsApi.downloadSkillsJson(),
                     'Inventario de competencias descargado en JSON.'
                   )
                 }
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-surface-container hover:bg-surface-container-high text-primary border border-primary/20 transition-all flex items-center gap-1 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">download</span>
+                <Download className="w-3.5 h-3.5 mr-1 text-primary" />
                 JSON
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {filteredSkills.map((s, idx) => (
-              <div key={idx} className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/20 text-xs flex flex-col justify-between">
+              <div key={idx} className="p-4 bg-surface-dim rounded-xl border border-outline-variant/40 text-xs flex flex-col justify-between">
                 <div>
                   <CompetenciaNombre
                     competencia={s.skill}
@@ -989,7 +1000,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-outline-variant/20">
+                <div className="mt-3 pt-2 border-t border-outline-variant">
                   <span className="text-[11px] font-semibold text-primary">
                     {s.demand}
                   </span>
@@ -997,7 +1008,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Modal: Vista Previa de Acta Oficial de Calibración */}
@@ -1006,18 +1017,20 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-acta-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-on-surface/40 backdrop-blur-xs animate-in fade-in duration-150"
           onClick={() => setShowActaModal(false)}
         >
           <div
             ref={actaModalRef}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-2xl bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
+            className="w-full max-w-2xl bg-surface-bright rounded-2xl border border-outline-variant shadow-2xl flex flex-col overflow-hidden max-h-[90vh] animate-in zoom-in-95 duration-150"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low">
+            <div className="px-6 py-4 border-b border-outline-variant/40 flex items-center justify-between bg-surface-dim/80">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">verified</span>
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
                 <div>
                   <h3 id="modal-acta-title" className="text-sm font-bold text-on-surface">
                     Acta Oficial de Calibración de Desempeño
@@ -1028,16 +1041,16 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               <button
                 type="button"
                 onClick={() => setShowActaModal(false)}
-                className="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-lg text-outline hover:text-on-surface hover:bg-surface-dim flex items-center justify-center cursor-pointer transition-colors"
                 aria-label="Cerrar modal"
               >
-                <span className="material-symbols-outlined text-xl" aria-hidden="true">close</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Content */}
             <div className="p-6 overflow-y-auto space-y-4 text-xs">
-              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/20 flex items-center justify-between">
+              <div className="p-3 bg-surface-dim rounded-xl border border-outline-variant/40 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] text-outline uppercase font-semibold block">Convocante</span>
                   <span className="font-bold text-on-surface">Comité de Calibración de Talento & Compensaciones</span>
@@ -1057,7 +1070,7 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
 
               <div>
                 <h4 className="font-bold text-on-surface text-xs mb-1">2. Resoluciones de Calibración</h4>
-                <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/20 space-y-2">
+                <div className="p-3 bg-surface-dim rounded-xl border border-outline-variant/40 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-on-surface-variant">Total de colaboradores calibrados:</span>
                     <span className="font-bold text-on-surface">{EMPLOYEES_DATA.length} evaluados</span>
@@ -1080,14 +1093,14 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
               <div>
                 <h4 className="font-bold text-on-surface text-xs mb-2">3. Firmas Digitales de Homologación</h4>
                 <div className="grid grid-cols-2 gap-3 text-center">
-                  <div className="p-3 border border-dashed border-outline-variant/40 rounded-xl">
+                  <div className="p-3 border border-dashed border-outline-variant rounded-xl">
                     <div className="font-bold text-on-surface text-[11px]">Dra. Alicia Valdés</div>
                     <div className="text-[10px] text-outline">Presidenta del Comité de Talento</div>
                     <span className="inline-block mt-1 text-[9px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                       Firma Digital Verificada
                     </span>
                   </div>
-                  <div className="p-3 border border-dashed border-outline-variant/40 rounded-xl">
+                  <div className="p-3 border border-dashed border-outline-variant rounded-xl">
                     <div className="font-bold text-on-surface text-[11px]">Ing. Lucas Valenzuela</div>
                     <div className="text-[10px] text-outline">Director de Arquitectura & Operaciones</div>
                     <span className="inline-block mt-1 text-[9px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
@@ -1099,26 +1112,26 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-3 border-t border-outline-variant/20 bg-surface-container-low flex items-center justify-between">
-              <button
-                type="button"
+            <div className="px-6 py-3 border-t border-outline-variant/40 bg-surface-dim/80 flex items-center justify-between">
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => window.print()}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-container hover:bg-surface-container-high text-on-surface border border-outline-variant/40 transition-all flex items-center gap-1 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-[15px]" aria-hidden="true">print</span>
+                <Printer className="w-3.5 h-3.5 mr-1.5" />
                 Imprimir Acta
-              </button>
+              </Button>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowActaModal(false)}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-medium text-on-surface hover:bg-surface-container transition-all cursor-pointer"
                 >
                   Cerrar
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  size="sm"
                   onClick={() => {
                     handleDownload(
                       () => evaluationsApi.download9Box('pdf'),
@@ -1126,11 +1139,10 @@ export const ReportesScreen: React.FC<ReportesScreenProps> = ({ onNavigate }) =>
                     );
                     setShowActaModal(false);
                   }}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all flex items-center gap-1 cursor-pointer shadow-xs"
                 >
-                  <span className="material-symbols-outlined text-[15px]" aria-hidden="true">picture_as_pdf</span>
+                  <FileText className="w-3.5 h-3.5 mr-1.5" />
                   Descargar PDF Oficial
-                </button>
+                </Button>
               </div>
             </div>
           </div>

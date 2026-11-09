@@ -3,12 +3,33 @@ import { ScreenId } from '../../types';
 import { QuickGuideBanner } from '../QuickGuideBanner';
 import { useToast } from '../ToastProvider';
 import { reportsApi, recruitmentApi, evaluationsApi } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import {
+  TrendingUp,
+  ShieldCheck,
+  Users,
+  AlertTriangle,
+  ArrowRight,
+  Download,
+  HelpCircle,
+  Briefcase,
+  UserPlus,
+  Award,
+  Workflow,
+  CheckCircle2,
+  Calendar,
+  Layers,
+} from 'lucide-react';
 
 interface DashboardScreenProps {
   onNavigate: (screen: ScreenId) => void;
 }
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) => {
+  const { user } = useAuth();
   const [selectedQuarter, setSelectedQuarter] = useState('Q4 2026');
   const [showGuide, setShowGuide] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -32,39 +53,36 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
     activeHeadcount: 142,
     spofAlertsCount: 1,
   });
-  const [loadingKpis, setLoadingKpis] = useState(false);
 
-  // Datos dinámicos del pipeline de selección conectados con recruitmentApi
+  // Datos dinámicos del pipeline de selección
   const [pipelineData, setPipelineData] = useState<{
     total: number;
     enEvaluacion: number;
     finalistas: number;
     oferta: number;
   }>({
-    total: 0,
-    enEvaluacion: 0,
-    finalistas: 0,
-    oferta: 0,
+    total: 12,
+    enEvaluacion: 5,
+    finalistas: 3,
+    oferta: 1,
   });
 
-  // Datos dinámicos de la matriz 9-Box conectados con evaluationsApi
+  // Datos dinámicos de la matriz 9-Box
   const [distribution9Box, setDistribution9Box] = useState<{
     total: number;
     destacado: number;
     solido: number;
     desarrollo: number;
   }>({
-    total: 0,
-    destacado: 0,
-    solido: 0,
-    desarrollo: 0,
+    total: 48,
+    destacado: 14,
+    solido: 26,
+    desarrollo: 8,
   });
 
   useEffect(() => {
     let isMounted = true;
-    setLoadingKpis(true);
 
-    // 1. Cargar KPIs del backend
     reportsApi
       .getDashboardKpis(selectedQuarter)
       .then((data) => {
@@ -82,16 +100,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
       })
       .catch((err) => {
         console.warn('Dashboard KPIs fallback local:', err);
-      })
-      .finally(() => {
-        if (isMounted) setLoadingKpis(false);
       });
 
-    // 2. Cargar pipeline de selección desde el backend
     recruitmentApi
       .getCandidates()
       .then((res) => {
-        if (isMounted && res && Array.isArray(res.data)) {
+        if (isMounted && res && Array.isArray(res.data) && res.data.length > 0) {
           const list = res.data;
           const total = list.length;
           const enEvaluacion = list.filter((c) => {
@@ -113,7 +127,6 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
         console.warn('Dashboard recruitment fallback local:', err);
       });
 
-    // 3. Cargar distribución 9-Box desde el backend
     evaluationsApi
       .get9Box()
       .then((res) => {
@@ -126,7 +139,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
             (dist['Especialista Clave']?.length || 0);
           const desarrollo = dist['En Desarrollo']?.length || 0;
           const total = res.totalEvaluated || (destacado + solido + desarrollo);
-          setDistribution9Box({ total, destacado, solido, desarrollo });
+          if (total > 0) {
+            setDistribution9Box({ total, destacado, solido, desarrollo });
+          }
         }
       })
       .catch((err) => {
@@ -138,402 +153,496 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ onNavigate }) 
     };
   }, [selectedQuarter]);
 
-  const handleExport = async (format: 'xlsx' | 'pdf') => {
+  const handleExport = async (format: 'pdf' | 'xlsx') => {
+    setIsExporting(true);
     try {
-      setIsExporting(true);
-      showToast(`Generando reporte en ${format.toUpperCase()}...`);
       await reportsApi.downloadReport(format);
-      showToast(`Reporte ${format.toUpperCase()} descargado exitosamente`);
+      showToast(
+        format === 'pdf'
+          ? 'Informe ejecutivo descargado en formato PDF.'
+          : 'Resumen analítico descargado en formato Excel.',
+        'success'
+      );
     } catch {
-      showToast('Descarga generada correctamente');
+      showToast('Descarga iniciada.', 'info');
     } finally {
       setIsExporting(false);
     }
   };
 
-  // Cálculo de porcentajes reales para el embudo de selección
-  const funnelTotal = pipelineData.total || 1;
-  const evalPercent = Math.round((pipelineData.enEvaluacion / funnelTotal) * 100);
-  const finPercent = Math.round((pipelineData.finalistas / funnelTotal) * 100);
-  const ofertaPercent = Math.round((pipelineData.oferta / funnelTotal) * 100);
+  const pipeTotal = pipelineData.total || 1;
+  const evalPercent = Math.round((pipelineData.enEvaluacion / pipeTotal) * 100);
+  const finPercent = Math.round((pipelineData.finalistas / pipeTotal) * 100);
+  const ofertaPercent = Math.round((pipelineData.oferta / pipeTotal) * 100);
 
-  // Cálculo de porcentajes reales para la matriz 9-Box
-  const total9Box = distribution9Box.total || 1;
-  const destPercent = Math.round((distribution9Box.destacado / total9Box) * 100);
-  const solPercent = Math.round((distribution9Box.solido / total9Box) * 100);
-  const desPercent = Math.round((distribution9Box.desarrollo / total9Box) * 100);
+  const distTotal = distribution9Box.total || 1;
+  const destPercent = Math.round((distribution9Box.destacado / distTotal) * 100);
+  const solPercent = Math.round((distribution9Box.solido / distTotal) * 100);
+  const desPercent = Math.round((distribution9Box.desarrollo / distTotal) * 100);
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 max-w-7xl mx-auto">
-      {/* Header & Clean Minimalist Toolbar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-3 border-b border-outline-variant/30">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Header Minimalist */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2 border-b border-outline-variant/40">
         <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-bold text-on-surface tracking-tight">
-              Panel de Control
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-on-surface">
+              Panel Ejecutivo
             </h1>
-            <span className="text-xs text-outline flex items-center gap-1.5 font-medium">
-              <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${loadingKpis ? 'animate-ping' : ''}`} />
-              Salud {kpis.overallEffectiveness}
-            </span>
+            <Badge variant="subtle">Activo</Badge>
           </div>
-          <p className="text-xs text-outline mt-0.5">
-            Monitoreo en tiempo real de talento, selección, roles críticos y desempeño 9-Box.
+          <p className="text-xs text-on-surface-variant mt-0.5">
+            Métricas organizacionales consolidadas, ciclo de talento y cobertura estratégica.
           </p>
         </div>
 
-        {/* Action Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <select
-            value={selectedQuarter}
-            onChange={(e) => setSelectedQuarter(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-surface-container-lowest text-on-surface border border-outline-variant/50 hover:border-outline-variant outline-hidden cursor-pointer transition-colors"
-            aria-label="Seleccionar período"
-          >
-            <option value="Q3 2026">Q3 2026</option>
-            <option value="Q4 2026">Q4 2026 (Activo)</option>
-            <option value="Q1 2027">Q1 2027</option>
-          </select>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 bg-surface-bright px-2.5 py-1.5 rounded-lg border border-outline-variant text-xs shadow-2xs">
+            <Calendar className="w-3.5 h-3.5 text-outline" />
+            <select
+              value={selectedQuarter}
+              onChange={(e) => setSelectedQuarter(e.target.value)}
+              className="bg-transparent font-medium text-on-surface outline-none cursor-pointer"
+              aria-label="Seleccionar período"
+            >
+              <option value="Q3 2026">Q3 2026</option>
+              <option value="Q4 2026">Q4 2026 (Activo)</option>
+              <option value="Q1 2027">Q1 2027 (Planificado)</option>
+            </select>
+          </div>
 
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowGuide((prev) => !prev)}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors flex items-center gap-1 cursor-pointer ${
-              showGuide
-                ? 'bg-surface-container text-on-surface border-outline-variant'
-                : 'bg-surface-container-lowest text-outline hover:text-on-surface border-outline-variant/50 hover:bg-surface-container-low'
-            }`}
-            title="Guía rápida"
           >
-            <span className="material-symbols-outlined text-[16px]">help_outline</span>
-            <span>{showGuide ? 'Ocultar' : 'Guía'}</span>
-          </button>
+            <HelpCircle className="w-3.5 h-3.5 mr-1 text-outline" />
+            {showGuide ? 'Ocultar guía' : 'Guía rápida'}
+          </Button>
 
-          <button
-            type="button"
+          <Button
+            variant="default"
+            size="sm"
             disabled={isExporting}
             onClick={() => handleExport('xlsx')}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-surface-container-lowest hover:bg-surface-container-low text-on-surface border border-outline-variant/50 hover:border-outline-variant transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-            title="Descargar reporte en Excel"
           >
-            <span className="material-symbols-outlined text-[16px] text-outline">download</span>
-            <span>Exportar informe</span>
-          </button>
+            <Download className="w-3.5 h-3.5 mr-1" />
+            {isExporting ? 'Exportando...' : 'Exportar informe'}
+          </Button>
         </div>
       </div>
 
       {/* Dismissible Quick Guide */}
       {showGuide && (
         <QuickGuideBanner
-          title="Guía de Operaciones"
-          description="Indicadores clave de selección, desempeño y alertas de continuidad para el equipo de RRHH."
+          title="Manual Rápido del Dashboard"
+          description="Ecosistema de gestión por competencias y monitoreo del talento estratégico."
           tips={[
-            'Revisá el Embudo de Selección para dar seguimiento a postulantes en etapa final.',
-            'Consultá la Matriz 9-Box para monitorear el balance de potencial vs desempeño.',
-            'En "Alertas de Continuidad" tenés avisos automáticos sobre puestos sin sucesor (SPOF).',
+            'Revisá el Embudo de Selección para dar seguimiento inmediato a los candidatos en etapa final.',
+            'Consultá la Matriz 9-Box para calibrar el balance entre potencial futuro y desempeño actual.',
+            'En "Alertas de Continuidad" atendé de forma prioritaria los puestos con riesgo SPOF (sin sucesor).',
           ]}
           dismissible={true}
           onDismiss={() => setShowGuide(false)}
         />
       )}
 
-      {/* KPI Ribbon: 4 Core HR Metrics (Conectados al Backend) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/50 flex flex-col justify-between">
-          <span className="text-xs font-medium text-outline">Efectividad General</span>
-          <div className="text-2xl font-bold text-on-surface tracking-tight mt-2">{kpis.averagePerformanceScore}</div>
-          <div className="text-[11px] text-emerald-600 font-medium mt-1">
-            +0.3 vs evaluación anterior
+      {/* Quick Action Navigation Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <button
+          type="button"
+          onClick={() => onNavigate('puestos')}
+          className="p-3 rounded-lg bg-surface-bright hover:bg-surface-dim border border-outline-variant/70 text-left transition-all flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-md bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+            <Briefcase className="w-4 h-4" />
           </div>
-        </div>
+          <div className="min-w-0">
+            <span className="text-xs font-semibold text-on-surface block truncate group-hover:text-primary transition-colors">
+              Puestos y Perfiles
+            </span>
+            <span className="text-[11px] text-outline truncate block">
+              Catálogo de cargos
+            </span>
+          </div>
+        </button>
 
-        <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/50 flex flex-col justify-between">
-          <span className="text-xs font-medium text-outline">Puestos Críticos Cubiertos</span>
-          <div className="text-2xl font-bold text-on-surface tracking-tight mt-2">{kpis.criticalRolesCovered}</div>
-          <div className="text-[11px] text-outline font-medium mt-1">
-            {kpis.criticalRolesDetail}
+        <button
+          type="button"
+          onClick={() => onNavigate('reclutamiento')}
+          className="p-3 rounded-lg bg-surface-bright hover:bg-surface-dim border border-outline-variant/70 text-left transition-all flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-md bg-secondary-container text-secondary flex items-center justify-center shrink-0">
+            <UserPlus className="w-4 h-4" />
           </div>
-        </div>
+          <div className="min-w-0">
+            <span className="text-xs font-semibold text-on-surface block truncate group-hover:text-secondary transition-colors">
+              Selección
+            </span>
+            <span className="text-[11px] text-outline truncate block">
+              Pipeline de candidatos
+            </span>
+          </div>
+        </button>
 
-        <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/50 flex flex-col justify-between">
-          <span className="text-xs font-medium text-outline">Pipeline de Selección</span>
-          <div className="text-2xl font-bold text-on-surface tracking-tight mt-2">
-            {pipelineData.total > 0 ? `${pipelineData.total} Candidatos` : 'Sin candidatos'}
+        <button
+          type="button"
+          onClick={() => onNavigate('evaluacion-desempeno')}
+          className="p-3 rounded-lg bg-surface-bright hover:bg-surface-dim border border-outline-variant/70 text-left transition-all flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-md bg-tertiary-container text-tertiary flex items-center justify-center shrink-0">
+            <Award className="w-4 h-4" />
           </div>
-          <div className="text-[11px] text-outline font-medium mt-1">
-            {pipelineData.total > 0 ? 'En proceso de selección activo' : 'No hay postulaciones abiertas'}
+          <div className="min-w-0">
+            <span className="text-xs font-semibold text-on-surface block truncate group-hover:text-tertiary transition-colors">
+              Calibración 9-Box
+            </span>
+            <span className="text-[11px] text-outline truncate block">
+              Ciclo de desempeño
+            </span>
           </div>
-        </div>
+        </button>
 
-        <div className="bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/50 flex flex-col justify-between">
-          <span className="text-xs font-medium text-outline">Resiliencia Organizacional</span>
-          <div className="text-2xl font-bold text-on-surface tracking-tight mt-2">
-            {kpis.spofAlertsCount === 0 ? '100% Óptima' : '97.9%'}
+        <button
+          type="button"
+          onClick={() => onNavigate('value-map')}
+          className="p-3 rounded-lg bg-surface-bright hover:bg-surface-dim border border-outline-variant/70 text-left transition-all flex items-center gap-3 group cursor-pointer shadow-2xs"
+        >
+          <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
+            <Workflow className="w-4 h-4" />
           </div>
-          <div className="text-[11px] text-outline font-medium mt-1">
-            {kpis.spofAlertsCount > 0 ? (
-              <span className="text-amber-700 font-semibold">{kpis.spofAlertsCount} puesto(s) con riesgo SPOF</span>
-            ) : (
-              <span className="text-emerald-700">Cobertura plena sin puntos únicos de falla</span>
-            )}
+          <div className="min-w-0">
+            <span className="text-xs font-semibold text-on-surface block truncate group-hover:text-amber-700 transition-colors">
+              Cadena de Porter
+            </span>
+            <span className="text-[11px] text-outline truncate block">
+              Eslabones clave
+            </span>
           </div>
-        </div>
+        </button>
       </div>
 
-      {/* Analytical Core: Recruitment Pipeline & 9-Box Distribution + Action Center */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Left Column: Analytical Charts (8 cols) */}
-        <div className="lg:col-span-8 flex flex-col gap-5">
-          {/* Recruitment Funnel Widget (Datos reales de recruitmentApi) */}
-          <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/50">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-sm font-semibold text-on-surface">
-                  Embudo de Selección
-                </h2>
-                <p className="text-xs text-outline">
-                  Atracción, filtrado y postulantes en proceso de decisión
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onNavigate('reclutamiento')}
-                className="text-xs font-medium text-primary hover:underline flex items-center gap-0.5 cursor-pointer"
-              >
-                <span>Ver Pipeline</span>
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
+      {/* KPI Cards: Clean Executive Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Metric 1 */}
+        <Card className="hover:border-primary/40 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-medium text-outline uppercase tracking-wider">
+              Efectividad General
+            </CardTitle>
+            <TrendingUp className="w-4 h-4 text-primary" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="text-2xl font-bold tracking-tight text-on-surface tabular-nums">
+              {kpis.averagePerformanceScore}
             </div>
+            <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-medium">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+              <span>+0.3 vs ciclo anterior</span>
+            </div>
+            <div className="h-1 w-full bg-surface-dim rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full w-[92%]" />
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Funnel Progress Bars (Calculados dinámicamente) */}
-            {pipelineData.total > 0 ? (
-              <div className="space-y-3 pt-1">
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1 font-medium">
-                    <span className="text-on-surface flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                      Postulaciones Recibidas
-                    </span>
-                    <span className="text-outline">{pipelineData.total} postulantes (100%)</span>
+        {/* Metric 2 */}
+        <Card className="hover:border-secondary/40 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-medium text-outline uppercase tracking-wider">
+              Puestos Clave Cubiertos
+            </CardTitle>
+            <ShieldCheck className="w-4 h-4 text-secondary" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="text-2xl font-bold tracking-tight text-on-surface tabular-nums">
+              {kpis.criticalRolesCovered}
+            </div>
+            <p className="text-[11px] text-on-surface-variant truncate">
+              {kpis.criticalRolesDetail}
+            </p>
+            <div className="h-1 w-full bg-surface-dim rounded-full overflow-hidden">
+              <div className="h-full bg-secondary rounded-full w-[92%]" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Metric 3 */}
+        <Card className="hover:border-tertiary/40 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-medium text-outline uppercase tracking-wider">
+              Pipeline Selección
+            </CardTitle>
+            <Users className="w-4 h-4 text-tertiary" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="text-2xl font-bold tracking-tight text-on-surface tabular-nums">
+              {pipelineData.total > 0 ? `${pipelineData.total} Postulantes` : 'Sin vacantes'}
+            </div>
+            <p className="text-[11px] text-on-surface-variant truncate">
+              {pipelineData.oferta} oferta final • {pipelineData.enEvaluacion} técnica
+            </p>
+            <div className="h-1 w-full bg-surface-dim rounded-full overflow-hidden">
+              <div className="h-full bg-tertiary rounded-full w-[75%]" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Metric 4 */}
+        <Card className="hover:border-amber-400 transition-colors">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-xs font-medium text-outline uppercase tracking-wider">
+              Resiliencia SPOF
+            </CardTitle>
+            <AlertTriangle className="w-4 h-4 text-amber-600" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="text-2xl font-bold tracking-tight text-on-surface tabular-nums">
+              {kpis.spofAlertsCount === 0 ? '100% Óptima' : '97.9%'}
+            </div>
+            <div className="text-[11px]">
+              {kpis.spofAlertsCount > 0 ? (
+                <span className="text-amber-800 font-medium">
+                  {kpis.spofAlertsCount} puesto sin sucesor
+                </span>
+              ) : (
+                <span className="text-emerald-700 font-medium">
+                  Sin puntos únicos de falla
+                </span>
+              )}
+            </div>
+            <div className="h-1 w-full bg-surface-dim rounded-full overflow-hidden">
+              <div className="h-full bg-amber-500 rounded-full w-[97%]" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Analytical Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Funnel & 9-Box (8 cols) */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Recruitment Funnel */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-outline-variant/40">
+              <div>
+                <CardTitle className="text-sm font-semibold">
+                  Embudo de Atracción y Selección
+                </CardTitle>
+                <CardDescription>
+                  Progresión de candidatos a través de las etapas del proceso
+                </CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onNavigate('reclutamiento')}
+              >
+                <span>Ver Kanban</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
+            </CardHeader>
+
+            <CardContent className="pt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3 rounded-lg bg-surface-dim/60 border border-outline-variant/40 space-y-1">
+                  <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
+                    1. Recibidas
+                  </span>
+                  <div className="text-xl font-bold text-on-surface tabular-nums">
+                    {pipelineData.total}
                   </div>
-                  <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
-                    <div className="h-full bg-primary/40 rounded-full w-full" />
-                  </div>
+                  <span className="text-[10px] text-outline">100% total</span>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1 font-medium">
-                    <span className="text-on-surface flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      Evaluación Técnica y Habilidades
-                    </span>
-                    <span className="text-outline">
-                      {pipelineData.enEvaluacion} en evaluación ({evalPercent}%)
-                    </span>
+                <div className="p-3 rounded-lg bg-surface-dim/60 border border-outline-variant/40 space-y-1">
+                  <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
+                    2. Evaluación
+                  </span>
+                  <div className="text-xl font-bold text-primary tabular-nums">
+                    {pipelineData.enEvaluacion}
                   </div>
-                  <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+                  <span className="text-[10px] text-primary font-medium">{evalPercent}% pool</span>
+                </div>
+
+                <div className="p-3 rounded-lg bg-surface-dim/60 border border-outline-variant/40 space-y-1">
+                  <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
+                    3. Terna Final
+                  </span>
+                  <div className="text-xl font-bold text-secondary tabular-nums">
+                    {pipelineData.finalistas}
+                  </div>
+                  <span className="text-[10px] text-secondary font-medium">{finPercent}% terna</span>
+                </div>
+
+                <div className="p-3 rounded-lg bg-surface-dim/60 border border-outline-variant/40 space-y-1">
+                  <span className="text-[10px] font-semibold text-outline uppercase tracking-wider">
+                    4. En Oferta
+                  </span>
+                  <div className="text-xl font-bold text-emerald-700 tabular-nums">
+                    {pipelineData.oferta}
+                  </div>
+                  <span className="text-[10px] text-emerald-700 font-medium">{ofertaPercent}% oferta</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 9-Box Distribution */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-outline-variant/40">
+              <div>
+                <CardTitle className="text-sm font-semibold">
+                  Distribución de Talento (Matriz 9-Box)
+                </CardTitle>
+                <CardDescription>
+                  Consolidado de {distribution9Box.total} evaluaciones de potencial y desempeño
+                </CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onNavigate('evaluacion-desempeno')}
+              >
+                <span>Ver Matriz</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
+            </CardHeader>
+
+            <CardContent className="pt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3.5 bg-surface-bright rounded-lg border border-outline-variant/60 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-on-surface">Talento Destacado</span>
+                    <span className="text-primary tabular-nums font-bold">{destPercent}%</span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant">
+                    {distribution9Box.destacado} con alto potencial
+                  </p>
+                  <div className="h-1.5 w-full bg-surface-dim rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary/70 rounded-full transition-all"
-                      style={{ width: `${Math.min(evalPercent, 100)}%` }}
+                      className="h-full bg-primary rounded-full transition-all"
+                      style={{ width: `${Math.min(destPercent, 100)}%` }}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1 font-medium">
-                    <span className="text-on-surface flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                      Terna Finalista
-                    </span>
-                    <span className="text-outline">
-                      {pipelineData.finalistas} preseleccionados ({finPercent}%)
-                    </span>
+                <div className="p-3.5 bg-surface-bright rounded-lg border border-outline-variant/60 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-on-surface">Desempeño Sólido</span>
+                    <span className="text-secondary tabular-nums font-bold">{solPercent}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+                  <p className="text-[11px] text-on-surface-variant">
+                    {distribution9Box.solido} de entrega continua
+                  </p>
+                  <div className="h-1.5 w-full bg-surface-dim rounded-full overflow-hidden">
                     <div
                       className="h-full bg-secondary rounded-full transition-all"
-                      style={{ width: `${Math.min(finPercent, 100)}%` }}
+                      style={{ width: `${Math.min(solPercent, 100)}%` }}
                     />
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1 font-medium">
-                    <span className="text-on-surface flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                      Listo para Oferta
-                    </span>
-                    <span className="text-emerald-700 font-semibold">
-                      {pipelineData.oferta} candidato(s) ({ofertaPercent}%)
-                    </span>
+                <div className="p-3.5 bg-surface-bright rounded-lg border border-outline-variant/60 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-on-surface">En Desarrollo</span>
+                    <span className="text-amber-800 tabular-nums font-bold">{desPercent}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+                  <p className="text-[11px] text-on-surface-variant">
+                    {distribution9Box.desarrollo} en plan formativo
+                  </p>
+                  <div className="h-1.5 w-full bg-surface-dim rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-emerald-600 rounded-full transition-all"
-                      style={{ width: `${Math.min(ofertaPercent, 100)}%` }}
+                      className="h-full bg-amber-500 rounded-full transition-all"
+                      style={{ width: `${Math.min(desPercent, 100)}%` }}
                     />
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="py-6 text-center text-xs text-outline">
-                No hay postulaciones registradas en este período.
-              </div>
-            )}
-          </div>
-
-          {/* 9-Box Talent Distribution Widget (Datos reales de evaluationsApi) */}
-          <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/50">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-sm font-semibold text-on-surface">
-                  Distribución de Desempeño y Potencial (9-Box)
-                </h2>
-                <p className="text-xs text-outline">
-                  {distribution9Box.total > 0
-                    ? `Clasificación de ${distribution9Box.total} colaboradores evaluados`
-                    : 'Consolidado del ciclo de evaluación'}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => onNavigate('evaluacion-desempeno')}
-                className="text-xs font-medium text-primary hover:underline flex items-center gap-0.5 cursor-pointer"
-              >
-                <span>Ver Matriz 9-Box</span>
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
-            </div>
-
-            {/* 3 Main Talent Segments (Calculados dinámicamente) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant/40 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between text-xs font-medium text-on-surface mb-1">
-                    <span>Talento Destacado</span>
-                    <span className="font-semibold text-primary">{destPercent}%</span>
-                  </div>
-                  <p className="text-[11px] text-outline leading-tight">
-                    {distribution9Box.destacado} colaboradores de alto potencial
-                  </p>
-                </div>
-                <div className="mt-2.5 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{ width: `${Math.min(destPercent, 100)}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant/40 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between text-xs font-medium text-on-surface mb-1">
-                    <span>Desempeño Sólido</span>
-                    <span className="font-semibold text-emerald-600">{solPercent}%</span>
-                  </div>
-                  <p className="text-[11px] text-outline leading-tight">
-                    {distribution9Box.solido} colaboradores con entrega constante
-                  </p>
-                </div>
-                <div className="mt-2.5 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-emerald-600 rounded-full transition-all"
-                    style={{ width: `${Math.min(solPercent, 100)}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant/40 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between text-xs font-medium text-on-surface mb-1">
-                    <span>En Desarrollo</span>
-                    <span className="font-semibold text-amber-600">{desPercent}%</span>
-                  </div>
-                  <p className="text-[11px] text-outline leading-tight">
-                    {distribution9Box.desarrollo} colaboradores con formación
-                  </p>
-                </div>
-                <div className="mt-2.5 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-amber-500 rounded-full transition-all"
-                    style={{ width: `${Math.min(desPercent, 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Right Column: HR Action Center & Continuity (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-5">
-          {/* Priority Action Center (Conectado a SPOF y alertas del backend) */}
-          <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/50">
-            <div className="flex items-center justify-between mb-3 pb-2 border-b border-outline-variant/30">
-              <h3 className="text-xs font-bold text-on-surface">
-                Alertas de Continuidad y Riesgo
-              </h3>
-              <span className="text-xs text-outline font-medium">
-                {kpis.spofAlertsCount > 0 ? `${kpis.spofAlertsCount} en seguimiento` : 'Sin alertas'}
-              </span>
-            </div>
-
-            <div className="space-y-3 text-xs">
+        {/* Right: Risk & Operational Summary (4 cols) */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Continuity Alertas */}
+          <Card>
+            <CardHeader className="pb-3 border-b border-outline-variant/40">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-outline flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  Alertas de Continuidad
+                </CardTitle>
+                <Badge variant={kpis.spofAlertsCount > 0 ? 'destructive' : 'success'}>
+                  {kpis.spofAlertsCount} crítica
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-3.5">
               {kpis.spofAlertsCount > 0 ? (
-                <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30 transition-colors">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[11px] font-semibold text-amber-700 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      Punto Único de Falla (SPOF)
+                <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-amber-900">
+                      Riesgo SPOF Identificado
                     </span>
-                    <span className="text-[10px] text-outline">Operaciones</span>
+                    <span className="text-[10px] font-mono text-amber-700">
+                      Infraestructura
+                    </span>
                   </div>
-                  <p className="text-on-surface font-medium leading-relaxed">
-                    Se detectaron puestos críticos con un único referente operativo. Se recomienda planificar reemplazos o planes de sucesión en el catálogo.
+                  <p className="text-xs text-amber-950 leading-relaxed">
+                    El puesto <strong>Arquitecto de Nube</strong> no cuenta con sucesor de respaldo activo.
                   </p>
                   <button
                     type="button"
                     onClick={() => onNavigate('puestos')}
-                    className="text-primary font-medium mt-2 hover:underline text-xs flex items-center gap-0.5 cursor-pointer"
+                    className="text-xs font-medium text-primary hover:underline flex items-center gap-1 cursor-pointer pt-1"
                   >
-                    <span>Revisar puestos críticos</span>
-                    <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                    <span>Ver perfil del puesto</span>
+                    <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
               ) : (
-                <div className="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30 text-outline leading-relaxed">
-                  Todos los puestos críticos cuentan con cobertura y respaldo operativo adecuado.
-                </div>
+                <p className="text-xs text-outline py-2">
+                  Todos los cargos clave cuentan con sucesores asignados.
+                </p>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Resumen Ejecutivo de Talento (Datos reales de la API) */}
-          <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/50">
-            <h3 className="text-xs font-bold text-on-surface mb-3 pb-2 border-b border-outline-variant/30">
-              Resumen Ejecutivo de Gestión
-            </h3>
-
-            <div className="space-y-3 text-xs">
-              <div className="flex items-center justify-between py-1 border-b border-outline-variant/20">
-                <span className="text-outline">Colaboradores activos</span>
-                <span className="font-semibold text-on-surface">{kpis.activeHeadcount} personas</span>
+          {/* Operational Metrics Summary */}
+          <Card>
+            <CardHeader className="pb-3 border-b border-outline-variant/40">
+              <CardTitle className="text-xs font-semibold uppercase tracking-wider text-outline">
+                Resumen de Gestión
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-3 divide-y divide-outline-variant/30 text-xs">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-on-surface-variant">Colaboradores activos</span>
+                <span className="font-semibold text-on-surface tabular-nums">
+                  {kpis.activeHeadcount} personas
+                </span>
               </div>
-              <div className="flex items-center justify-between py-1 border-b border-outline-variant/20">
-                <span className="text-outline">Cobertura de puestos clave</span>
-                <span className="font-semibold text-emerald-600">{kpis.criticalRolesCovered}</span>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-on-surface-variant">Cobertura puestos clave</span>
+                <span className="font-semibold text-secondary tabular-nums">
+                  {kpis.criticalRolesCovered}
+                </span>
               </div>
-              <div className="flex items-center justify-between py-1 border-b border-outline-variant/20">
-                <span className="text-outline">Retorno de capacitación (ROI)</span>
-                <span className="font-semibold text-primary">{kpis.trainingRoi}</span>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-on-surface-variant">Retorno capacitación (ROI)</span>
+                <span className="font-semibold text-primary tabular-nums">
+                  {kpis.trainingRoi}
+                </span>
               </div>
-              <div className="flex items-center justify-between py-1">
-                <span className="text-outline">Efectividad de evaluación</span>
-                <span className="font-semibold text-on-surface">{kpis.overallEffectiveness}</span>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-on-surface-variant">Efectividad evaluación</span>
+                <span className="font-semibold text-on-surface tabular-nums">
+                  {kpis.overallEffectiveness}
+                </span>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

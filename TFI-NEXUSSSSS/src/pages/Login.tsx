@@ -5,6 +5,27 @@ import { UserRole } from '../types';
 import { APP_NAME } from '../routes';
 import { useToast } from '../components/ToastProvider';
 import { useFocusTrap } from '../components/useFocusTrap';
+import {
+  Layers,
+  FileText,
+  Brain,
+  Workflow,
+  Grid3X3,
+  ShieldCheck,
+  Lock,
+  Mail,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  UserCheck,
+  CheckCircle2,
+  AlertCircle,
+  Zap,
+  Key,
+  UserPlus,
+} from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 
 type LoginTab = 'credentials' | 'demo' | 'register';
 
@@ -12,7 +33,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();
-  const { login, loginAs, register, logout, isAuthenticated, isLoading, user } = useAuth();
+  const { login, loginAs, register, isAuthenticated, isLoading } = useAuth();
 
   const [activeTab, setActiveTab] = useState<LoginTab>('credentials');
 
@@ -37,11 +58,6 @@ export default function Login() {
 
   // Redirect if authenticated
   const from = (location.state as any)?.from || '/';
-  useEffect(() => {
-    if (isAuthenticated && !isLoading && !errorMessage) {
-      // Si el usuario ya está autenticado, no redirigir automáticamente si quiere cambiar de cuenta
-    }
-  }, [isAuthenticated, isLoading, errorMessage]);
 
   // Submit Login
   const handleSubmitLogin = async (e: React.FormEvent) => {
@@ -119,243 +135,169 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col lg:flex-row text-on-surface font-body selection:bg-primary/20 selection:text-primary">
-      {/* LEFT COLUMN: HERO & ARCHITECTURAL SHOWCASE (Desktop) */}
-      <div className="lg:w-1/2 bg-gradient-to-br from-[#090d16] via-[#111827] to-[#030712] text-white p-8 lg:p-14 flex flex-col justify-between relative overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10">
-        {/* Glow Background Elements */}
-        <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-96 h-96 rounded-full bg-indigo-600/15 blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen bg-surface flex flex-col lg:flex-row text-on-surface antialiased">
+      {/* LEFT COLUMN: HERO & BRANDING */}
+      <div className="lg:w-5/12 bg-slate-900 text-white p-8 lg:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-800">
         {/* Top Header */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-sm">
-            <span className="material-symbols-outlined text-white text-2xl" aria-hidden="true">hub</span>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-xs">
+            <Layers className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tight block leading-tight font-headline">
+            <span className="text-base font-bold tracking-tight block leading-tight text-white">
               {APP_NAME}
             </span>
-            <span className="text-[10px] uppercase tracking-wider text-white/60 font-medium">
-              Ecosistema Integral de Talento &amp; Estructura
+            <span className="text-[11px] text-slate-400 font-medium">
+              Ecosistema Integral de Talento
             </span>
           </div>
         </div>
 
-        {/* Center Pitch & Architecture Pillars */}
-        <div className="relative z-10 my-8 lg:my-0 flex flex-col gap-5 max-w-lg">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium w-fit">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            NEXUS Enterprise v3.2 • Control RBAC Activo
-          </div>
-
-          <h1 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight font-headline">
-            Gestión inteligente de talento, puestos y cadena de valor.
-          </h1>
-
-          <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-normal">
-            Centralizá el manual descriptivo de puestos (DPT), evaluá competencias con calibración matricial 9-Box y vinculá directamente cada cargo con los eslabones estratégicos de Porter.
-          </p>
-
-          {/* Core Architectural Pillars */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <div className="p-3 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-2.5">
-              <span className="material-symbols-outlined text-amber-300 text-lg shrink-0 mt-0.5" aria-hidden="true">
-                badge
-              </span>
-              <div>
-                <span className="text-xs font-semibold block text-white">Manual DPT (ISO 9001)</span>
-                <span className="text-[11px] text-white/70 leading-snug">
-                  Fichas técnicas con perfil, funciones, tareas y riesgos.
-                </span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-2.5">
-              <span className="material-symbols-outlined text-emerald-300 text-lg shrink-0 mt-0.5" aria-hidden="true">
-                psychology
-              </span>
-              <div>
-                <span className="text-xs font-semibold block text-white">Matriz de Competencias</span>
-                <span className="text-[11px] text-white/70 leading-snug">
-                  Análisis de brechas 1-5 y planes de upskilling.
-                </span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-2.5">
-              <span className="material-symbols-outlined text-cyan-300 text-lg shrink-0 mt-0.5" aria-hidden="true">
-                schema
-              </span>
-              <div>
-                <span className="text-xs font-semibold block text-white">Cadena de Valor Porter</span>
-                <span className="text-[11px] text-white/70 leading-snug">
-                  Simulación de impacto en actividades primarias y margen.
-                </span>
-              </div>
-            </div>
-
-            <div className="p-3 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 flex items-start gap-2.5">
-              <span className="material-symbols-outlined text-indigo-300 text-lg shrink-0 mt-0.5" aria-hidden="true">
-                grid_view
-              </span>
-              <div>
-                <span className="text-xs font-semibold block text-white">Calibración 9-Box</span>
-                <span className="text-[11px] text-white/70 leading-snug">
-                  Mapeo de potencial vs desempeño y actas oficiales.
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Security Info */}
-        <div className="relative z-10 flex items-center justify-between text-xs text-white/60 pt-4 border-t border-white/10">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-emerald-400 text-base" aria-hidden="true">verified_user</span>
-            <span>Autenticación corporativa segura con tokens JWT</span>
-          </div>
-          <span className="text-[11px] font-mono text-white/40">TLS 1.3 / AES-256</span>
-        </div>
-      </div>
-
-      {/* RIGHT COLUMN: LOGIN FORM & WORKFLOW */}
-      <div className="lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-14">
-        <div className="w-full max-w-md flex flex-col gap-5">
-          {/* Form Header */}
+        {/* Center Pillars */}
+        <div className="my-10 lg:my-0 space-y-6 max-w-sm">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
-                Portal de Acceso
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-on-surface tracking-tight font-headline">
-              Iniciar Sesión en NEXUS
-            </h2>
-            <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
-              Ingresá con tus credenciales corporativas o seleccioná un perfil demo de acceso inmediato.
+            <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-white leading-snug">
+              Gestión estratégica de talento y estructura organizacional.
+            </h1>
+            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+              Catálogo oficial de puestos, matriz de competencias, cadena de valor de Porter y calibración 9-Box en una sola plataforma unificada.
             </p>
           </div>
 
-          {/* Active Session Card (If user is already logged in) */}
-          {user && (
-            <div className="p-3.5 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between text-xs animate-in fade-in duration-150">
-              <div className="flex items-center gap-3 min-w-0">
-                <img
-                  src={user.avatar || DEMO_CREDENTIALS.ADMIN_HR.user.avatar}
-                  alt={user.name}
-                  className="w-9 h-9 rounded-full object-cover shrink-0 border border-primary/20"
-                />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="font-bold text-on-surface truncate">{user.name}</span>
-                  </div>
-                  <span className="text-[11px] text-outline truncate block">
-                    {user.title || user.role} • {user.email}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => navigate(from, { replace: true })}
-                  className="px-3 py-1.5 bg-primary text-on-primary rounded-xl font-semibold text-xs hover:bg-primary-container transition-all cursor-pointer shadow-xs"
-                >
-                  Entrar &rarr;
-                </button>
-                <button
-                  type="button"
-                  onClick={logout}
-                  className="p-1.5 text-outline hover:text-error hover:bg-surface-container rounded-lg transition-all cursor-pointer"
-                  title="Cerrar sesión actual"
-                  aria-label="Cerrar sesión"
-                >
-                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">logout</span>
-                </button>
+          <div className="space-y-3 pt-2">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs">
+              <FileText className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-white block">Manual de Puestos (DPT)</span>
+                <span className="text-[11px] text-slate-300">Fichas técnicas con funciones, requisitos y riesgos.</span>
               </div>
             </div>
-          )}
 
-          {/* Navigation Tabs (Credentials / Quick Demo / Register) */}
-          <div className="flex items-center gap-1 bg-surface-container-low p-1 rounded-2xl border border-outline-variant/30">
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs">
+              <Brain className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-white block">Matriz de Competencias</span>
+                <span className="text-[11px] text-slate-300">Brechas de habilidades y planes de desarrollo.</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs">
+              <Workflow className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-white block">Cadena de Valor Porter</span>
+                <span className="text-[11px] text-slate-300">Vinculación de cargos a eslabones críticos.</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/60 border border-slate-700/60 text-xs">
+              <Grid3X3 className="w-4 h-4 text-primary-fixed shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-white block">Calibración 9-Box</span>
+                <span className="text-[11px] text-slate-300">Mapeo de potencial vs desempeño del equipo.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Security badge */}
+        <div className="flex items-center justify-between text-[11px] text-slate-400 pt-4 border-t border-slate-800">
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Autenticación corporativa segura</span>
+          </div>
+          <span className="font-mono text-[10px] text-slate-500">v3.2 Enterprise</span>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN: LOGIN FORMS */}
+      <div className="lg:w-7/12 flex items-center justify-center p-6 sm:p-10 lg:p-16">
+        <div className="w-full max-w-md space-y-5">
+          <div>
+            <h2 className="text-xl font-bold text-on-surface tracking-tight">
+              Bienvenido a NEXUS
+            </h2>
+            <p className="text-xs text-on-surface-variant mt-1">
+              Ingresá con tus credenciales o utilizá un perfil demo de acceso rápido.
+            </p>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex items-center gap-1 bg-surface-dim p-1 rounded-lg border border-outline-variant/60">
             <button
               type="button"
               onClick={() => { setActiveTab('credentials'); setErrorMessage(null); }}
-              className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-1.5 px-3 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'credentials'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs ring-1 ring-primary/20'
+                  ? 'bg-surface-bright text-on-surface shadow-2xs font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[15px]" aria-hidden="true">key</span>
+              <Key className="w-3.5 h-3.5" />
               Credenciales
             </button>
 
             <button
               type="button"
               onClick={() => { setActiveTab('demo'); setErrorMessage(null); }}
-              className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-1.5 px-3 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'demo'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs ring-1 ring-primary/20'
+                  ? 'bg-surface-bright text-on-surface shadow-2xs font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[15px] text-amber-500" aria-hidden="true">bolt</span>
-              Acceso Rápido
+              <Zap className="w-3.5 h-3.5 text-amber-500" />
+              1-Click Demo
             </button>
 
             <button
               type="button"
               onClick={() => { setActiveTab('register'); setErrorMessage(null); }}
-              className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-1.5 px-3 rounded-md text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'register'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs ring-1 ring-primary/20'
+                  ? 'bg-surface-bright text-on-surface shadow-2xs font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined text-[15px]" aria-hidden="true">person_add</span>
-              Registrarse
+              <UserPlus className="w-3.5 h-3.5" />
+              Registrar
             </button>
           </div>
 
-          {/* Error Alert */}
+          {/* Error Message */}
           {errorMessage && (
             <div
               role="alert"
-              className="p-3 bg-error/10 border border-error/30 rounded-xl flex items-start gap-2.5 text-xs text-error animate-in fade-in duration-150"
+              className="p-3 bg-error/10 border border-error/20 rounded-lg text-error text-xs flex items-center gap-2"
             >
-              <span className="material-symbols-outlined text-base shrink-0 mt-0.5" aria-hidden="true">error</span>
-              <span className="font-medium leading-relaxed">{errorMessage}</span>
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span className="font-medium text-[11px] leading-relaxed">{errorMessage}</span>
             </div>
           )}
 
-          {/* TAB 1: FORMULARIO DE CREDENCIALES */}
+          {/* TAB 1: CREDENTIALS */}
           {activeTab === 'credentials' && (
-            <form onSubmit={handleSubmitLogin} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmitLogin} className="space-y-3.5">
               <div>
-                <label htmlFor="login-email" className="text-xs font-semibold text-on-surface block mb-1">
-                  Correo Electrónico Corporativo
+                <label htmlFor="login-email" className="text-xs font-medium text-on-surface block mb-1">
+                  Correo Electrónico
                 </label>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none" aria-hidden="true">
-                    alternate_email
-                  </span>
-                  <input
+                  <Mail className="w-4 h-4 text-outline absolute left-3 pointer-events-none" />
+                  <Input
                     id="login-email"
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="usuario@nexus.com"
-                    className="w-full pl-9 pr-4 py-2.5 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs sm:text-sm font-medium outline-none border border-outline-variant/40 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="pl-9"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label htmlFor="login-password" className="text-xs font-semibold text-on-surface">
+                  <label htmlFor="login-password" className="text-xs font-medium text-on-surface">
                     Contraseña
                   </label>
                   <button
@@ -370,358 +312,200 @@ export default function Login() {
                   </button>
                 </div>
                 <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none" aria-hidden="true">
-                    lock
-                  </span>
-                  <input
+                  <Lock className="w-4 h-4 text-outline absolute left-3 pointer-events-none" />
+                  <Input
                     id="login-password"
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-9 pr-10 py-2.5 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs sm:text-sm font-medium outline-none border border-outline-variant/40 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="pl-9 pr-9"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2.5 p-1 rounded-md text-outline hover:text-on-surface cursor-pointer"
-                    title={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
-                    aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                    className="absolute right-2.5 p-1 text-outline hover:text-on-surface cursor-pointer"
+                    title={showPassword ? 'Ocultar' : 'Mostrar'}
                   >
-                    <span className="material-symbols-outlined text-[17px]" aria-hidden="true">
-                      {showPassword ? 'visibility_off' : 'visibility'}
-                    </span>
+                    {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-0.5">
+              <div className="flex items-center justify-between text-xs pt-1">
                 <label className="flex items-center gap-2 cursor-pointer select-none text-on-surface-variant">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-outline-variant text-primary focus:ring-primary/20"
+                    className="rounded border-outline-variant text-primary focus:ring-primary"
                   />
-                  <span>Recordar sesión en este equipo</span>
+                  <span>Recordar sesión</span>
                 </label>
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full mt-1 py-2.5 px-4 bg-primary text-on-primary rounded-xl font-bold text-xs sm:text-sm hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="material-symbols-outlined animate-spin text-base" aria-hidden="true">progress_activity</span>
-                    <span>Validando credenciales...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Ingresar a la Plataforma</span>
-                    <span className="material-symbols-outlined text-base" aria-hidden="true">arrow_forward</span>
-                  </>
-                )}
-              </button>
+              <Button type="submit" disabled={isSubmitting} className="w-full mt-2">
+                {isSubmitting ? 'Iniciando...' : 'Iniciar Sesión'}
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Button>
             </form>
           )}
 
-          {/* TAB 2: PERFILES DEMO DE ACCESO RÁPIDO (1 CLIC) */}
+          {/* TAB 2: 1-CLICK DEMO */}
           {activeTab === 'demo' && (
-            <div className="flex flex-col gap-3">
-              <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/20 text-xs text-on-surface-variant flex items-center gap-2">
-                <span className="material-symbols-outlined text-amber-500 text-lg shrink-0" aria-hidden="true">info</span>
-                <span>Seleccioná cualquiera de los 4 perfiles preconfigurados para explorar las funciones de NEXUS sin ingresar contraseñas.</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {/* 1. Admin HR */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('ADMIN_HR')}
-                  disabled={isSubmitting}
-                  className="p-3 bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-2xl flex flex-col gap-2 transition-all text-left cursor-pointer group disabled:opacity-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
-                      ADMIN_HR
-                    </span>
-                    <span className="material-symbols-outlined text-outline group-hover:text-primary text-[18px]" aria-hidden="true">
-                      arrow_forward
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-on-surface block group-hover:text-primary">
-                      Directora de Personas
-                    </span>
-                    <span className="text-[11px] text-outline block">
-                      Acceso total a todos los módulos y comités.
-                    </span>
-                  </div>
-                </button>
-
-                {/* 2. Manager */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('MANAGER')}
-                  disabled={isSubmitting}
-                  className="p-3 bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-2xl flex flex-col gap-2 transition-all text-left cursor-pointer group disabled:opacity-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-700 border border-blue-500/20">
-                      MANAGER
-                    </span>
-                    <span className="material-symbols-outlined text-outline group-hover:text-primary text-[18px]" aria-hidden="true">
-                      arrow_forward
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-on-surface block group-hover:text-primary">
-                      Martín Krause
-                    </span>
-                    <span className="text-[11px] text-outline block">
-                      VP de Ingeniería • Gestión y calibración.
-                    </span>
-                  </div>
-                </button>
-
-                {/* 3. Recruiter */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('RECRUITER')}
-                  disabled={isSubmitting}
-                  className="p-3 bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-2xl flex flex-col gap-2 transition-all text-left cursor-pointer group disabled:opacity-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 border border-amber-500/20">
-                      RECRUITER
-                    </span>
-                    <span className="material-symbols-outlined text-outline group-hover:text-primary text-[18px]" aria-hidden="true">
-                      arrow_forward
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-on-surface block group-hover:text-primary">
-                      Camila Navarro
-                    </span>
-                    <span className="text-[11px] text-outline block">
-                      Líder de Selección • Vacantes y postulantes.
-                    </span>
-                  </div>
-                </button>
-
-                {/* 4. Employee */}
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('EMPLOYEE')}
-                  disabled={isSubmitting}
-                  className="p-3 bg-surface-container-low hover:bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-2xl flex flex-col gap-2 transition-all text-left cursor-pointer group disabled:opacity-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-700 border border-purple-500/20">
-                      EMPLOYEE
-                    </span>
-                    <span className="material-symbols-outlined text-outline group-hover:text-primary text-[18px]" aria-hidden="true">
-                      arrow_forward
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-on-surface block group-hover:text-primary">
-                      Lucas Valenzuela
-                    </span>
-                    <span className="text-[11px] text-outline block">
-                      Arquitecto Principal • Perfil 360° y cursos.
-                    </span>
-                  </div>
-                </button>
+            <div className="space-y-2.5">
+              <p className="text-[11px] text-outline">
+                Seleccioná un rol preconfigurado para probar el sistema sin escribir credenciales:
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {(Object.entries(DEMO_CREDENTIALS) as [UserRole, (typeof DEMO_CREDENTIALS)[UserRole]][]).map(
+                  ([roleKey, item]) => (
+                    <button
+                      key={roleKey}
+                      type="button"
+                      onClick={() => handleQuickLogin(roleKey)}
+                      disabled={isSubmitting}
+                      className="p-3 bg-surface-bright hover:bg-surface-dim border border-outline-variant/60 hover:border-primary/40 rounded-lg flex flex-col gap-1 transition-all text-left cursor-pointer group disabled:opacity-50"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`px-1.5 py-0.2 rounded text-[10px] font-medium ${
+                          roleKey === 'ADMIN_HR'
+                            ? 'bg-emerald-50 text-emerald-800'
+                            : roleKey === 'MANAGER'
+                            ? 'bg-blue-50 text-blue-800'
+                            : roleKey === 'RECRUITER'
+                            ? 'bg-amber-50 text-amber-900'
+                            : 'bg-purple-50 text-purple-800'
+                        }`}>
+                          {roleKey}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-outline group-hover:text-primary transition-colors" />
+                      </div>
+                      <span className="text-xs font-semibold text-on-surface block truncate">
+                        {item.user.name}
+                      </span>
+                      <span className="text-[11px] text-outline truncate block">
+                        {item.user.title}
+                      </span>
+                    </button>
+                  )
+                )}
               </div>
             </div>
           )}
 
-          {/* TAB 3: REGISTRO DE NUEVO USUARIO */}
+          {/* TAB 3: REGISTER */}
           {activeTab === 'register' && (
-            <form onSubmit={handleSubmitRegister} className="flex flex-col gap-3.5">
+            <form onSubmit={handleSubmitRegister} className="space-y-3">
               <div>
-                <label htmlFor="reg-name" className="text-xs font-semibold text-on-surface block mb-1">
+                <label htmlFor="reg-name" className="text-xs font-medium text-on-surface block mb-1">
                   Nombre Completo
                 </label>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none" aria-hidden="true">
-                    person
-                  </span>
-                  <input
-                    id="reg-name"
-                    type="text"
-                    required
-                    value={regName}
-                    onChange={(e) => setRegName(e.target.value)}
-                    placeholder="Ej. Ing. Daniel Moreno"
-                    className="w-full pl-9 pr-4 py-2 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs sm:text-sm font-medium outline-none border border-outline-variant/40 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
-                </div>
+                <Input
+                  id="reg-name"
+                  type="text"
+                  required
+                  value={regName}
+                  onChange={(e) => setRegName(e.target.value)}
+                  placeholder="Ej: Lic. Sofía Martínez"
+                />
               </div>
 
               <div>
-                <label htmlFor="reg-email" className="text-xs font-semibold text-on-surface block mb-1">
+                <label htmlFor="reg-email" className="text-xs font-medium text-on-surface block mb-1">
                   Correo Electrónico
                 </label>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none" aria-hidden="true">
-                    mail
-                  </span>
-                  <input
-                    id="reg-email"
-                    type="email"
-                    required
-                    value={regEmail}
-                    onChange={(e) => setRegEmail(e.target.value)}
-                    placeholder="daniel@nexus.com"
-                    className="w-full pl-9 pr-4 py-2 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs sm:text-sm font-medium outline-none border border-outline-variant/40 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
-                </div>
+                <Input
+                  id="reg-email"
+                  type="email"
+                  required
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  placeholder="sofia@nexus.com"
+                />
               </div>
 
               <div>
-                <label htmlFor="reg-role" className="text-xs font-semibold text-on-surface block mb-1">
-                  Rol Solicitado
+                <label htmlFor="reg-role" className="text-xs font-medium text-on-surface block mb-1">
+                  Rol Organizacional
                 </label>
                 <select
                   id="reg-role"
                   value={regRole}
                   onChange={(e) => setRegRole(e.target.value as UserRole)}
-                  className="w-full px-3 py-2 bg-surface-container-low text-on-surface rounded-xl text-xs sm:text-sm font-medium outline-none border border-outline-variant/40 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                  className="w-full h-9 px-3 rounded-lg bg-surface-bright border border-outline-variant text-xs text-on-surface outline-none focus:border-primary cursor-pointer"
                 >
-                  <option value="ADMIN_HR">Administrador General de RRHH (ADMIN_HR)</option>
-                  <option value="MANAGER">Gerente de Área / Evaluador (MANAGER)</option>
-                  <option value="RECRUITER">Especialista en Selección (RECRUITER)</option>
-                  <option value="EMPLOYEE">Colaborador / Funcional (EMPLOYEE)</option>
+                  <option value="ADMIN_HR">Administrador General de RRHH</option>
+                  <option value="MANAGER">Gerente de Área / Evaluador</option>
+                  <option value="RECRUITER">Especialista en Selección</option>
+                  <option value="EMPLOYEE">Colaborador</option>
                 </select>
               </div>
 
               <div>
-                <label htmlFor="reg-password" className="text-xs font-semibold text-on-surface block mb-1">
+                <label htmlFor="reg-password" className="text-xs font-medium text-on-surface block mb-1">
                   Contraseña (mínimo 6 caracteres)
                 </label>
-                <div className="relative flex items-center">
-                  <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none" aria-hidden="true">
-                    lock
-                  </span>
-                  <input
-                    id="reg-password"
-                    type="password"
-                    required
-                    minLength={6}
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-9 pr-4 py-2 bg-surface-container-low text-on-surface placeholder:text-outline rounded-xl text-xs sm:text-sm font-medium outline-none border border-outline-variant/40 focus:border-primary focus:bg-surface-container-lowest focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
-                </div>
+                <Input
+                  id="reg-password"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full mt-1 py-2.5 px-4 bg-primary text-on-primary rounded-xl font-bold text-xs sm:text-sm hover:bg-primary-container transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="material-symbols-outlined animate-spin text-base" aria-hidden="true">progress_activity</span>
-                    <span>Registrando cuenta...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Registrar e Ingresar</span>
-                    <span className="material-symbols-outlined text-base" aria-hidden="true">check</span>
-                  </>
-                )}
-              </button>
+              <Button type="submit" disabled={isSubmitting} className="w-full mt-2">
+                <UserPlus className="w-3.5 h-3.5 mr-1" />
+                {isSubmitting ? 'Registrando...' : 'Registrar y Continuar'}
+              </Button>
             </form>
           )}
-
-          {/* Footer Information */}
-          <div className="text-center text-[10px] text-outline pt-2 border-t border-outline-variant/20 flex items-center justify-between">
-            <span>NEXUS HR Platform &bull; v3.2 Enterprise</span>
-            <span>Seguridad &bull; Soporte 24/7</span>
-          </div>
         </div>
       </div>
 
-      {/* Modal: Recuperación de Contraseña */}
+      {/* Forgot Password Modal */}
       {showForgotModal && (
         <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="forgot-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 bg-on-surface/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-100"
           onClick={() => setShowForgotModal(false)}
         >
           <div
             ref={forgotModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="forgot-title"
+            className="bg-surface-bright max-w-sm w-full rounded-xl p-5 shadow-lg border border-outline-variant/70 flex flex-col gap-3"
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-2xl p-6 flex flex-col gap-4 text-xs"
           >
-            <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-xl" aria-hidden="true">lock_reset</span>
-                <h3 id="forgot-modal-title" className="text-sm font-bold text-on-surface">
-                  Recuperación de Contraseña
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowForgotModal(false)}
-                className="p-1 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
-                aria-label="Cerrar modal"
-              >
-                <span className="material-symbols-outlined text-lg" aria-hidden="true">close</span>
-              </button>
-            </div>
-
-            <p className="text-on-surface-variant leading-relaxed">
-              En este entorno corporativo de demostración, podés restablecer tu clave ingresando con cualquiera de los 4 perfiles preconfigurados de <strong>Acceso Rápido</strong>, o enviar un enlace de recuperación al correo institucional:
+            <h3 id="forgot-title" className="text-sm font-semibold text-on-surface">
+              Recuperar Contraseña
+            </h3>
+            <p className="text-xs text-on-surface-variant">
+              Ingresá tu correo para recibir las instrucciones de restablecimiento.
             </p>
-
-            <div>
-              <label htmlFor="forgot-email-input" className="text-xs font-semibold text-on-surface block mb-1">
-                Correo Corporativo
-              </label>
-              <input
-                id="forgot-email-input"
-                type="email"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                placeholder="usuario@nexus.com"
-                className="w-full px-3 py-2 bg-surface-container-low text-on-surface rounded-xl border border-outline-variant/40 outline-none text-xs"
-              />
-            </div>
-
-            <div className="p-3 bg-primary/5 rounded-xl border border-primary/20 text-on-surface-variant space-y-1">
-              <span className="font-semibold text-on-surface block text-[11px]">Credenciales Demo por Defecto:</span>
-              <p className="text-[11px] font-mono text-outline">admin@nexus.com &bull; Admin1234!</p>
-              <p className="text-[11px] font-mono text-outline">manager@nexus.com &bull; Manager1234!</p>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/20">
-              <button
-                type="button"
-                onClick={() => setShowForgotModal(false)}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium text-on-surface hover:bg-surface-container transition-all cursor-pointer"
-              >
-                Cerrar
-              </button>
-              <button
-                type="button"
+            <Input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="tu@nexus.com"
+            />
+            <div className="flex justify-end gap-2 pt-2 border-t border-outline-variant/40">
+              <Button variant="ghost" size="sm" onClick={() => setShowForgotModal(false)}>
+                Cancelar
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
-                  showToast(`Se enviaron instrucciones de recuperación a ${forgotEmail || 'tu correo'}`);
+                  showToast('Enlace de restablecimiento enviado');
                   setShowForgotModal(false);
                 }}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-primary text-on-primary hover:bg-primary-container transition-all cursor-pointer shadow-xs"
               >
-                Enviar Enlace
-              </button>
+                Enviar enlace
+              </Button>
             </div>
           </div>
         </div>

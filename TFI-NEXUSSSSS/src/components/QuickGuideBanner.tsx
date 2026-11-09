@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { HelpCircle, X, ExternalLink, Check } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface QuickGuideBannerProps {
   title: string;
@@ -38,31 +40,31 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
   return (
     <>
       {/* Slim inline helper bar */}
-      <div className="bg-surface-container-low/80 border border-outline-variant/50 rounded-lg px-3 py-1.5 transition-all flex items-center justify-between gap-3 text-xs">
+      <div className="bg-surface-dim/70 border border-outline-variant/60 rounded-lg px-3 py-1.5 transition-all flex items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="material-symbols-outlined text-outline text-[16px] shrink-0">lightbulb</span>
+          <HelpCircle className="w-3.5 h-3.5 text-outline shrink-0" />
           <span className="font-semibold text-on-surface truncate">{title}</span>
-          <span className="hidden md:inline-block text-[11px] text-outline truncate">&bull; {description}</span>
+          <span className="hidden md:inline-block text-[11px] text-outline truncate">• {description}</span>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="text-xs font-semibold text-primary hover:underline px-2 py-0.5 rounded transition-colors flex items-center gap-0.5 cursor-pointer"
+            className="text-[11px] font-medium text-primary hover:underline px-1.5 py-0.5 rounded transition-colors flex items-center gap-1 cursor-pointer"
           >
             <span>Ver guía</span>
-            <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+            <ExternalLink className="w-3 h-3" />
           </button>
           {dismissible && (
             <button
               type="button"
               onClick={handleDismiss}
-              className="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+              className="p-1 rounded text-outline hover:text-on-surface hover:bg-surface-dim transition-colors cursor-pointer"
               title="Ocultar guía"
               aria-label="Ocultar guía"
             >
-              <span className="material-symbols-outlined text-[15px]">close</span>
+              <X className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -71,54 +73,51 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
       {/* Modal Dialog for Guide Tips */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-100"
+          className="fixed inset-0 z-50 bg-on-surface/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-100"
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="bg-surface-container-lowest max-w-lg w-full rounded-xl p-5 shadow-xl border border-outline-variant/40 flex flex-col gap-4 animate-in zoom-in-95 duration-100"
+            className="bg-surface-bright max-w-md w-full rounded-xl p-5 shadow-lg border border-outline-variant/70 flex flex-col gap-3.5 animate-in zoom-in-95 duration-100"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <span className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-lg">lightbulb</span>
-                </span>
+                <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <HelpCircle className="w-4 h-4" />
+                </div>
                 <div>
-                  <h3 className="text-sm font-bold text-on-surface">{title}</h3>
-                  <p className="text-xs text-outline mt-0.5">{description}</p>
+                  <h3 className="text-xs font-semibold text-on-surface">{title}</h3>
+                  <p className="text-[11px] text-outline mt-0.5">{description}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-md text-outline hover:text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
+                className="p-1 rounded-md text-outline hover:text-on-surface hover:bg-surface-dim transition-colors cursor-pointer"
               >
-                <span className="material-symbols-outlined text-base">close</span>
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="space-y-2 pt-1">
+            <div className="space-y-1.5 pt-1">
               {tips.map((tip, idx) => (
                 <div
                   key={idx}
-                  className="flex items-start gap-2.5 text-xs text-on-surface bg-surface-container-low p-2.5 rounded-lg border border-outline-variant/30"
+                  className="flex items-start gap-2 text-xs text-on-surface bg-surface-dim/70 p-2.5 rounded-lg border border-outline-variant/40"
                 >
-                  <span className="w-4 h-4 rounded-full bg-primary/15 text-primary text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="w-4 h-4 rounded-full bg-primary-fixed text-primary text-[10px] font-semibold flex items-center justify-center shrink-0 mt-0.5">
                     {idx + 1}
                   </span>
-                  <span className="leading-relaxed">{tip}</span>
+                  <span className="leading-relaxed text-[11px] text-on-surface">{tip}</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-outline-variant/20">
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-semibold text-xs hover:bg-primary-container transition-colors cursor-pointer"
-              >
+            <div className="flex justify-end pt-2 border-t border-outline-variant/40">
+              <Button size="sm" onClick={() => setIsOpen(false)}>
+                <Check className="w-3.5 h-3.5 mr-1" />
                 Entendido
-              </button>
+              </Button>
             </div>
           </div>
         </div>
